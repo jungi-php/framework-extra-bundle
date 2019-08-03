@@ -1,0 +1,41 @@
+{
+    "name": "jungi/framework-extra-bundle",
+    "description": "Additional features on top of symfony framework bundle",
+    "keywords": ["annotations", "request", "response", "conversion"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "require": {
+        "php": "^7.2.9",
+        "symfony/framework-bundle": "^4.3",
+        "symfony/http-kernel": "^4.3",
+        "symfony/dependency-injection": "^4.3",
+        "doctrine/annotations": "^1.6"
+    },
+    "suggest": {
+        "symfony/serializer": "For SerializerMapperAdapter"
+    },
+    "require-dev": {
+        "symfony/serializer": "^4.3",
+        "phpunit/phpunit": "^8.3",
+        "symfony/property-info": "^4.3"
+    },
+    "authors": [
+        {
+            "name": "Piotr Kugla",
+            "email": "piku235@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Jungi\\FrameworkExtraBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jungi\\FrameworkExtraBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}

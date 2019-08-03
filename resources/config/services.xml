@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="jungi.message_conversion_mapper_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <argument type="collection" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager" class="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager">
+            <argument />
+        </service>
+
+        <service id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" class="Jungi\FrameworkExtraBundle\Http\ResponseFactory" public="true">
+            <argument />
+            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager" />
+        </service>
+
+        <service id="Jungi\FrameworkExtraBundle\EventListener\RequestBodyConverterListener" class="Jungi\FrameworkExtraBundle\EventListener\RequestBodyConverterListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="annotation_reader" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConverterListener" class="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConverterListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="annotation_reader" />
+            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener" class="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="Jungi\FrameworkExtraBundle\Controller\RequestBodyValueResolver" class="Jungi\FrameworkExtraBundle\Controller\RequestBodyValueResolver">
+            <tag name="controller.argument_value_resolver" />
+            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager" />
+        </service>
+    </services>
+</container>
