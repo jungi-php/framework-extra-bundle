@@ -3,6 +3,8 @@ JungiFrameworkExtraBundle
 
 Like SensioFrameworkExtraBundle this bundle adds extra features on top of existing ones in the Symfony FrameworkBundle.
 
+[![Build Status](https://img.shields.io/travis/piku235/JungiFrameworkExtraBundle/master.svg?style=flat-square)](https://travis-ci.org/piku235/JungiFrameworkExtraBundle)
+
 Includes:
 * Annotations: RequestBody, ResponseBody,
 * Entity responses - normal responses with converted entity
