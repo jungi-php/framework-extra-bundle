@@ -1,13 +1,13 @@
 JungiFrameworkExtraBundle
 =========================
 
-Like SensioFrameworkExtraBundle this bundle adds extra features on top of existing ones in the Symfony FrameworkBundle.
+Just like the SensioFrameworkExtraBundle this bundle adds extra features on top of existing in the Symfony FrameworkBundle.
 
 [![Build Status](https://img.shields.io/travis/piku235/JungiFrameworkExtraBundle/master.svg?style=flat-square)](https://travis-ci.org/piku235/JungiFrameworkExtraBundle)
 
 Includes:
 * Annotations: RequestBody, ResponseBody,
-* Entity responses - normal responses with converted entity
+* Entity responses - a normal response with the converted entity to text format
 
 ### Quick insight
 
@@ -24,19 +24,19 @@ use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 class UserController
 {
     /**
-     * @Route("{userId}/residential-address", methods={"GET"})
+     * @Route("/{userId}/residential-address", methods={"GET"})
      * @ResponseBody
      */
     public function getResidentialAddress(string $userId)
     {
-        return new UserResidentialAddressRepresentation('street', 'city', 'province', 'country_code');
+        return new UserResidentialAddressResource('street', 'city', 'province', 'country_code');
     }
 
     /**
-     * @Route("{userId}/residential-address", methods={"PUT"})
-     * @RequestBody("cmd")
+     * @Route("/{userId}/residential-address", methods={"PUT"})
+     * @RequestBody("resource")
      */
-    public function changeResidentialAddress(string $userId, ChangeUserResidentialAddressCommand $cmd)
+    public function changeResidentialAddress(string $userId, UserResidentialAddressResource $resource)
     {
         // ..
         return new Response('', 204);
