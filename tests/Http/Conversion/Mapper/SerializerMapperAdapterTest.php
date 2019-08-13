@@ -18,7 +18,7 @@ class SerializerMapperAdapterTest extends TestCase
     /** @test */
     public function mapFromData()
     {
-        $expected = new FooCommand('xml-world');
+        $expected = new Foo('xml-world');
         $message = <<< 'EOXML'
 <?xml version="1.0"?>
 <message>
@@ -27,7 +27,7 @@ class SerializerMapperAdapterTest extends TestCase
 EOXML;
 
         $mapper = $this->createXmlSerializerMapperAdapter($message);
-        $this->assertEquals($expected, $mapper->mapFromData($message, FooCommand::class));
+        $this->assertEquals($expected, $mapper->mapFromData($message, Foo::class));
     }
 
     /**
@@ -43,7 +43,7 @@ EOXML;
 EOXML;
 
         $mapper = $this->createXmlSerializerMapperAdapter();
-        $mapper->mapFromData($message, FooCommand::class);
+        $mapper->mapFromData($message, Foo::class);
     }
 
     /**
@@ -64,7 +64,7 @@ EOXML;
 EOXML;
 
         $mapper = $this->createXmlSerializerMapperAdapter(true);
-        $mapper->mapFromData($message, FooCommand::class);
+        $mapper->mapFromData($message, Foo::class);
     }
 
     /**
@@ -82,7 +82,7 @@ EOXML;
 EOXML;
 
         $mapper = new SerializerMapperAdapter('xml', new Serializer([new CustomNormalizer()], [new XmlEncoder()]));
-        $mapper->mapFromData($message, FooCommand::class);
+        $mapper->mapFromData($message, Foo::class);
     }
 
     /**
@@ -100,7 +100,7 @@ EOXML;
     public function mapDataTo()
     {
         $mapper = new SerializerMapperAdapter('json', new Serializer([new GetSetMethodNormalizer()], [new JsonEncoder()]));
-        $this->assertJsonStringEqualsJsonString('{"hello": "json-world"}', $mapper->mapDataTo(new FooCommand('json-world')));
+        $this->assertJsonStringEqualsJsonString('{"hello": "json-world"}', $mapper->mapDataTo(new Foo('json-world')));
     }
 
     /**
@@ -112,7 +112,7 @@ EOXML;
         $this->expectException(\InvalidArgumentException::class);
 
         $mapper = new SerializerMapperAdapter('json', new Serializer([new CustomNormalizer()], [new JsonEncoder()]));
-        $mapper->mapDataTo(new FooCommand('json-world'));
+        $mapper->mapDataTo(new Foo('json-world'));
     }
 
     /**
@@ -137,7 +137,7 @@ EOXML;
     }
 }
 
-class FooCommand
+class Foo
 {
     private $hello;
 

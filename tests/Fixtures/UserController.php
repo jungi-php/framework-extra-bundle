@@ -13,13 +13,13 @@ class UserController
 {
     public function getResidentialAddress()
     {
-        return new UserResidentialAddressRepresentation('street', 'city', 'province', 'country_code');
+        return new UserResidentialAddressResource('street', 'city', 'province', 'country_code');
     }
 
     /**
-     * @RequestBody("cmd")
+     * @RequestBody("resource")
      */
-    public function changeResidentialAddress(ChangeUserResidentialAddressCommand $cmd)
+    public function changeResidentialAddress(string $userId, UserResidentialAddressResource $resource)
     {
         return new Response('', 204);
     }

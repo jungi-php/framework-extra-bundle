@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
-class UserResidentialAddressRepresentation
+class UserResidentialAddressResource
 {
     private $street;
     private $city;
