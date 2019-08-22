@@ -2,6 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Http\Conversion\Mapper;
 
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Serializer;
@@ -28,7 +29,7 @@ final class SerializerMapperAdapter implements MapperInterface
     {
         try {
             return $this->serializer->deserialize($data, $type, $this->format);
-        } catch (UnexpectedValueException $e) {
+        } catch (UnexpectedValueException | MissingConstructorArgumentsException $e) {
             if ($e instanceof NotNormalizableValueException
                 && !$this->serializer->supportsDenormalization($data, $type, $this->format)
             ) {

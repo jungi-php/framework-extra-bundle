@@ -69,6 +69,24 @@ EOXML;
 
     /**
      * @test
+     * @group client_error
+     */
+    public function mapFromDataOnMissingConstructorArgument()
+    {
+        $this->expectException(MalformedDataException::class);
+        $message = <<< 'EOXML'
+<?xml version="1.0"?>
+<message>
+    <other>foo</other>
+</message>
+EOXML;
+
+        $mapper = $this->createXmlSerializerMapperAdapter(true);
+        $mapper->mapFromData($message, Foo::class);
+    }
+
+    /**
+     * @test
      * @group server_error
      */
     public function mapFromDataOnNonRegisteredNormalizer()
