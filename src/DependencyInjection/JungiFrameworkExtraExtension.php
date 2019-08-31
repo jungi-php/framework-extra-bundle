@@ -7,7 +7,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -22,7 +22,7 @@ final class JungiFrameworkExtraExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../resources/config'));
         $loader->load('services.xml');
 
-        if (class_exists(Serializer::class)) {
+        if (class_exists(SerializerInterface::class)) {
             $loader->load('serializer_mappers.xml');
         }
 

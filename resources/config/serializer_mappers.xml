@@ -12,7 +12,7 @@
             <tag name="jungi.message_conversion_mapper" media-type="application/x-json" />
 
             <argument>json</argument>
-            <argument type="service" id="serializer" />
+            <argument type="service" id="Symfony\Component\Serializer\SerializerInterface" />
         </service>
         <service id="jungi.message_conversion_mapper.serializer.xml" class="Jungi\FrameworkExtraBundle\Http\Conversion\Mapper\SerializerMapperAdapter">
             <tag name="jungi.message_conversion_mapper" media-type="application/x-xml" />
@@ -20,7 +20,7 @@
             <tag name="jungi.message_conversion_mapper" media-type="text/xml" />
 
             <argument>xml</argument>
-            <argument type="service" id="serializer" />
+            <argument type="service" id="Symfony\Component\Serializer\SerializerInterface" />
         </service>
     </services>
 </container>
