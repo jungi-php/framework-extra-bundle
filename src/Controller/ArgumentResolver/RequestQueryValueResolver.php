@@ -30,15 +30,21 @@ final class RequestQueryValueResolver implements ArgumentValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        if (!class_exists($argument->getType())) {
+        if (!$argument->getType()) {
             throw new \InvalidArgumentException(sprintf(
-                'Argument "%s" must be of object type for the request query conversion.',
+                'Argument "%s" must have the type specified for the request query conversion.',
                 $argument->getName()
             ));
         }
         if ($argument->isNullable()) {
             throw new \InvalidArgumentException(sprintf(
                 'Argument "%s" cannot be nullable for the request query conversion.',
+                $argument->getName()
+            ));
+        }
+        if (!class_exists($argument->getType())) {
+            throw new \InvalidArgumentException(sprintf(
+                'Argument "%s" must be of concrete class type for the request query conversion.',
                 $argument->getName()
             ));
         }

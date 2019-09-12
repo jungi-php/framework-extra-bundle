@@ -51,8 +51,29 @@ class RequestQueryValueResolverTest extends TestCase
     public function nullableArgument()
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument "foo" cannot be nullable');
 
         $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null, true))->current();
+        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null, true))->current();
+    }
+
+    /** @test */
+    public function argumentWithoutType()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument "foo" must have the type specified');
+
+        $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
+        $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null))->current();
+    }
+
+    /** @test */
+    public function nonObjectArgument()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument "foo" must be of concrete class type');
+
+        $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
+        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null))->current();
     }
 }
