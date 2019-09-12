@@ -1,6 +1,6 @@
 {
     "name": "jungi/framework-extra-bundle",
-    "description": "Request/response annotations, content negotiation and more",
+    "description": "Request/response annotations, content negotiation and more for symfony projects",
     "keywords": ["body", "param", "conversion", "mapper"],
     "type": "symfony-bundle",
     "license": "MIT",
@@ -12,7 +12,7 @@
         "doctrine/annotations": "^1.6"
     },
     "suggest": {
-        "symfony/serializer": "For SerializerMapperAdapter"
+        "symfony/serializer": "For serializer adapters"
     },
     "require-dev": {
         "symfony/serializer": "^4.3",
