@@ -35,6 +35,20 @@ class BuiltinTypeSafeConverterTest extends TestCase
         $converter->convert($value, $type);
     }
 
+    /** @test */
+    public function nonNumericValuePhpNotice()
+    {
+        $converter = new BuiltinTypeSafeConverter();
+
+        try {
+            $converter->convert('123foo', 'int');
+        } catch (TypeConversionException $e) {
+            // continue
+        }
+
+        $this->assertEquals(123, $converter->convert('123', 'int'));
+    }
+
     public function provideValid()
     {
         yield [123, '123', 'int'];

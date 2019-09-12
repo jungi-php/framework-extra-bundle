@@ -73,6 +73,8 @@ final class BuiltinTypeSafeConverter implements ConverterInterface
     {
         $error = error_get_last();
         if ($error && 'A non well formed numeric value encountered' === $error['message']) {
+            error_clear_last();
+
             throw new TypeConversionException($error['message']);
         }
     }
