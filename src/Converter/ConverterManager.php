@@ -2,6 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Converter;
 
+use Jungi\FrameworkExtraBundle\Util\TypeUtils;
 use Psr\Container\ContainerInterface;
 
 /**

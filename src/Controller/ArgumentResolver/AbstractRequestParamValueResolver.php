@@ -4,8 +4,8 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
-use Jungi\FrameworkExtraBundle\Converter\TypeUtils;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
+use Jungi\FrameworkExtraBundle\Util\TypeUtils;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;

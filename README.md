@@ -47,6 +47,16 @@ class UserController
     }
 
     /**
+     * @Route("/{userId}/files/{fileName}", methods={"PUT"})
+     * @RequestBody("file")
+     */
+    public function uploadFile(string $userId, string $fileName, UploadedFile $file)
+    {
+        // ..
+        return new Response('', 201);
+    }
+
+    /**
      * @Route("/{userId}/residential-address", methods={"PUT"})
      * @RequestBody("resource")
      */
@@ -57,14 +67,13 @@ class UserController
     }
 
     /**
-     * @Route("/{userId}/files", methods={"POST"})
-     * @RequestBodyParam("name")
-     * @RequestBodyParam("file")
+     * @Route("/{userId}/nickname", methods={"PUT"})
+     * @RequestBodyParam("nickname")
      */
-    public function uploadFile(string $userId, string $name, UploadedFile $file)
+    public function changeNickname(string $userId, string $nickname)
     {
         // ..
-        return new Response('', 201);
+        return new Response('', 204);
     }
 }
 ```

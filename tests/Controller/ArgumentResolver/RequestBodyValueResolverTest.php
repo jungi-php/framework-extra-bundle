@@ -12,6 +12,7 @@ use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\FakeArgumentAnnotation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -100,6 +101,52 @@ class RequestBodyValueResolverTest extends TestCase
         $resolver->resolve($request, $argument)->current();
     }
 
+    /**
+     * @test
+     * @dataProvider provideRegularFileClassTypes
+     */
+    public function regularFileRequest($type)
+    {
+        $request = new Request([], [], [], [], [], [], 'hello,world');
+        $request->headers->set('Content-Type', 'text/csv');
+
+        $argument = new ArgumentMetadata('foo', $type, false, false, null);
+
+        $resolver = new RequestBodyValueResolver(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class)
+        );
+
+        /** @var \SplFileInfo $file */
+        $file = $resolver->resolve($request, $argument)->current();
+
+        $this->assertInstanceOf($type, $file);
+        $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
+    }
+
+    /** @test */
+    public function uploadedFileRequest()
+    {
+        $request = new Request([], [], [], [], [], [], 'hello,world');
+        $request->headers->set('Content-Type', 'text/csv');
+        $request->headers->set('Content-Disposition', 'inline; filename = "foo123.csv"');
+
+        $argument = new ArgumentMetadata('foo', UploadedFile::class, false, false, null);
+
+        $resolver = new RequestBodyValueResolver(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class)
+        );
+
+        /** @var UploadedFile $file */
+        $file = $resolver->resolve($request, $argument)->current();
+
+        $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
+        $this->assertEquals('foo123.csv', $file->getClientOriginalName());
+        $this->assertEquals('csv', $file->getClientOriginalExtension());
+        $this->assertEquals('text/csv', $file->getClientMimeType());
+    }
+
     /** @test */
     public function nullableArgument()
     {
@@ -172,5 +219,12 @@ class RequestBodyValueResolverTest extends TestCase
             $this->createMock(ConverterInterface::class)
         );
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
+    }
+
+    public function provideRegularFileClassTypes()
+    {
+        yield [File::class];
+        yield ['SplFileInfo'];
+        yield ['SplFileObject'];
     }
 }

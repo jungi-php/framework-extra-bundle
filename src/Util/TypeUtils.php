@@ -1,6 +1,6 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\Converter;
+namespace Jungi\FrameworkExtraBundle\Util;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>

@@ -1,8 +1,8 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\Tests\Converter;
+namespace Jungi\FrameworkExtraBundle\Tests\Util;
 
-use Jungi\FrameworkExtraBundle\Converter\TypeUtils;
+use Jungi\FrameworkExtraBundle\Util\TypeUtils;
 use PHPUnit\Framework\TestCase;
 
 /**
