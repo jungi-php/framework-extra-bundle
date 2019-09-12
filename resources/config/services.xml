@@ -7,34 +7,57 @@
     <services>
         <defaults public="false" />
 
-        <service id="jungi.message_conversion_mapper_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+        <service id="jungi.message_body_mapper_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
             <argument type="collection" />
         </service>
-        <service id="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager" class="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager">
+        <service id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" class="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager">
             <argument />
         </service>
+
+        <service id="Jungi\FrameworkExtraBundle\Converter\BuiltinTypeSafeConverter" class="Jungi\FrameworkExtraBundle\Converter\BuiltinTypeSafeConverter">
+            <tag name="jungi.converter" type="string" />
+            <tag name="jungi.converter" type="int" />
+            <tag name="jungi.converter" type="float" />
+            <tag name="jungi.converter" type="bool" />
+            <tag name="jungi.converter" type="array" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\Converter\ConverterManager" class="Jungi\FrameworkExtraBundle\Converter\ConverterManager">
+            <argument />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" alias="Jungi\FrameworkExtraBundle\Converter\ConverterManager" />
+        <service id="jungi.converter.request_body_parameters" alias="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
+        <service id="jungi.converter.request_query_parameters" alias="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
 
         <service id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" class="Jungi\FrameworkExtraBundle\Http\ResponseFactory" public="true">
             <argument />
-            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager" />
+            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
         </service>
 
-        <service id="Jungi\FrameworkExtraBundle\EventListener\RequestBodyConverterListener" class="Jungi\FrameworkExtraBundle\EventListener\RequestBodyConverterListener">
+        <service id="Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener" class="Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="annotation_reader" />
         </service>
-        <service id="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConverterListener" class="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConverterListener">
+        <service id="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener" class="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener">
             <tag name="kernel.event_subscriber" />
-            <argument type="service" id="annotation_reader" />
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" />
         </service>
-        <service id="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener" class="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener">
-            <tag name="kernel.event_subscriber" />
-        </service>
 
-        <service id="Jungi\FrameworkExtraBundle\Controller\RequestBodyValueResolver" class="Jungi\FrameworkExtraBundle\Controller\RequestBodyValueResolver">
+        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver">
             <tag name="controller.argument_value_resolver" />
-            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager" />
+            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
+            <argument type="service" id="jungi.converter.request_body_parameters" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryValueResolver">
+            <tag name="controller.argument_value_resolver" />
+            <argument type="service" id="jungi.converter.request_query_parameters" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyParamValueResolver">
+            <tag name="controller.argument_value_resolver" />
+            <argument type="service" id="jungi.converter.request_body_parameters" />
+        </service>
+        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryParamValueResolver">
+            <tag name="controller.argument_value_resolver" />
+            <argument type="service" id="jungi.converter.request_query_parameters" />
         </service>
     </services>
 </container>

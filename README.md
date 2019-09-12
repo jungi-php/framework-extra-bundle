@@ -2,21 +2,32 @@ JungiFrameworkExtraBundle
 =========================
 
 Just like the SensioFrameworkExtraBundle this bundle adds extra features on top of existing in the Symfony FrameworkBundle.
+The main aim of this bundle is to facilitate the request/response operations.
 
 [![Build Status](https://img.shields.io/travis/piku235/JungiFrameworkExtraBundle/master.svg?style=flat-square)](https://travis-ci.org/piku235/JungiFrameworkExtraBundle)
 
-Includes:
-* Annotations: RequestBody, ResponseBody,
-* Entity responses - a normal response with the converted entity to text format
+Annotations:
+* **@RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
+* **@RequestQuery** - Converts the request query parameters to the controller method argument.
+* **@RequestBodyParam** - Converts a request body parameter to the controller method argument.
+* **@RequestQueryParam** - Converts a request query parameter to the controller method argument.
+* **@ResponseBody** - Maps the controller method result to an appropriate entity response.
+
+Also includes:
+* **Entity response** - a response with the mapped entity to the text representation. Uses the content negotiation 
+to decide to what media type map the entity.
 
 ### Quick insight
 
 ```php
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
+use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
+use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
 
 /**
  * @Route("/users")
@@ -24,12 +35,15 @@ use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 class UserController
 {
     /**
-     * @Route("/{userId}/residential-address", methods={"GET"})
+     * @Route("", methods={"GET"})
+     * @RequestQuery("filterData")
      * @ResponseBody
      */
-    public function getResidentialAddress(string $userId)
+    public function filterUsers(FilterUsersDTO $filterData)
     {
-        return new UserResidentialAddressResource('street', 'city', 'province', 'country_code');
+        // ..
+        /** @var UserResource[] $filteredUsers */
+        return $filteredUsers;
     }
 
     /**
@@ -40,6 +54,17 @@ class UserController
     {
         // ..
         return new Response('', 204);
+    }
+
+    /**
+     * @Route("/{userId}/files", methods={"POST"})
+     * @RequestBodyParam("name")
+     * @RequestBodyParam("file")
+     */
+    public function uploadFile(string $userId, string $name, UploadedFile $file)
+    {
+        // ..
+        return new Response('', 201);
     }
 }
 ```

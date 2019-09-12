@@ -5,6 +5,9 @@ namespace Jungi\FrameworkExtraBundle\Tests\Http;
 use Jungi\FrameworkExtraBundle\Http\NotAcceptableMediaTypeException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Piotr Kugla <piku235@gmail.com>
+ */
 class NotAcceptableMediaTypeExceptionTest extends TestCase
 {
     /** @test */

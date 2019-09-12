@@ -2,7 +2,6 @@
 
 namespace Jungi\FrameworkExtraBundle\Http;
 
-use Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,9 +15,9 @@ class ResponseFactory
     private const MEDIA_TYPE_ALL = '*/*';
 
     private $defaultContentType;
-    private $messageBodyConversionManager;
+    private $messageBodyMapperManager;
 
-    public function __construct(string $defaultContentType, MessageBodyConversionManager $messageBodyConversionManager)
+    public function __construct(string $defaultContentType, MessageBodyMapperManager $messageBodyMapperManager)
     {
         $defaultContentType = MediaTypeDescriptor::parse($defaultContentType);
         if (!$defaultContentType->isSpecific()) {
@@ -26,7 +25,7 @@ class ResponseFactory
         }
 
         $this->defaultContentType = $defaultContentType;
-        $this->messageBodyConversionManager = $messageBodyConversionManager;
+        $this->messageBodyMapperManager = $messageBodyMapperManager;
     }
 
     /**
@@ -42,7 +41,7 @@ class ResponseFactory
     public function createEntityResponse(Request $request, $entity, int $status = 200, array $headers = []): Response
     {
         $acceptableMediaTypes = $this->resolveAcceptableMediaTypes($request);
-        $supportedMediaTypes = MediaTypeDescriptor::parseList($this->messageBodyConversionManager->getSupportedMediaTypes());
+        $supportedMediaTypes = MediaTypeDescriptor::parseList($this->messageBodyMapperManager->getSupportedMediaTypes());
         $contentType = $this->selectResponseContentType($acceptableMediaTypes, $supportedMediaTypes);
 
         if (!$contentType) {
@@ -56,7 +55,7 @@ class ResponseFactory
         $headers['Content-Type'] = $contentType->toString();
 
         return new Response(
-            $this->messageBodyConversionManager->convertToOutputMessage($entity, $contentType->toString()),
+            $this->messageBodyMapperManager->mapTo($entity, $contentType->toString()),
             $status,
             $headers
         );

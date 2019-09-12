@@ -2,12 +2,15 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Http;
 
-use Jungi\FrameworkExtraBundle\Http\Conversion\MessageBodyConversionManager;
+use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\NotAcceptableMediaTypeException;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @author Piotr Kugla <piku235@gmail.com>
+ */
 class ResponseFactoryTest extends TestCase
 {
     /** @test */
@@ -15,7 +18,7 @@ class ResponseFactoryTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        new ResponseFactory('application/*', $this->createMock(MessageBodyConversionManager::class));
+        new ResponseFactory('application/*', $this->createMock(MessageBodyMapperManager::class));
     }
 
     /** @test */
@@ -23,9 +26,9 @@ class ResponseFactoryTest extends TestCase
     {
         $responseBody = 'foo';
 
-        $conversionManager = $this->createMock(MessageBodyConversionManager::class);
+        $conversionManager = $this->createMock(MessageBodyMapperManager::class);
         $conversionManager
-            ->method('convertToOutputMessage')
+            ->method('mapTo')
             ->willReturn($responseBody);
         $conversionManager
             ->method('getSupportedMediaTypes')
@@ -93,7 +96,7 @@ class ResponseFactoryTest extends TestCase
     {
         $this->expectException(NotAcceptableMediaTypeException::class);
 
-        $conversionManager = $this->createMock(MessageBodyConversionManager::class);
+        $conversionManager = $this->createMock(MessageBodyMapperManager::class);
         $conversionManager
             ->method('getSupportedMediaTypes')
             ->willReturn(['application/json', 'text/csv']);
@@ -134,10 +137,10 @@ class ResponseFactoryTest extends TestCase
         $entity = 'raw-entity';
         $responseBody = 'converted-entity';
 
-        $conversionManager = $this->createMock(MessageBodyConversionManager::class);
+        $conversionManager = $this->createMock(MessageBodyMapperManager::class);
         $conversionManager
             ->expects($this->once())
-            ->method('convertToOutputMessage')
+            ->method('mapTo')
             ->with($entity, $expectedContentType)
             ->willReturn($responseBody);
         $conversionManager

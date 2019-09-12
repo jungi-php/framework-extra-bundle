@@ -3,15 +3,18 @@
 namespace Jungi\FrameworkExtraBundle\Tests\EventListener;
 
 use Jungi\FrameworkExtraBundle\EventListener\ExceptionListener;
-use Jungi\FrameworkExtraBundle\Http\Conversion\Mapper\MalformedDataException;
+use Jungi\FrameworkExtraBundle\Http\UnsupportedMediaTypeException;
 use Jungi\FrameworkExtraBundle\Http\NotAcceptableMediaTypeException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ * @author Piotr Kugla <piku235@gmail.com>
+ */
 class ExceptionListenerTest extends TestCase
 {
     /**
@@ -36,8 +39,8 @@ class ExceptionListenerTest extends TestCase
     public function provideExceptions()
     {
         yield [
-            BadRequestHttpException::class,
-            new MalformedDataException('Data malformed'),
+            UnsupportedMediaTypeHttpException::class,
+            new UnsupportedMediaTypeException('application/xml', 'Unsupported media type.'),
         ];
         yield [
             NotAcceptableHttpException::class,

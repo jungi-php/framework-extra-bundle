@@ -8,6 +8,6 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"CLASS","METHOD"})
  */
-class ResponseBody
+class ResponseBody implements AnnotationInterface
 {
 }

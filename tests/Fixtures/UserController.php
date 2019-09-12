@@ -3,6 +3,8 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
+use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
+use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -11,9 +13,25 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class UserController
 {
-    public function getResidentialAddress()
+    public function getUserResidentialAddress(string $userId)
     {
         return new UserResidentialAddressResource('street', 'city', 'province', 'country_code');
+    }
+
+    /**
+     * @RequestQueryParam("limit")
+     */
+    public function getUsers(int $limit)
+    {
+        return [];
+    }
+
+    /**
+     * @RequestQuery("data")
+     */
+    public function filterUsers(FilterUserData $data)
+    {
+        return [];
     }
 
     /**

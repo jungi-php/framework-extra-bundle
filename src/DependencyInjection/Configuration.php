@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->booleanNode('serializer')->defaultTrue()->end()
                 ->arrayNode('entity_response')
                     ->addDefaultsIfNotSet()
                     ->children()

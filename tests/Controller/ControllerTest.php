@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @author Piotr Kugla <piku235@gmail.com>
+ */
 class ControllerTest extends TestCase
 {
     /** @test */

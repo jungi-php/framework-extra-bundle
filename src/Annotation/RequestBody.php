@@ -2,25 +2,32 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\Required;
+
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestBody
+class RequestBody implements ArgumentAnnotationInterface
 {
-    private $name;
+    /**
+     * @Required
+     *
+     * @var string
+     */
+    private $value;
 
     public function __construct(array $data)
     {
         if (isset($data['value'])) {
-            $this->name = $data['value'];
+            $this->value = $data['value'];
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return $this->value;
     }
 }

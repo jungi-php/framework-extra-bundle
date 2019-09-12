@@ -2,7 +2,8 @@
 
 namespace Jungi\FrameworkExtraBundle;
 
-use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterConversionMappersPass;
+use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterConvertersPass;
+use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterMessageBodyMappersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -13,6 +14,7 @@ class JungiFrameworkExtraBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new RegisterConversionMappersPass());
+        $container->addCompilerPass(new RegisterMessageBodyMappersPass());
+        $container->addCompilerPass(new RegisterConvertersPass());
     }
 }

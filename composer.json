@@ -1,7 +1,7 @@
 {
     "name": "jungi/framework-extra-bundle",
-    "description": "Additional features on top of symfony framework bundle",
-    "keywords": ["annotations", "request", "response", "conversion"],
+    "description": "Request/response annotations, content negotiation and more",
+    "keywords": ["body", "param", "conversion", "mapper"],
     "type": "symfony-bundle",
     "license": "MIT",
     "require": {

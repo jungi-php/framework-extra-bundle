@@ -5,6 +5,9 @@ namespace Jungi\FrameworkExtraBundle\Tests\Http;
 use Jungi\FrameworkExtraBundle\Http\MediaTypeDescriptor;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Piotr Kugla <piku235@gmail.com>
+ */
 class MediaTypeDescriptorTest extends TestCase
 {
     /** @test */
