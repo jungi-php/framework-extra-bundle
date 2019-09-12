@@ -104,12 +104,26 @@ class RequestBodyValueResolverTest extends TestCase
     public function nullableArgument()
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument "foo" cannot be nullable');
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
             $this->createMock(ConverterInterface::class)
         );
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null, true))->current();
+    }
+
+    /** @test */
+    public function argumentWithoutType()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument "foo" must have the type specified');
+
+        $resolver = new RequestBodyValueResolver(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class)
+        );
+        $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null))->current();
     }
 
     /** @test */

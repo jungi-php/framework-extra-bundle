@@ -36,6 +36,12 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
+        if (!$argument->getType()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Argument "%s" must have the type specified for the request body conversion.',
+                $argument->getName()
+            ));
+        }
         if ($argument->isNullable()) {
             throw new \InvalidArgumentException(sprintf(
                 'Argument "%s" cannot be nullable for the request body conversion.',
