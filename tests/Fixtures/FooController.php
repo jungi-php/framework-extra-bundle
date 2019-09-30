@@ -56,4 +56,9 @@ class FooController extends AbstractController
     {
         return $this->entity($entity, $status, $headers);
     }
+
+    public function withNormalizeEntity($entity, $context, $status, $headers)
+    {
+        return $this->normalizeEntity($entity, $context, $status, $headers);
+    }
 }
