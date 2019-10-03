@@ -47,7 +47,7 @@ class ControllerTest extends TestCase
     }
 
     /** @test */
-    public function normalizeEntity()
+    public function normalizedEntity()
     {
         $request = new Request();
         $normalizedEntity = array('hello' => 'world');
@@ -66,15 +66,15 @@ class ControllerTest extends TestCase
         $container = new Container();
         $container->set('request_stack', $requestStack);
         $container->set('jungi.response_factory', $responseFactory);
-        $container->set('serializer', $this->createSerializerWithGroupAttribute());
+        $container->set('serializer.normalizer', $this->createNormalizerWithGroupAttribute());
 
         $controller = new FooController();
         $controller->setContainer($container);
 
-        $controller->withNormalizeEntity(new FooData(), ['groups' => 'foo'], $status, $headers);
+        $controller->withNormalizedEntity(new FooData(), ['groups' => 'foo'], $status, $headers);
     }
 
-    private function createSerializerWithGroupAttribute(): Serializer
+    private function createNormalizerWithGroupAttribute(): PropertyNormalizer
     {
         $attribute = new AttributeMetadata('hello');
         $attribute->addGroup('foo');
@@ -86,7 +86,7 @@ class ControllerTest extends TestCase
             ->method('getMetadataFor')
             ->willReturn($classMetadata);
 
-        return new Serializer([new PropertyNormalizer($classMetadataFactory)]);
+        return new PropertyNormalizer($classMetadataFactory);
     }
 }
 
