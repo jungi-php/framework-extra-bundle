@@ -41,6 +41,9 @@
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" />
         </service>
+        <service id="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener" class="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener">
+            <tag name="kernel.event_subscriber" />
+        </service>
 
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver">
             <tag name="controller.argument_value_resolver" />
