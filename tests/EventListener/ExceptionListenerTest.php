@@ -23,6 +23,10 @@ class ExceptionListenerTest extends TestCase
      */
     public function exceptionIsReplaced(string $expectedExceptionClass, \Exception $thrown)
     {
+        if (!method_exists(ExceptionEvent::class, 'getThrowable')) {
+            $this->markTestSkipped();
+        }
+
         $listener = new ExceptionListener();
 
         $event = new ExceptionEvent(
@@ -32,6 +36,29 @@ class ExceptionListenerTest extends TestCase
             $thrown
         );
         $listener->onKernelException($event);
+
+        $this->assertInstanceOf($expectedExceptionClass, $event->getThrowable());
+    }
+
+    /**
+     * @test
+     * @dataProvider provideExceptions
+     */
+    public function exceptionIsReplacedBC(string $expectedExceptionClass, \Exception $thrown)
+    {
+        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
+            $this->markTestSkipped();
+        }
+
+        $listener = new ExceptionListener();
+
+        $event = new ExceptionEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            $thrown
+        );
+        $listener->onKernelExceptionBC($event);
 
         $this->assertInstanceOf($expectedExceptionClass, $event->getException());
     }
