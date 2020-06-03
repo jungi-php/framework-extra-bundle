@@ -13,6 +13,6 @@ class RequestBodyTest extends TestCase
     /** @test */
     public function create()
     {
-        $this->assertEquals('foo', (new RequestBody(['value' => 'foo']))->getName());
+        $this->assertEquals('foo', (new RequestBody(['value' => 'foo']))->getArgumentName());
     }
 }

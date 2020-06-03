@@ -13,7 +13,7 @@ final class FakeArgumentAnnotation implements ArgumentAnnotationInterface
         $this->name = $data['value'] ?? 'fake';
     }
 
-    public function getName(): string
+    public function getArgumentName(): string
     {
         return $this->name;
     }

@@ -8,7 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestBodyParam implements RequestFieldAnnotationInterface
+class RequestCookie implements RequestFieldAnnotationInterface
 {
     /**
      * @Required

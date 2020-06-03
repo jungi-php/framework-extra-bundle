@@ -8,7 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestBodyParam implements RequestFieldAnnotationInterface
+class RequestHeader implements RequestFieldAnnotationInterface
 {
     /**
      * @Required
@@ -28,7 +28,6 @@ class RequestBodyParam implements RequestFieldAnnotationInterface
     {
         if (isset($data['value'])) {
             $this->argumentName = $data['value'];
-            $this->fieldName = $data['value'];
         }
         if (isset($data['argument'])) {
             $this->argumentName = $data['argument'];

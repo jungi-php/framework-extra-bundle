@@ -11,6 +11,8 @@ Annotations:
 * **@RequestQuery** - Converts the request query parameters to the controller method argument.
 * **@RequestBodyParam** - Converts a request body parameter to the controller method argument.
 * **@RequestQueryParam** - Converts a request query parameter to the controller method argument.
+* **@RequestHeader** - Converts a request header to the controller method argument.
+* **@RequestCookie** - Converts a request cookie to the controller method argument.
 * **@ResponseBody** - Maps the controller method result to an appropriate entity response.
 
 Also includes:
@@ -27,6 +29,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
+use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
 
 /**
@@ -44,6 +47,17 @@ class UserController
         // ..
         /** @var UserResource[] $filteredUsers */
         return $filteredUsers;
+    }
+
+    /**
+     * @Route("", methods={"GET"})
+     *
+     * @RequestQueryParam("limit")
+     * @RequestQueryParam("offset")
+     */
+    public function getUsers(?int $limit = null, ?int $offset = null)
+    {
+        // ..
     }
 
     /**

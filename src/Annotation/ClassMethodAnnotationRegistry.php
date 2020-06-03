@@ -79,7 +79,7 @@ final class ClassMethodAnnotationRegistry
         return isset($this->argumentAnnotations[$name][$annotationClass]);
     }
 
-    public function getArgumentAnnotation(string $name, string $annotationClass): object
+    public function getArgumentAnnotation(string $name, string $annotationClass): ArgumentAnnotationInterface
     {
         if (!isset($this->argumentAnnotations[$name][$annotationClass])) {
             throw new \OutOfBoundsException(sprintf('Annotation "%s" does not exist for argument "%s".', $annotationClass, $name));
@@ -88,6 +88,7 @@ final class ClassMethodAnnotationRegistry
         return $this->argumentAnnotations[$name][$annotationClass];
     }
 
+    /** @return ArgumentAnnotationInterface[] */
     public function getArgumentAnnotations(string $name): array
     {
         if (!isset($this->argumentAnnotations[$name])) {
@@ -113,15 +114,18 @@ final class ClassMethodAnnotationRegistry
         }
     }
 
+    /**
+     * @param ArgumentAnnotationInterface[] $annotations
+     */
     private function setArgumentAnnotations(array $annotations): void
     {
         $this->argumentAnnotations = [];
         foreach ($annotations as $annotation) {
-            if (!isset($this->argumentAnnotations[$annotation->getName()])) {
-                $this->argumentAnnotations[$annotation->getName()] = [];
+            if (!isset($this->argumentAnnotations[$annotation->getArgumentName()])) {
+                $this->argumentAnnotations[$annotation->getArgumentName()] = [];
             }
 
-            $this->argumentAnnotations[$annotation->getName()][get_class($annotation)] = $annotation;
+            $this->argumentAnnotations[$annotation->getArgumentName()][get_class($annotation)] = $annotation;
         }
     }
 }

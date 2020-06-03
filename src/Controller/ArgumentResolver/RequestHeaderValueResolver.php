@@ -2,26 +2,26 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
+use Jungi\FrameworkExtraBundle\Annotation\RequestHeader;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-final class RequestBodyParamValueResolver extends AbstractRequestFieldValueResolver
+final class RequestHeaderValueResolver extends AbstractRequestFieldValueResolver
 {
     public function __construct(ConverterInterface $converter)
     {
-        parent::__construct(RequestBodyParam::class, $converter);
+        parent::__construct(RequestHeader::class, $converter);
     }
 
     public function getFieldValue(Request $request, string $name, ?string $type)
     {
-        if ($this !== $result = $request->files->get($name, $this)) {
-            return $result;
+        if ('array' === $type) {
+            return $request->headers->all($name);
         }
 
-        return $request->request->get($name);
+        return $request->headers->get($name);
     }
 }

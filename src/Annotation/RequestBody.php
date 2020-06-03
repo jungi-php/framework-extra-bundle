@@ -17,17 +17,17 @@ class RequestBody implements ArgumentAnnotationInterface
      *
      * @var string
      */
-    private $value;
+    private $argumentName;
 
     public function __construct(array $data)
     {
         if (isset($data['value'])) {
-            $this->value = $data['value'];
+            $this->argumentName = $data['value'];
         }
     }
 
-    public function getName(): string
+    public function getArgumentName(): string
     {
-        return $this->value;
+        return $this->argumentName;
     }
 }

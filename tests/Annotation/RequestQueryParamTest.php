@@ -13,11 +13,25 @@ class RequestQueryParamTest extends TestCase
     /** @test */
     public function create()
     {
+        $annotation = new RequestQueryParam(array('value' => 'foo'));
+
+        $this->assertEquals('foo', $annotation->getArgumentName());
+        $this->assertEquals('foo', $annotation->getFieldName());
+
         $annotation = new RequestQueryParam(array(
             'value' => 'foo',
-            'field' => 'bar'
+            'field' => 'bar',
         ));
-        $this->assertEquals('foo', $annotation->getName());
-        $this->assertEquals('bar', $annotation->getField());
+
+        $this->assertEquals('foo', $annotation->getArgumentName());
+        $this->assertEquals('bar', $annotation->getFieldName());
+
+        $annotation = new RequestQueryParam(array(
+            'value' => 'foo',
+            'argument' => 'bar',
+        ));
+
+        $this->assertEquals('bar', $annotation->getArgumentName());
+        $this->assertEquals('foo', $annotation->getFieldName());
     }
 }
