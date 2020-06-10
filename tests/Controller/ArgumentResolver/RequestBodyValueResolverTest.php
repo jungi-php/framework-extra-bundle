@@ -168,7 +168,6 @@ class RequestBodyValueResolverTest extends TestCase
 
         $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
         $this->assertEquals('text/csv', $file->getClientMimeType());
-        $this->assertEquals('csv', $file->guessClientExtension());
         $this->assertEmpty($file->getClientOriginalName());
         $this->assertEmpty($file->getClientOriginalExtension());
         $this->assertTrue($file->isValid());
