@@ -43,37 +43,51 @@ class RequestBodyValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null)));
     }
 
-    /** @test */
-    public function plainRequest()
+    /**
+     * @test
+     * @dataProvider provideConvertibleTypes
+     */
+    public function convertRequestBody(string $argumentType, ?string $annotatedAsType)
     {
         $request = new Request([], [], [], [], [], [], 'hello-world');
-        $request->headers->set('Content-Type', 'text/plain');
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
 
-        $argument = new ArgumentMetadata('foo', 'string', false, false, null);
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
+        ]));
+
+        $argument = new ArgumentMetadata('foo', $argumentType, false, false, null);
 
         $converter = $this->createMock(ConverterInterface::class);
         $converter
             ->expects($this->once())
             ->method('convert')
-            ->with($request->getContent(), $argument->getType());
+            ->with($request->getContent(), $annotatedAsType ?: $argumentType);
 
         $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
         $resolver->resolve($request, $argument)->current();
     }
 
-    /** @test */
-    public function jsonRequest()
+    /**
+     * @test
+     * @dataProvider provideMapableTypes
+     */
+    public function mapRequestBody(string $argumentType, ?string $annotatedAsType)
     {
-        $request = new Request([], [], [], [], [], [], '{"hello": "world"}');
-        $request->headers->set('Content-Type', 'application/json');
+        $request = new Request([], [], [], [], [], [], 'hello-world');
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
 
-        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null);
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
+        ]));
+
+        $argument = new ArgumentMetadata('foo', $argumentType, false, false, null);
 
         $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
         $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
-            ->with($request->getContent(), $request->headers->get('CONTENT_TYPE'), $argument->getType());
+            ->with($request->getContent(), $request->headers->get('CONTENT_TYPE'), $annotatedAsType ?: $argumentType);
 
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $this->createMock(ConverterInterface::class));
         $resolver->resolve($request, $argument)->current();
@@ -88,6 +102,10 @@ class RequestBodyValueResolverTest extends TestCase
             'file' => new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain'),
         ]);
         $request->headers->set('Content-Type', 'multipart/form-data');
+
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo'])
+        ]));
 
         $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null);
 
@@ -110,6 +128,10 @@ class RequestBodyValueResolverTest extends TestCase
         $request = new Request([], [], [], [], [], [], 'hello,world');
         $request->headers->set('Content-Type', 'text/csv');
 
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo'])
+        ]));
+
         $argument = new ArgumentMetadata('foo', $type, false, false, null);
 
         $resolver = new RequestBodyValueResolver(
@@ -130,6 +152,10 @@ class RequestBodyValueResolverTest extends TestCase
         $request = new Request([], [], [], [], [], [], 'hello,world');
         $request->headers->set('Content-Type', 'text/csv');
         $request->headers->set('Content-Disposition', 'inline; filename = "foo123.csv"');
+
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo'])
+        ]));
 
         $argument = new ArgumentMetadata('foo', UploadedFile::class, false, false, null);
 
@@ -187,6 +213,10 @@ class RequestBodyValueResolverTest extends TestCase
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
 
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo'])
+        ]));
+
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $this->createMock(ConverterInterface::class));
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
@@ -205,6 +235,10 @@ class RequestBodyValueResolverTest extends TestCase
         $request = new Request([], ['foo' => 'bar']);
         $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
 
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo'])
+        ]));
+
         $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
@@ -214,11 +248,37 @@ class RequestBodyValueResolverTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
+        $request = new Request();
+
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo'])
+        ]));
+
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
             $this->createMock(ConverterInterface::class)
         );
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
+        $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
+    }
+
+    /** @test */
+    public function inappropriateArgumentTypeAnnotation()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectDeprecationMessage('Expected argument "foo" to be type hinted as "array"');
+
+        $request = new Request([], [], [], [], [], [], '[{"hello": "world"}, {"hello": "me"}]');
+        $request->headers->set('Content-Type', 'application/json');
+
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
+            new RequestBody(['value' => 'foo', 'type' => 'stdClass[]'])
+        ]));
+
+        $resolver = new RequestBodyValueResolver(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class)
+        );
+        $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
 
     public function provideRegularFileClassTypes()
@@ -226,5 +286,26 @@ class RequestBodyValueResolverTest extends TestCase
         yield [File::class];
         yield ['SplFileInfo'];
         yield ['SplFileObject'];
+    }
+
+    public function provideConvertibleTypes()
+    {
+        yield ['string', null];
+        yield ['int', null];
+        yield ['float', null];
+        yield ['bool', null];
+        yield ['array', null];
+        yield ['array', 'string[]'];
+        yield ['array', 'int[]'];
+        yield ['array', 'float[]'];
+        yield ['array', 'bool[]'];
+        yield ['array', 'string[][]'];
+    }
+
+    public function provideMapableTypes()
+    {
+        yield ['stdClass', null];
+        yield ['array', 'stdClass[]'];
+        yield ['array', 'stdClass[][]'];
     }
 }

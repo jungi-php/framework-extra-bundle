@@ -44,6 +44,33 @@ class TypeUtilsTest extends TestCase
         TypeUtils::isValueOfType('123', 'invalid');
     }
 
+    /** @test */
+    public function isCollection()
+    {
+        $this->assertTrue(TypeUtils::isCollection('string[]'));
+        $this->assertTrue(TypeUtils::isCollection('string[][]'));
+
+        $this->assertFalse(TypeUtils::isCollection('string'));
+        $this->assertFalse(TypeUtils::isCollection('string['));
+        $this->assertFalse(TypeUtils::isCollection('string]'));
+        $this->assertFalse(TypeUtils::isCollection('string]['));
+    }
+
+    /** @test */
+    public function getCollectionBaseElementType()
+    {
+        $this->assertEquals('string', TypeUtils::getCollectionBaseElementType('string[]'));
+        $this->assertEquals('string', TypeUtils::getCollectionBaseElementType('string[][]'));
+    }
+
+    /** @test */
+    public function getCollectionBaseElementTypeOnNonCollection()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        TypeUtils::getCollectionBaseElementType('int');
+    }
+
     public function provideValuesOfBuiltInType()
     {
         yield ['foo', 'string'];

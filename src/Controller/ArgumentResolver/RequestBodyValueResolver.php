@@ -10,6 +10,7 @@ use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
+use Jungi\FrameworkExtraBundle\Util\TypeUtils;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,19 +60,39 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
             ));
         }
 
+        $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
+        /** @var RequestBody $annotation */
+        $annotation = $annotationRegistry->getArgumentAnnotation($argument->getName(), RequestBody::class);
+
+        if (null !== $annotation->getArgumentType()) {
+            if ('array' !== $argument->getType()) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Expected argument "%s" to be type hinted as "array", got "%s", the annotation indicates "%s".',
+                    $argument->getName(),
+                    $argument->getType(),
+                    $annotation->getArgumentType()
+                ));
+            }
+
+            $argumentType = $annotation->getArgumentType();
+            $verifyType = TypeUtils::getCollectionBaseElementType($annotation->getArgumentType());
+        } else {
+            $argumentType = $verifyType = $argument->getType();
+        }
+
         // when request parameters are available
         if ($parameters = RequestUtils::getRequestBodyParameters($request)) {
             try {
-                yield $this->converter->convert($parameters, $argument->getType()); return;
+                yield $this->converter->convert($parameters, $argumentType); return;
             } catch (TypeConversionException $e) {
                 throw new BadRequestHttpException('Request body parameters are invalid.', $e);
             }
         }
 
         // when argument type is not of class type
-        if (!class_exists($argument->getType())) {
+        if (!class_exists($verifyType)) {
             try {
-                yield $this->converter->convert($request->getContent(), $argument->getType()); return;
+                yield $this->converter->convert($request->getContent(), $argumentType); return;
             } catch (TypeConversionException $e) {
                 throw new BadRequestHttpException('Request body is malformed.', $e);
             }
@@ -83,7 +104,8 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
             throw new BadRequestHttpException('The request content type must be specified.');
         }
 
-        if (in_array($argument->getType(), self::$fileClassTypes, true)) {
+        // file as the request body
+        if (in_array($argumentType, self::$fileClassTypes, true)) {
             $filename = null;
 
             if ($contentDispositionRaw = $request->headers->get('CONTENT_DISPOSITION')) {
@@ -91,12 +113,12 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
                 $filename = $contentDisposition->isInline() ? $contentDisposition->getFilename() : null;
             }
 
-            yield $this->convertToFile($request->getContent(true), $contentType, $filename ?: '', $argument->getType()); 
+            yield $this->convertToFile($request->getContent(true), $contentType, $filename ?: '', $argumentType);
             return;
         }
 
         try {
-            yield $this->messageBodyMapperManager->mapFrom($request->getContent(), $contentType, $argument->getType());
+            yield $this->messageBodyMapperManager->mapFrom($request->getContent(), $contentType, $argumentType);
         } catch (MalformedDataException $e) {
             throw new BadRequestHttpException('Request body is malformed.', $e);
         }

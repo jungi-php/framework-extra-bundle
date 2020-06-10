@@ -29,4 +29,18 @@ final class TypeUtils
 
         return $fnName($value);
     }
+
+    public static function isCollection(string $type): bool
+    {
+        return '[]' === substr($type, -2);
+    }
+
+    public static function getCollectionBaseElementType(string $type): string
+    {
+        if (false === $elementType = strstr($type, '[]', true)) {
+            throw new \InvalidArgumentException(sprintf('Expected a collection type, got "%s".', $type));
+        }
+
+        return $elementType;
+    }
 }
