@@ -8,7 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestQueryParam implements RequestFieldAnnotationInterface
+class QueryParam implements RequestFieldAnnotationInterface
 {
     /**
      * @Required

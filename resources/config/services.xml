@@ -56,11 +56,11 @@
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_query_parameter" />
         </service>
-        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyParamValueResolver">
+        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_body_parameter" />
         </service>
-        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryParamValueResolver">
+        <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_query_parameter" />
         </service>

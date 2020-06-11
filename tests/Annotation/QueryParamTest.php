@@ -2,23 +2,23 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Annotation;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestBodyParamTest extends TestCase
+class QueryParamTest extends TestCase
 {
     /** @test */
     public function create()
     {
-        $annotation = new RequestBodyParam(array('value' => 'foo'));
+        $annotation = new QueryParam(array('value' => 'foo'));
 
         $this->assertEquals('foo', $annotation->getArgumentName());
         $this->assertEquals('foo', $annotation->getFieldName());
 
-        $annotation = new RequestBodyParam(array(
+        $annotation = new QueryParam(array(
             'value' => 'foo',
             'field' => 'bar',
         ));
@@ -26,7 +26,7 @@ class RequestBodyParamTest extends TestCase
         $this->assertEquals('foo', $annotation->getArgumentName());
         $this->assertEquals('bar', $annotation->getFieldName());
 
-        $annotation = new RequestBodyParam(array(
+        $annotation = new QueryParam(array(
             'value' => 'foo',
             'argument' => 'bar',
         ));

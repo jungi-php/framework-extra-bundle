@@ -4,7 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +19,7 @@ class UserController
     }
 
     /**
-     * @RequestQueryParam("limit")
+     * @QueryParam("limit")
      */
     public function getUsers(int $limit)
     {

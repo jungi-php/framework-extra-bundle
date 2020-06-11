@@ -3,8 +3,8 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
-use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryParamValueResolver;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
+use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -12,11 +12,11 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestQueryParamValueResolverTest extends AbstractRequestFieldValueResolverTest
+class QueryParamValueResolverTest extends AbstractRequestFieldValueResolverTest
 {
     protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
     {
-        return new RequestQueryParamValueResolver($converter);
+        return new QueryParamValueResolver($converter);
     }
 
     protected function createRequestWithParameters(array $parameters): Request
@@ -26,6 +26,6 @@ class RequestQueryParamValueResolverTest extends AbstractRequestFieldValueResolv
 
     protected function createAnnotation(string $name): RequestFieldAnnotationInterface
     {
-        return new RequestQueryParam(array('value' => $name));
+        return new QueryParam(array('value' => $name));
     }
 }

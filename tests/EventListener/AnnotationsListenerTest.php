@@ -5,9 +5,9 @@ namespace Jungi\FrameworkExtraBundle\Tests\EventListener;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
-use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
+use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
@@ -41,10 +41,10 @@ class AnnotationsListenerTest extends TestCase
         $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
 
         $this->assertTrue($annotationRegistry->hasClassAnnotation(ResponseBody::class));
-        $this->assertTrue($annotationRegistry->hasArgumentAnnotation('foo', RequestBodyParam::class));
+        $this->assertTrue($annotationRegistry->hasArgumentAnnotation('foo', RequestParam::class));
 
         $this->listener->onKernelController($this->createControllerEvent($request, [$controller, 'withRequestQueryParam']));
-        $this->assertTrue(RequestUtils::getControllerAnnotationRegistry($request)->hasArgumentAnnotation('foo', RequestQueryParam::class));
+        $this->assertTrue(RequestUtils::getControllerAnnotationRegistry($request)->hasArgumentAnnotation('foo', QueryParam::class));
 
         $this->listener->onKernelController($this->createControllerEvent($request, [$controller, 'withRequestBody']));
         $this->assertTrue(RequestUtils::getControllerAnnotationRegistry($request)->hasArgumentAnnotation('foo', RequestBody::class));

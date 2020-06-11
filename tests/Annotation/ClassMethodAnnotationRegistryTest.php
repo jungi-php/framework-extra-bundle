@@ -4,7 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\Annotation;
 
 use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\FakeArgumentAnnotation;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ class ClassMethodAnnotationRegistryTest extends TestCase
         $classAnnotation = new ResponseBody();
         $methodAnnotation = new ResponseBody();
         $dataArgAnnotation = new RequestBody(array('value' => 'data'));
-        $queryDataAnnotationQueryParam = new RequestQueryParam(array('value' => 'queryData'));
+        $queryDataAnnotationQueryParam = new QueryParam(array('value' => 'queryData'));
         $queryDataAnnotationFake = new FakeArgumentAnnotation(array('value' => 'queryData'));
 
         $registry = new ClassMethodAnnotationRegistry([$classAnnotation], [$methodAnnotation], [
@@ -40,10 +40,10 @@ class ClassMethodAnnotationRegistryTest extends TestCase
         $this->assertSame($methodAnnotation, $registry->getMethodAnnotation(ResponseBody::class));
         $this->assertSame($dataArgAnnotation, $registry->getArgumentAnnotation('data', RequestBody::class));
         $this->assertTrue($registry->hasClassAnnotation(ResponseBody::class));
-        $this->assertFalse($registry->hasClassAnnotation(RequestQueryParam::class));
+        $this->assertFalse($registry->hasClassAnnotation(QueryParam::class));
         $this->assertTrue($registry->hasMethodAnnotation(ResponseBody::class));
-        $this->assertFalse($registry->hasMethodAnnotation(RequestQueryParam::class));
-        $this->assertTrue($registry->hasArgumentAnnotation('queryData', RequestQueryParam::class));
+        $this->assertFalse($registry->hasMethodAnnotation(QueryParam::class));
+        $this->assertTrue($registry->hasArgumentAnnotation('queryData', QueryParam::class));
         $this->assertFalse($registry->hasArgumentAnnotation('queryData', RequestBody::class));
 
         try {

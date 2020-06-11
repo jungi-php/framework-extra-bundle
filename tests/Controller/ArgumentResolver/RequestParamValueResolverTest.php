@@ -3,9 +3,9 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
-use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
+use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
-use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyParamValueResolver;
+use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestBodyParamValueResolverTest extends AbstractRequestFieldValueResolverTest
+class RequestParamValueResolverTest extends AbstractRequestFieldValueResolverTest
 {
     public function uploadedFileArgument()
     {
@@ -39,7 +39,7 @@ class RequestBodyParamValueResolverTest extends AbstractRequestFieldValueResolve
 
     protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
     {
-        return new RequestBodyParamValueResolver($converter);
+        return new RequestParamValueResolver($converter);
     }
 
     protected function createRequestWithParameters(array $parameters): Request
@@ -49,6 +49,6 @@ class RequestBodyParamValueResolverTest extends AbstractRequestFieldValueResolve
 
     protected function createAnnotation(string $name): RequestFieldAnnotationInterface
     {
-        return new RequestBodyParam(array('value' => $name));
+        return new RequestParam(array('value' => $name));
     }
 }

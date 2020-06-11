@@ -9,8 +9,8 @@ The main aim of this bundle is to facilitate the request/response operations.
 Annotations:
 * **@RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
 * **@RequestQuery** - Converts the request query parameters to the controller method argument.
-* **@RequestBodyParam** - Converts a request body parameter to the controller method argument.
-* **@RequestQueryParam** - Converts a request query parameter to the controller method argument.
+* **@RequestParam** - Converts a request body parameter to the controller method argument.
+* **@QueryParam** - Converts a request query parameter to the controller method argument.
 * **@RequestHeader** - Converts a request header to the controller method argument.
 * **@RequestCookie** - Converts a request cookie to the controller method argument.
 * **@ResponseBody** - Maps the controller method result to an appropriate entity response.
@@ -29,8 +29,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
-use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
+use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 
 /**
  * @Route("/users")
@@ -52,8 +52,8 @@ class UserController
     /**
      * @Route("", methods={"GET"})
      *
-     * @RequestQueryParam("limit")
-     * @RequestQueryParam("offset")
+     * @QueryParam("limit")
+     * @QueryParam("offset")
      */
     public function getUsers(?int $limit = null, ?int $offset = null)
     {
@@ -82,7 +82,7 @@ class UserController
 
     /**
      * @Route("/{userId}/nickname", methods={"PUT"})
-     * @RequestBodyParam("nickname")
+     * @RequestParam("nickname")
      */
     public function changeNickname(string $userId, string $nickname)
     {

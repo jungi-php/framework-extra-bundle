@@ -3,9 +3,9 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
-use Jungi\FrameworkExtraBundle\Annotation\RequestBodyParam;
+use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQueryParam;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class FooController extends AbstractController
 {
     /**
-     * @RequestBodyParam("foo")
+     * @RequestParam("foo")
      */
     public function withRequestBodyParam(string $foo)
     {
@@ -24,7 +24,7 @@ class FooController extends AbstractController
     }
 
     /**
-     * @RequestQueryParam("foo")
+     * @QueryParam("foo")
      */
     public function withRequestQueryParam(string $foo)
     {
