@@ -9,10 +9,10 @@ The main aim of this bundle is to facilitate the request/response operations.
 Annotations:
 * **@RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
 * **@RequestQuery** - Converts the request query parameters to the controller method argument.
-* **@RequestParam** - Converts a request body parameter to the controller method argument.
-* **@QueryParam** - Converts a request query parameter to the controller method argument.
 * **@RequestHeader** - Converts a request header to the controller method argument.
 * **@RequestCookie** - Converts a request cookie to the controller method argument.
+* **@RequestParam** - Converts a request body parameter to the controller method argument.
+* **@QueryParam** - Converts a request query parameter to the controller method argument.
 * **@ResponseBody** - Maps the controller method result to an appropriate entity response.
 
 Also includes:
@@ -39,13 +39,14 @@ class UserController
 {
     /**
      * @Route("", methods={"GET"})
+     *
      * @RequestQuery("filterData")
      * @ResponseBody
      */
-    public function filterUsers(FilterUsersDTO $filterData)
+    public function filterUsers(FilterUsersDto $filterData)
     {
         // ..
-        /** @var UserResource[] $filteredUsers */
+        /** @var UserData[] $filteredUsers */
         return $filteredUsers;
     }
 
@@ -67,27 +68,26 @@ class UserController
     public function uploadFile(string $userId, string $fileName, UploadedFile $file)
     {
         // ..
-        return new Response('', 201);
     }
 
     /**
-     * @Route("/{userId}/residential-address", methods={"PUT"})
-     * @RequestBody("resource")
+     * @Route("/{userId}/avatar", methods={"PATCH"})
+     *
+     * @RequestParam("file")
+     * @RequestParam("title")
      */
-    public function changeResidentialAddress(string $userId, UserResidentialAddressResource $resource)
+    public function replaceAvatar(string $userId, UploadedFile $file, string $title)
     {
         // ..
-        return new Response('', 204);
     }
 
     /**
-     * @Route("/{userId}/nickname", methods={"PUT"})
-     * @RequestParam("nickname")
+     * @Route("/{userId}/residential-address", methods={"PATCH"})
+     * @RequestBody("data")
      */
-    public function changeNickname(string $userId, string $nickname)
+    public function changeResidentialAddress(string $userId, UserResidentialAddressData $data)
     {
         // ..
-        return new Response('', 204);
     }
 }
 ```
