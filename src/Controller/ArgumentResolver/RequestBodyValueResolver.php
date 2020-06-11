@@ -81,7 +81,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         }
 
         // when request parameters are available
-        if ($parameters = RequestUtils::getRequestBodyParameters($request)) {
+        if ($parameters = array_replace($request->files->all(), $request->request->all())) {
             try {
                 yield $this->converter->convert($parameters, $argumentType); return;
             } catch (TypeConversionException $e) {

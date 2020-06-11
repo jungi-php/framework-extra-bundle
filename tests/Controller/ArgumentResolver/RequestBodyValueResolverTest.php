@@ -113,7 +113,7 @@ class RequestBodyValueResolverTest extends TestCase
         $converter
             ->expects($this->once())
             ->method('convert')
-            ->with(RequestUtils::getRequestBodyParameters($request), $argument->getType());
+            ->with(array_replace($request->files->all(), $request->request->all()), $argument->getType());
 
         $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
         $resolver->resolve($request, $argument)->current();

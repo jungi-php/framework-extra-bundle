@@ -19,9 +19,4 @@ final class RequestUtils
     {
         $request->attributes->set('_jungi_controller_annotation_registry', $annotationRegistry);
     }
-
-    public static function getRequestBodyParameters(Request $request): array
-    {
-        return array_replace($request->files->all(), $request->request->all());
-    }
 }
