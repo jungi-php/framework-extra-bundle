@@ -6,6 +6,7 @@ use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Util\TmpFileUtils;
+use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
@@ -105,7 +106,15 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
         // file as the request body
         if (in_array($argumentType, self::$fileClassTypes, true)) {
-            yield $this->convertToFile($request->getContent(true), $contentType, $argumentType); return;
+            $filename = null;
+
+            if ($headerValue = $request->headers->get('CONTENT_DISPOSITION')) {
+                $contentDisposition = ContentDispositionDescriptor::parse($headerValue);
+                $filename = $contentDisposition->isInline() ? $contentDisposition->getFilename() : null;
+            }
+
+            yield $this->convertToFile($request->getContent(true), $contentType, $argumentType, $filename);
+            return;
         }
 
         try {
@@ -115,13 +124,13 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         }
     }
 
-    private function convertToFile($resource, string $mediaType, string $type): \SplFileInfo
+    private function convertToFile($resource, string $mediaType, string $type, ?string $filename): \SplFileInfo
     {
         $tmpFile = TmpFileUtils::fromResource($resource);
 
         switch ($type) {
             case UploadedFile::class:
-                return new UploadedFile($tmpFile, '', $mediaType, UPLOAD_ERR_OK, true);
+                return new UploadedFile($tmpFile, $filename ?: '', $mediaType, UPLOAD_ERR_OK, true);
             case File::class:
                 return new File($tmpFile, false);
             case 'SplFileObject':

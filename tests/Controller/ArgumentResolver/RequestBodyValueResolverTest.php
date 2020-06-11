@@ -151,6 +151,7 @@ class RequestBodyValueResolverTest extends TestCase
     {
         $request = new Request([], [], [], [], [], [], 'hello,world');
         $request->headers->set('Content-Type', 'text/csv');
+        $request->headers->set('Content-Disposition', 'inline; filename = "foo123.csv"');
 
         RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
             new RequestBody(['value' => 'foo'])
@@ -168,10 +169,18 @@ class RequestBodyValueResolverTest extends TestCase
 
         $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
         $this->assertEquals('text/csv', $file->getClientMimeType());
-        $this->assertEmpty($file->getClientOriginalName());
-        $this->assertEmpty($file->getClientOriginalExtension());
+        $this->assertEquals('foo123.csv', $file->getClientOriginalName());
+        $this->assertEquals('csv', $file->getClientOriginalExtension());
         $this->assertTrue($file->isValid());
         $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
+
+        $request->headers->set('Content-Disposition', 'attachment; filename = "foo123.csv"');
+
+        /** @var UploadedFile $file */
+        $file = $resolver->resolve($request, $argument)->current();
+
+        $this->assertEmpty($file->getClientOriginalName());
+        $this->assertEmpty($file->getClientOriginalExtension());
     }
 
     /** @test */
