@@ -6,7 +6,7 @@ use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
-use Jungi\FrameworkExtraBundle\Util\TypeUtils;
+use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

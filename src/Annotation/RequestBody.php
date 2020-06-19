@@ -3,7 +3,7 @@
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Required;
-use Jungi\FrameworkExtraBundle\Util\TypeUtils;
+use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\Util;
+namespace Jungi\FrameworkExtraBundle\Utils;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
