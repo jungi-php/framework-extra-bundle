@@ -96,11 +96,15 @@ class RequestBodyValueResolverTest extends TestCase
     /** @test */
     public function multipartFormDataRequest()
     {
-        $request = new Request([], [
-            'hello' => 'world'
-        ], [], [], [
-            'file' => new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain'),
-        ]);
+        $file = new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain');
+        $request = new Request([], array(
+            'hello' => 'world',
+            'attachments' => [array('name' => 'foo')],
+        ), [], [], array(
+            'attachments' => [array(
+                'file' => $file
+            )],
+        ));
         $request->headers->set('Content-Type', 'multipart/form-data');
 
         RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
@@ -108,12 +112,19 @@ class RequestBodyValueResolverTest extends TestCase
         ]));
 
         $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null);
+        $expectedData = array(
+            'hello' => 'world',
+            'attachments' => [array(
+                'name' => 'foo',
+                'file' => $file,
+            )],
+        );
 
         $converter = $this->createMock(ConverterInterface::class);
         $converter
             ->expects($this->once())
             ->method('convert')
-            ->with(array_replace($request->files->all(), $request->request->all()), $argument->getType());
+            ->with($expectedData, $argument->getType());
 
         $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
         $resolver->resolve($request, $argument)->current();
