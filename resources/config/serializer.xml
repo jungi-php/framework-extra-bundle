@@ -15,10 +15,14 @@
             <argument type="service" id="Symfony\Component\Serializer\SerializerInterface" />
         </service>
 
+        <service id="jungi.serializer" class="Jungi\FrameworkExtraBundle\Serializer\Serializer">
+            <argument type="collection" />
+            <argument type="collection" />
+        </service>
         <service id="Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter" class="Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter">
             <tag name="jungi.converter" type="object" />
 
-            <argument type="service" id="Symfony\Component\Serializer\Normalizer\DenormalizerInterface" />
+            <argument type="service" id="jungi.serializer" />
             <argument type="collection">
                 <argument key="disable_type_enforcement">true</argument>
             </argument>

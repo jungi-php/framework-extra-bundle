@@ -4,11 +4,12 @@ namespace Jungi\FrameworkExtraBundle\Tests\Converter;
 
 use Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
+use Jungi\FrameworkExtraBundle\Serializer\Serializer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -32,37 +33,61 @@ class SerializerObjectConverterAdapterTest extends TestCase
     }
 
     /** @test */
-    public function convertArrayToDTO()
+    public function convertArrayToDto()
     {
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(new GetSetMethodNormalizer(null, null, $propertyInfo));
+        $converter = new SerializerObjectConverterAdapter(new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]));
 
-        $expected = new FooDTO('hello-world', true, false, array('num' => 1));
+        $expected = new FooDto('hello-world', true, new Number(123), array('foo' => 'bar'));
         $actual = $converter->convert(array(
-            'foo' => 'hello-world',
-            'boolTrue' => true,
-            'boolFalse' => false,
-            'collection' => array('num' => 1),
-        ), FooDTO::class);
+            'stringVal' => 'hello-world',
+            'boolVal' => true,
+            'numberVal' => array('value' => 123),
+            'arrayVal' => array('foo' => 'bar'),
+        ), FooDto::class);
 
         $this->assertEquals($expected, $actual);
     }
 
     /** @test */
-    public function convertStringArrayToDTO()
+    public function convertStringArrayToDto()
     {
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(new GetSetMethodNormalizer(null, null, $propertyInfo), ['disable_type_enforcement' => true]);
+        $converter = new SerializerObjectConverterAdapter(
+            new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]),
+            ['disable_type_enforcement' => true]
+        );
 
-        $expected = new FooDTO('hello-world', true, false, array('num' => 1));
+        $expected = new FooDto('hello-world', true, new Number(123), array('foo' => 'bar'));
         $actual = $converter->convert(array(
-            'foo' => 'hello-world',
-            'boolTrue' => '1',
-            'boolFalse' => '0',
-            'collection' => array('num' => '1'),
-        ), FooDTO::class);
+            'stringVal' => 'hello-world',
+            'boolVal' => '1',
+            'numberVal' => array('value' => '123'),
+            'arrayVal' => array('foo' => 'bar'),
+        ), FooDto::class);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /** @test */
+    public function convertPartiallyDenormalizedArrayToDto()
+    {
+        $extractors = [new ReflectionExtractor()];
+        $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
+        $converter = new SerializerObjectConverterAdapter(
+            new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]),
+            ['disable_type_enforcement' => true]
+        );
+
+        $expected = new FooDto('hello-world', true, new Number(123), array('foo' => 'bar'));
+        $actual = $converter->convert(array(
+            'stringVal' => 'hello-world',
+            'boolVal' => '1',
+            'numberVal' => new Number(123), // @see RequestBodyValueResolver: multipart/form-data file support
+            'arrayVal' => array('foo' => 'bar'),
+        ), FooDto::class);
 
         $this->assertEquals($expected, $actual);
     }
@@ -74,23 +99,23 @@ class SerializerObjectConverterAdapterTest extends TestCase
      * Request parameters as well data decoded by XmlEncoder comes as a string, so the type casting is required
      * to properly convert it.
      */
-    public function convertArrayWithNonCastableTypeToDTO()
+    public function convertArrayWithNonCastableTypeToDto()
     {
         $this->expectException(TypeConversionException::class);
 
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(new GetSetMethodNormalizer(null, null, $propertyInfo), ['disable_type_enforcement' => true]);
+        $converter = new SerializerObjectConverterAdapter(new Serializer(
+            [new PropertyNormalizer(null, null, $propertyInfo)]),
+            ['disable_type_enforcement' => true]
+        );
 
-        $expected = new FooDTO('hello-world', true, false, array('num' => 1));
-        $actual = $converter->convert(array(
-            'foo' => 'hello-world',
-            'boolTrue' => '1',
-            'boolFalse' => array('invalid'), // array -> bool = TypeError
-            'collection' => array('num' => '1'),
-        ), FooDTO::class);
-
-        $this->assertEquals($expected, $actual);
+        $converter->convert(array(
+            'stringVal' => 'hello-world',
+            'boolVal' => '1',
+            'numberVal' => array('value' => 'invalid'), // string -> int (uncastable) = TypeError
+            'arrayVal' => array('num' => '1'),
+        ), FooDto::class);
     }
 
     /** @test */
@@ -104,44 +129,48 @@ class SerializerObjectConverterAdapterTest extends TestCase
     }
 }
 
-class FooDTO
+class Number
 {
-    private $foo;
-    private $boolTrue;
-    private $boolFalse;
-    private $collection;
+    private $value;
 
-    /**
-     * @param string $foo
-     * @param bool   $boolTrue
-     * @param bool   $boolFalse
-     * @param array  $collection
-     */
-    public function __construct(string $foo, bool $boolTrue, bool $boolFalse, array $collection)
+    public function __construct(int $value)
     {
-        $this->foo = $foo;
-        $this->boolTrue = $boolTrue;
-        $this->boolFalse = $boolFalse;
-        $this->collection = $collection;
+        $this->value = $value;
+    }
+}
+
+class FooDto
+{
+    private $stringVal;
+    private $boolVal;
+    private $numberVal;
+    private $arrayVal;
+
+    public function __construct(string $stringVal, bool $boolVal, Number $numberVal, array $arrayVal)
+    {
+        $this->stringVal = $stringVal;
+        $this->boolVal = $boolVal;
+        $this->numberVal = $numberVal;
+        $this->arrayVal = $arrayVal;
     }
 
-    public function getFoo(): string
+    public function getStringVal(): string
     {
-        return $this->foo;
+        return $this->stringVal;
     }
 
-    public function getBoolTrue(): bool
+    public function getBoolVal(): bool
     {
-        return $this->boolTrue;
+        return $this->boolVal;
     }
 
-    public function getBoolFalse(): bool
+    public function getNumberVal(): Number
     {
-        return $this->boolFalse;
+        return $this->numberVal;
     }
 
-    public function getCollection(): array
+    public function getArrayVal(): array
     {
-        return $this->collection;
+        return $this->arrayVal;
     }
 }
