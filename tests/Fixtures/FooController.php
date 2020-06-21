@@ -4,7 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\Controller\AbstractController;
@@ -40,7 +40,7 @@ class FooController extends AbstractController
     }
 
     /**
-     * @RequestQuery("foo")
+     * @QueryParams("foo")
      */
     public function withRequestQuery(\stdClass $foo)
     {

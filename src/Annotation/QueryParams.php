@@ -10,7 +10,7 @@ use Doctrine\Common\Annotations\Annotation\Required;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestQuery implements ArgumentAnnotationInterface
+class QueryParams implements ArgumentAnnotationInterface
 {
     /**
      * @Required

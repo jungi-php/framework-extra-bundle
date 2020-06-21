@@ -3,7 +3,7 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +27,7 @@ class UserController
     }
 
     /**
-     * @RequestQuery("data")
+     * @QueryParams("data")
      */
     public function filterUsers(FilterUserData $data)
     {

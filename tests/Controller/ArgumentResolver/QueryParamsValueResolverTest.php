@@ -3,8 +3,8 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
-use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestQueryValueResolver;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
+use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use PHPUnit\Framework\TestCase;
@@ -14,15 +14,15 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestQueryValueResolverTest extends TestCase
+class QueryParamsValueResolverTest extends TestCase
 {
     /** @test */
     public function supports()
     {
-        $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
+        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
 
         $request = new Request();
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [new RequestQuery(['value' => 'foo'])]));
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [new QueryParams(['value' => 'foo'])]));
 
         $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', null, false, false, null)));
@@ -34,7 +34,7 @@ class RequestQueryValueResolverTest extends TestCase
         $type = 'stdClass';
 
         $request = new Request(['foo' => 'bar']);
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [new RequestQuery(['value' => 'foo'])]));
+        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [new QueryParams(['value' => 'foo'])]));
 
         $converter = $this->createMock(ConverterInterface::class);
         $converter
@@ -42,7 +42,7 @@ class RequestQueryValueResolverTest extends TestCase
             ->method('convert')
             ->with($request->query->all(), $type);
 
-        $resolver = new RequestQueryValueResolver($converter);
+        $resolver = new QueryParamsValueResolver($converter);
 
         $resolver->resolve($request, new ArgumentMetadata('foo', $type, false, false, null))->current();
     }
@@ -53,7 +53,7 @@ class RequestQueryValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" cannot be nullable');
 
-        $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
+        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null, true))->current();
     }
 
@@ -63,7 +63,7 @@ class RequestQueryValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must have the type specified');
 
-        $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
+        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null))->current();
     }
 
@@ -73,7 +73,7 @@ class RequestQueryValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must be of concrete class type');
 
-        $resolver = new RequestQueryValueResolver($this->createMock(ConverterInterface::class));
+        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null))->current();
     }
 }

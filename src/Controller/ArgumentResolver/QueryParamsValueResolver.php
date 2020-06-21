@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-final class RequestQueryValueResolver implements ArgumentValueResolverInterface
+final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 {
     private $converter;
 
@@ -25,7 +25,7 @@ final class RequestQueryValueResolver implements ArgumentValueResolverInterface
     {
         $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
 
-        return $annotationRegistry && $annotationRegistry->hasArgumentAnnotation($argument->getName(), RequestQuery::class);
+        return $annotationRegistry && $annotationRegistry->hasArgumentAnnotation($argument->getName(), QueryParams::class);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)

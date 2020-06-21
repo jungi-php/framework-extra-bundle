@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
-use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener;
@@ -50,7 +50,7 @@ class AnnotationsListenerTest extends TestCase
         $this->assertTrue(RequestUtils::getControllerAnnotationRegistry($request)->hasArgumentAnnotation('foo', RequestBody::class));
 
         $this->listener->onKernelController($this->createControllerEvent($request, [$controller, 'withRequestQuery']));
-        $this->assertTrue(RequestUtils::getControllerAnnotationRegistry($request)->hasArgumentAnnotation('foo', RequestQuery::class));
+        $this->assertTrue(RequestUtils::getControllerAnnotationRegistry($request)->hasArgumentAnnotation('foo', QueryParams::class));
     }
 
     /** @test */

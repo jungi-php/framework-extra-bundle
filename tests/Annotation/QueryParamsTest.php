@@ -2,17 +2,17 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Annotation;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestQuery;
+use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestQueryTest extends TestCase
+class QueryParamsTest extends TestCase
 {
     /** @test */
     public function create()
     {
-        $this->assertEquals('foo', (new RequestQuery(['value' => 'foo']))->getArgumentName());
+        $this->assertEquals('foo', (new QueryParams(['value' => 'foo']))->getArgumentName());
     }
 }
