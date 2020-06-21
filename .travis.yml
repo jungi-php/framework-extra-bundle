@@ -8,6 +8,7 @@ env:
   - SYMFONY_REQUIRE="4.3.*"
   - SYMFONY_REQUIRE="4.4.*"
   - SYMFONY_REQUIRE="5.0.*"
+  - SYMFONY_REQUIRE="5.1.*"
 
 before_install: composer require --no-progress --no-scripts --no-plugins symfony/flex
 install: composer update
