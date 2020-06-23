@@ -70,6 +70,23 @@ class AnnotationsListenerTest extends TestCase
         $this->assertTrue($annotationRegistry->hasArgumentAnnotation('data', RequestBody::class));
     }
 
+    /** @test */
+    public function argumentAnnotationOnNonExistingArgument()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected to have the argument "foo"');
+
+        $controller = new class() {
+            /** @RequestBody("foo") */
+            public function __invoke(\stdClass $data)
+            {
+            }
+        };
+        $request = new Request();
+
+        $this->listener->onKernelController($this->createControllerEvent($request, $controller));
+    }
+
     private function createControllerEvent(Request $request, callable $controller): ControllerEvent
     {
         return new ControllerEvent(

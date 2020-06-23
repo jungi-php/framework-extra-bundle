@@ -48,8 +48,23 @@ final class AnnotationsListener implements EventSubscriberInterface
 
         $methodAnnotations = [];
         $argumentAnnotations = [];
+        $existingParameters = [];
+
+        foreach ($methodRefl->getParameters() as $parameter) {
+            $existingParameters[] = $parameter->getName();
+        }
+
         foreach ($this->reader->getMethodAnnotations($methodRefl) as $annotation) {
             if ($annotation instanceof ArgumentAnnotationInterface) {
+                if (!in_array($annotation->getArgumentName(), $existingParameters, true)) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Expected to have the argument "%s" in "%s::%s", but it\'s not present.',
+                        $annotation->getArgumentName(),
+                        $classRefl->getName(),
+                        $methodRefl->getName()
+                    ));
+                }
+
                 $argumentAnnotations[] = $annotation;
             } elseif ($annotation instanceof AnnotationInterface) {
                 $methodAnnotations[] = $annotation;
