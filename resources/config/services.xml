@@ -35,7 +35,7 @@
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
         </service>
 
-        <service id="Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener" class="Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener">
+        <service id="Jungi\FrameworkExtraBundle\EventListener\ControllerAnnotationsListener" class="Jungi\FrameworkExtraBundle\EventListener\ControllerAnnotationsListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="annotation_reader" />
         </service>

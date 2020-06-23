@@ -9,7 +9,7 @@ use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-use Jungi\FrameworkExtraBundle\EventListener\AnnotationsListener;
+use Jungi\FrameworkExtraBundle\EventListener\ControllerAnnotationsListener;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\FooController;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class AnnotationsListenerTest extends TestCase
+class ControllerAnnotationsListenerTest extends TestCase
 {
     private $listener;
 
@@ -28,7 +28,7 @@ class AnnotationsListenerTest extends TestCase
     {
         AnnotationRegistry::registerLoader('class_exists');
 
-        $this->listener = new AnnotationsListener(new AnnotationReader());
+        $this->listener = new ControllerAnnotationsListener(new AnnotationReader());
     }
 
     /** @test */

@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-final class AnnotationsListener implements EventSubscriberInterface
+final class ControllerAnnotationsListener implements EventSubscriberInterface
 {
     private $reader;
 
@@ -39,17 +39,13 @@ final class AnnotationsListener implements EventSubscriberInterface
         $classRefl = new \ReflectionClass($controller[0]);
         $methodRefl = $classRefl->getMethod($controller[1]);
 
-        $classAnnotations = [];
-        foreach ($this->reader->getClassAnnotations($classRefl) as $annotation) {
-            if ($annotation instanceof AnnotationInterface) {
-                $classAnnotations[] = $annotation;
-            }
-        }
-
+        $classAnnotations = array_filter($this->reader->getClassAnnotations($classRefl), function ($annotation) {
+            return $annotation instanceof AnnotationInterface;
+        });
         $methodAnnotations = [];
         $argumentAnnotations = [];
-        $existingParameters = [];
 
+        $existingParameters = [];
         foreach ($methodRefl->getParameters() as $parameter) {
             $existingParameters[] = $parameter->getName();
         }
@@ -58,7 +54,7 @@ final class AnnotationsListener implements EventSubscriberInterface
             if ($annotation instanceof ArgumentAnnotationInterface) {
                 if (!in_array($annotation->getArgumentName(), $existingParameters, true)) {
                     throw new \InvalidArgumentException(sprintf(
-                        'Expected to have the argument "%s" in "%s::%s", but it\'s not present.',
+                        'Expected to have the argument "%s" in "%s::%s()", but it\'s not present.',
                         $annotation->getArgumentName(),
                         $classRefl->getName(),
                         $methodRefl->getName()
