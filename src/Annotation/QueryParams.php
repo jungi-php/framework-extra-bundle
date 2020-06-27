@@ -10,7 +10,7 @@ use Doctrine\Common\Annotations\Annotation\Required;
  * @Annotation
  * @Target({"METHOD"})
  */
-class QueryParams implements ArgumentAnnotationInterface
+class QueryParams extends AbstractAnnotation implements ArgumentAnnotationInterface
 {
     /**
      * @Required
@@ -21,9 +21,7 @@ class QueryParams implements ArgumentAnnotationInterface
 
     public function __construct(array $data)
     {
-        if (isset($data['value'])) {
-            $this->argumentName = $data['value'];
-        }
+        $this->argumentName = $data['argumentName'] ?? $data['value'] ?? null;
     }
 
     public function getArgumentName(): string

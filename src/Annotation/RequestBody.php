@@ -11,7 +11,7 @@ use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestBody implements ArgumentAnnotationInterface
+class RequestBody extends AbstractAnnotation implements ArgumentAnnotationInterface
 {
     /**
      * @Required
@@ -27,11 +27,10 @@ class RequestBody implements ArgumentAnnotationInterface
 
     public function __construct(array $data)
     {
-        if (isset($data['value'])) {
-            $this->argumentName = $data['value'];
-        }
-        if (isset($data['type'])) {
-            $this->setArgumentType($data['type']);
+        $this->argumentName = $data['argumentName'] ?? $data['value'] ?? null;
+
+        if ($type = $data['argumentType'] ?? $data['type'] ?? null) {
+            $this->setArgumentType($type);
         }
     }
 

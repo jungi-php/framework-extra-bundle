@@ -35,13 +35,10 @@
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
         </service>
 
-        <service id="Jungi\FrameworkExtraBundle\EventListener\ControllerAnnotationsListener" class="Jungi\FrameworkExtraBundle\EventListener\ControllerAnnotationsListener">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="annotation_reader" />
-        </service>
         <service id="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener" class="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
         <service id="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener" class="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener">
             <tag name="kernel.event_subscriber" />
@@ -51,26 +48,32 @@
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
             <argument type="service" id="jungi.converter.request_body_parameter" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_query_parameter" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_body_parameter" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_query_parameter" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestHeaderValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestHeaderValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_header" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="jungi.converter.request_cookie" />
+            <argument type="service" id="jungi.controller_annotation_locator" />
         </service>
     </services>
 </container>

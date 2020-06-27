@@ -2,12 +2,12 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
-use Jungi\FrameworkExtraBundle\Http\RequestUtils;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -20,26 +20,28 @@ class RequestParamValueResolverTest extends AbstractRequestFieldValueResolverTes
 {
     public function uploadedFileArgument()
     {
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$file' => function() {
+                return $this->createAnnotationContainer([$this->createAnnotation('file')]);
+            }
+        ));
+
         $converter = $this->createMock(ConverterInterface::class);
         $converter
             ->expects($this->never())
             ->method('convert');
 
-        $resolver = $this->createArgumentValueResolver($converter);
-        $request = new Request([], [], [], [], [
+        $resolver = $this->createArgumentValueResolver($converter, $annotationLocator);
+        $request = new Request([], [], ['_controller' => 'FooController'], [], [
             'file' => new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain'),
         ]);
-
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            $this->createAnnotation('file'),
-        ]));
 
         $resolver->resolve($request, new ArgumentMetadata('file', UploadedFile::class, false, false, null))->current();
     }
 
-    protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
+    protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $annotationLocator): ArgumentValueResolverInterface
     {
-        return new RequestParamValueResolver($converter);
+        return new RequestParamValueResolver($converter, $annotationLocator);
     }
 
     protected function createRequestWithParameters(array $parameters): Request

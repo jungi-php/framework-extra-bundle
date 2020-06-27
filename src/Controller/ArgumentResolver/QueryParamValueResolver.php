@@ -4,6 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -11,9 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class QueryParamValueResolver extends AbstractRequestFieldValueResolver
 {
-    public function __construct(ConverterInterface $converter)
+    public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
-        parent::__construct(QueryParam::class, $converter);
+        parent::__construct(QueryParam::class, $converter, $annotationLocator);
     }
 
     protected function getFieldValue(Request $request, string $name, ?string $type)

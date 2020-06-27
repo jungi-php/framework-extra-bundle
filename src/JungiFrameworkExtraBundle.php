@@ -2,6 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle;
 
+use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterControllerAnnotationLocatorsPass;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterConvertersPass;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterMessageBodyMappersPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
@@ -18,6 +19,7 @@ class JungiFrameworkExtraBundle extends Bundle
     {
         $container->addCompilerPass(new RegisterMessageBodyMappersPass());
         $container->addCompilerPass(new RegisterConvertersPass());
+        $container->addCompilerPass(new RegisterControllerAnnotationLocatorsPass());
 
         $container->addResource(new ClassExistenceResource(SerializerPass::class));
         if (class_exists(SerializerPass::class)) {

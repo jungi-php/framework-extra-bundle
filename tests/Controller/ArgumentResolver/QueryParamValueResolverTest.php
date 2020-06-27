@@ -6,6 +6,7 @@ use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 
@@ -14,9 +15,9 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
  */
 class QueryParamValueResolverTest extends AbstractRequestFieldValueResolverTest
 {
-    protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
+    protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $container): ArgumentValueResolverInterface
     {
-        return new QueryParamValueResolver($converter);
+        return new QueryParamValueResolver($converter, $container);
     }
 
     protected function createRequestWithParameters(array $parameters): Request

@@ -11,6 +11,7 @@ use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,8 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 {
     private $messageBodyMapperManager;
     private $converter;
+    private $annotationLocator;
+
     private static $fileClassTypes = [
         UploadedFile::class,
         File::class,
@@ -32,17 +35,18 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         \SplFileObject::class,
     ];
 
-    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter)
+    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
         $this->messageBodyMapperManager = $messageBodyMapperManager;
         $this->converter = $converter;
+        $this->annotationLocator = $annotationLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
+        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
 
-        return $annotationRegistry && $annotationRegistry->hasArgumentAnnotation($argument->getName(), RequestBody::class);
+        return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has(RequestBody::class);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
@@ -60,9 +64,9 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
             ));
         }
 
-        $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
+        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
         /** @var RequestBody $annotation */
-        $annotation = $annotationRegistry->getArgumentAnnotation($argument->getName(), RequestBody::class);
+        $annotation = $this->annotationLocator->get($id)->get(RequestBody::class);
 
         if (null !== $annotation->getArgumentType()) {
             if ('array' !== $argument->getType()) {

@@ -2,7 +2,6 @@
 
 namespace Jungi\FrameworkExtraBundle\Http;
 
-use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -10,13 +9,21 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestUtils
 {
-    public static function getControllerAnnotationRegistry(Request $request): ?ClassMethodAnnotationRegistry
+    public static function getControllerAsCallableSyntax(Request $request): string
     {
-        return $request->attributes->get('_jungi_controller_annotation_registry');
-    }
+        $controller = $request->attributes->get('_controller');
+        if (null === $controller) {
+            throw new \InvalidArgumentException('Controller attribute is missing.');
+        }
 
-    public static function setControllerAnnotationRegistry(Request $request, ClassMethodAnnotationRegistry $annotationRegistry): void
-    {
-        $request->attributes->set('_jungi_controller_annotation_registry', $annotationRegistry);
+        if (is_array($controller)) {
+            return ltrim($controller[0], '\\').'::'.$controller[1];
+        }
+
+        if (!is_string($controller)) {
+            throw new \UnexpectedValueException(sprintf('Expected to get string, got: %s.', gettype($controller)));
+        }
+
+        return $controller;
     }
 }

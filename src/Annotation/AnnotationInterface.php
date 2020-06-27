@@ -2,11 +2,11 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
+use Jungi\FrameworkExtraBundle\DependencyInjection\ExportableObject;
+
 /**
- * Marker interface.
- *
  * @author Piotr Kugla <piku235@gmail.com>
  */
-interface AnnotationInterface
+interface AnnotationInterface extends ExportableObject
 {
 }

@@ -5,6 +5,7 @@ namespace Jungi\FrameworkExtraBundle\EventListener;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -15,22 +16,19 @@ use Symfony\Component\HttpKernel\KernelEvents;
 final class ResponseBodyConversionListener implements EventSubscriberInterface
 {
     private $responseFactory;
+    private $annotationLocator;
 
-    public function __construct(ResponseFactory $responseFactory)
+    public function __construct(ResponseFactory $responseFactory, ContainerInterface $annotationLocator)
     {
         $this->responseFactory = $responseFactory;
+        $this->annotationLocator = $annotationLocator;
     }
 
     public function onKernelView(ViewEvent $event)
     {
-        $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($event->getRequest());
-        if (!$annotationRegistry) {
-            return;
-        }
+        $id = RequestUtils::getControllerAsCallableSyntax($event->getRequest());
 
-        if (!$annotationRegistry->hasMethodAnnotation(ResponseBody::class)
-            && !$annotationRegistry->hasClassAnnotation(ResponseBody::class)
-        ) {
+        if (!$this->annotationLocator->has($id) || !$this->annotationLocator->get($id)->has(ResponseBody::class)) {
             return;
         }
 

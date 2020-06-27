@@ -6,6 +6,7 @@ use Jungi\FrameworkExtraBundle\Annotation\RequestCookie;
 use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 
@@ -19,9 +20,9 @@ class RequestCookieValueResolverTest extends AbstractRequestFieldValueResolverTe
         $this->markTestSkipped('always as string value');
     }
 
-    protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
+    protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $annotationLocator): ArgumentValueResolverInterface
     {
-        return new RequestCookieValueResolver($converter);
+        return new RequestCookieValueResolver($converter, $annotationLocator);
     }
 
     protected function createRequestWithParameters(array $parameters): Request

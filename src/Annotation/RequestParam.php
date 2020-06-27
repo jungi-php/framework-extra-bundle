@@ -8,7 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestParam implements RequestFieldAnnotationInterface
+class RequestParam extends AbstractAnnotation implements RequestFieldAnnotationInterface
 {
     /**
      * @Required
@@ -26,16 +26,8 @@ class RequestParam implements RequestFieldAnnotationInterface
 
     public function __construct(array $data)
     {
-        if (isset($data['value'])) {
-            $this->argumentName = $data['value'];
-            $this->fieldName = $data['value'];
-        }
-        if (isset($data['argument'])) {
-            $this->argumentName = $data['argument'];
-        }
-        if (isset($data['field'])) {
-            $this->fieldName = $data['field'];
-        }
+        $this->argumentName = $data['argumentName'] ?? $data['argument'] ?? $data['value'] ?? null;
+        $this->fieldName = $data['fieldName'] ?? $data['field'] ?? $data['value'] ?? null;
     }
 
     public function getFieldName(): string

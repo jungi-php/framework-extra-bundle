@@ -2,16 +2,16 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
+use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
-use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\FakeArgumentAnnotation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,20 +26,38 @@ class RequestBodyValueResolverTest extends TestCase
     /** @test */
     public function supports()
     {
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            $annotationLocator
         );
 
-        $request = new Request();
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [new RequestBody(['value' => 'foo'])]));
-
+        $request = new Request([], [], array('_controller' => 'FooController'));
         $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null)));
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', 'stdClass', false, false, null)));
-        $this->assertFalse($resolver->supports(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null)));
 
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [new FakeArgumentAnnotation()]));
+        $request = new Request([], [], array('_controller' => 'BarController'));
+        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null)));
 
+        $annotationLocator = new ServiceLocator(array(
+            'BarController$foo' => function() {
+                return new SimpleContainer(array(
+                    FakeArgumentAnnotation::class => new FakeArgumentAnnotation(['value' => 'foo'])
+                ));
+            }
+        ));
+        $resolver = new RequestBodyValueResolver(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class),
+            $annotationLocator
+        );
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null)));
     }
 
@@ -49,12 +67,16 @@ class RequestBodyValueResolverTest extends TestCase
      */
     public function convertRequestBody(string $argumentType, ?string $annotatedAsType)
     {
-        $request = new Request([], [], [], [], [], [], 'hello-world');
-        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() use ($annotatedAsType) {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
+                ));
+            }
+        ));
 
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
-        ]));
+        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello-world');
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
 
         $argument = new ArgumentMetadata('foo', $argumentType, false, false, null);
 
@@ -64,7 +86,9 @@ class RequestBodyValueResolverTest extends TestCase
             ->method('convert')
             ->with($request->getContent(), $annotatedAsType ?: $argumentType);
 
-        $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
+        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
+
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, $argument)->current();
     }
 
@@ -74,42 +98,53 @@ class RequestBodyValueResolverTest extends TestCase
      */
     public function mapRequestBody(string $argumentType, ?string $annotatedAsType)
     {
-        $request = new Request([], [], [], [], [], [], 'hello-world');
-        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() use ($annotatedAsType) {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
+                ));
+            }
+        ));
 
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
-        ]));
+        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello-world');
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
 
         $argument = new ArgumentMetadata('foo', $argumentType, false, false, null);
 
-        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $messageBodyMapperManager
+        $converter = $this->createMock(ConverterInterface::class);
+        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $mapperManager
             ->expects($this->once())
             ->method('mapFrom')
             ->with($request->getContent(), $request->headers->get('CONTENT_TYPE'), $annotatedAsType ?: $argumentType);
 
-        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $this->createMock(ConverterInterface::class));
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
     public function multipartFormDataRequest()
     {
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
+
         $file = new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain');
         $request = new Request([], array(
             'hello' => 'world',
             'attachments' => [array('name' => 'foo')],
-        ), [], [], array(
+        ), array(
+            '_controller' => 'FooController'
+        ), [], array(
             'attachments' => [array(
                 'file' => $file
             )],
         ));
         $request->headers->set('Content-Type', 'multipart/form-data');
-
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo'])
-        ]));
 
         $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null);
         $expectedData = array(
@@ -120,13 +155,15 @@ class RequestBodyValueResolverTest extends TestCase
             )],
         );
 
+        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
         $converter = $this->createMock(ConverterInterface::class);
         $converter
             ->expects($this->once())
             ->method('convert')
             ->with($expectedData, $argument->getType());
 
-        $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
+
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, $argument)->current();
     }
 
@@ -136,18 +173,23 @@ class RequestBodyValueResolverTest extends TestCase
      */
     public function regularFileRequest($type)
     {
-        $request = new Request([], [], [], [], [], [], 'hello,world');
-        $request->headers->set('Content-Type', 'text/csv');
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
 
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo'])
-        ]));
+        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello,world');
+        $request->headers->set('Content-Type', 'text/csv');
 
         $argument = new ArgumentMetadata('foo', $type, false, false, null);
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            $annotationLocator
         );
 
         /** @var \SplFileInfo $file */
@@ -160,19 +202,24 @@ class RequestBodyValueResolverTest extends TestCase
     /** @test */
     public function uploadedFileRequest()
     {
-        $request = new Request([], [], [], [], [], [], 'hello,world');
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
+
+        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello,world');
         $request->headers->set('Content-Type', 'text/csv');
         $request->headers->set('Content-Disposition', 'inline; filename = "foo123.csv"');
-
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo'])
-        ]));
 
         $argument = new ArgumentMetadata('foo', UploadedFile::class, false, false, null);
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            $annotationLocator
         );
 
         /** @var UploadedFile $file */
@@ -202,8 +249,10 @@ class RequestBodyValueResolverTest extends TestCase
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            new ServiceLocator([])
         );
+
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null, true))->current();
     }
 
@@ -215,7 +264,8 @@ class RequestBodyValueResolverTest extends TestCase
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            new ServiceLocator([])
         );
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null))->current();
     }
@@ -225,20 +275,25 @@ class RequestBodyValueResolverTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $messageBodyMapperManager
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
+
+        $converter = $this->createMock(ConverterInterface::class);
+        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $mapperManager
             ->expects($this->once())
             ->method('mapFrom')
             ->willThrowException(new MalformedDataException('Malformed data'));
 
-        $request = new Request();
+        $request = new Request([], [], array('_controller' => 'FooController'));
         $request->headers->set('Content-Type', 'application/json');
-
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo'])
-        ]));
-
-        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $this->createMock(ConverterInterface::class));
+        
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
 
@@ -247,20 +302,25 @@ class RequestBodyValueResolverTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
+
+        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
         $converter = $this->createMock(ConverterInterface::class);
         $converter
             ->expects($this->once())
             ->method('convert')
             ->willThrowException(new TypeConversionException('Cannot convert data'));
 
-        $request = new Request([], ['foo' => 'bar']);
+        $request = new Request([], ['foo' => 'bar'], ['_controller' => 'FooController']);
         $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
 
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo'])
-        ]));
-
-        $resolver = new RequestBodyValueResolver($this->createMock(MessageBodyMapperManager::class), $converter);
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
 
@@ -269,15 +329,19 @@ class RequestBodyValueResolverTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request = new Request();
-
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo'])
-        ]));
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo'])
+                ));
+            }
+        ));
+        $request = new Request([], [], ['_controller' => 'FooController']);
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            $annotationLocator
         );
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
@@ -288,16 +352,21 @@ class RequestBodyValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectDeprecationMessage('Expected argument "foo" to be type hinted as "array"');
 
-        $request = new Request([], [], [], [], [], [], '[{"hello": "world"}, {"hello": "me"}]');
-        $request->headers->set('Content-Type', 'application/json');
+        $annotationLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return new SimpleContainer(array(
+                    RequestBody::class => new RequestBody(['value' => 'foo', 'type' => 'stdClass[]'])
+                ));
+            }
+        ));
 
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], [
-            new RequestBody(['value' => 'foo', 'type' => 'stdClass[]'])
-        ]));
+        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], '[{"hello": "world"}, {"hello": "me"}]');
+        $request->headers->set('Content-Type', 'application/json');
 
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
+            $this->createMock(ConverterInterface::class),
+            $annotationLocator
         );
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }

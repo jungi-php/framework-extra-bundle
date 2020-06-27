@@ -7,6 +7,7 @@ use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -19,8 +20,9 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
 {
     private $annotationClass;
     private $converter;
+    private $annotationLocator;
 
-    public function __construct(string $annotationClass, ConverterInterface $converter)
+    public function __construct(string $annotationClass, ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
         if (!is_subclass_of($annotationClass, RequestFieldAnnotationInterface::class)) {
             throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', RequestFieldAnnotationInterface::class, $annotationClass));
@@ -28,15 +30,14 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
 
         $this->annotationClass = $annotationClass;
         $this->converter = $converter;
+        $this->annotationLocator = $annotationLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        if (null === $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request)) {
-            return false;
-        }
+        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
 
-        return $annotationRegistry->hasArgumentAnnotation($argument->getName(), $this->annotationClass);
+        return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has($this->annotationClass);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
@@ -45,10 +46,10 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
             throw new \InvalidArgumentException('Variadic arguments are not supported.');
         }
 
-        $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
+        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
 
         /** @var RequestFieldAnnotationInterface $annotation */
-        $annotation = $annotationRegistry->getArgumentAnnotation($argument->getName(), $this->annotationClass);
+        $annotation = $this->annotationLocator->get($id)->get($this->annotationClass);
 
         $fieldValue = $this->getFieldValue($request, $annotation->getFieldName(), $argument->getType());
 

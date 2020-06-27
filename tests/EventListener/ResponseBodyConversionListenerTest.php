@@ -2,12 +2,13 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\EventListener;
 
-use Jungi\FrameworkExtraBundle\Annotation\ClassMethodAnnotationRegistry;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
+use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener;
-use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -19,26 +20,30 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class ResponseBodyConversionListenerTest extends TestCase
 {
     /** @test */
-    public function responseBodyOnClass()
+    public function responseBodyMapped()
     {
-        $this->assertEntityResponse(new ClassMethodAnnotationRegistry([new ResponseBody()], [], []));
-    }
-
-    /** @test */
-    public function responseBodyOnMethod()
-    {
-        $this->assertEntityResponse(new ClassMethodAnnotationRegistry([], [new ResponseBody()], []));
+        $annotationLocator = new ServiceLocator(array(
+            'FooController' => function() {
+                return new SimpleContainer(array(
+                    ResponseBody::class => new ResponseBody()
+                ));
+            },
+            'FooController::bar' => function() {
+                return new SimpleContainer(array(
+                    ResponseBody::class => new ResponseBody()
+                ));
+            },
+        ));
+        $this->assertEntityResponse(new Request([], [], ['_controller' => 'FooController']), $annotationLocator);
+        $this->assertEntityResponse(new Request([], [], ['_controller' => 'FooController::bar']), $annotationLocator);
     }
 
     /** @test */
     public function unavailableResponseBody()
     {
         $httpKernel = $this->createMock(HttpKernelInterface::class);
-        $request = new Request();
-
-        RequestUtils::setControllerAnnotationRegistry($request, new ClassMethodAnnotationRegistry([], [], []));
-
-        $listener = new ResponseBodyConversionListener($this->createMock(ResponseFactory::class));
+        $listener = new ResponseBodyConversionListener($this->createMock(ResponseFactory::class), new ServiceLocator([]));
+        $request = new Request([], [], ['_controller' => 'FooController']);
 
         $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, null);
         $listener->onKernelView($event);
@@ -46,27 +51,10 @@ class ResponseBodyConversionListenerTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    /** @test */
-    public function unavailableControllerAnnotationRegistry()
-    {
-        $httpKernel = $this->createMock(HttpKernelInterface::class);
-        $request = new Request();
-
-        $listener = new ResponseBodyConversionListener($this->createMock(ResponseFactory::class));
-
-        $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, null);
-        $listener->onKernelView($event);
-
-        $this->assertFalse($event->hasResponse());
-    }
-
-    private function assertEntityResponse(ClassMethodAnnotationRegistry $annotationRegistry)
+    private function assertEntityResponse(Request $request, ContainerInterface $annotationLocator)
     {
         $httpKernel = $this->createMock(HttpKernelInterface::class);
         $response = new Response();
-        $request = new Request();
-
-        RequestUtils::setControllerAnnotationRegistry($request, $annotationRegistry);
 
         $responseFactory = $this->createMock(ResponseFactory::class);
         $responseFactory
@@ -75,7 +63,7 @@ class ResponseBodyConversionListenerTest extends TestCase
             ->with($request, 'foo')
             ->willReturn($response);
 
-        $listener = new ResponseBodyConversionListener($responseFactory);
+        $listener = new ResponseBodyConversionListener($responseFactory, $annotationLocator);
 
         $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, 'foo');
         $listener->onKernelView($event);

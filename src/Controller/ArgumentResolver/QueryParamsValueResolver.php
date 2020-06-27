@@ -5,6 +5,7 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -15,17 +16,19 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 {
     private $converter;
+    private $annotationLocator;
 
-    public function __construct(ConverterInterface $converter)
+    public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
         $this->converter = $converter;
+        $this->annotationLocator = $annotationLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        $annotationRegistry = RequestUtils::getControllerAnnotationRegistry($request);
+        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
 
-        return $annotationRegistry && $annotationRegistry->hasArgumentAnnotation($argument->getName(), QueryParams::class);
+        return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has(QueryParams::class);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
