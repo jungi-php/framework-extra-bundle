@@ -47,6 +47,8 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                 }
             }
 
+            $class = $container->getParameterBag()->resolveValue($class);
+
             $classRefl = $container->getReflectionClass($class);
             if (!$classRefl) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
@@ -55,7 +57,10 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
             $annotations = array_filter($this->annotationReader->getClassAnnotations($classRefl), function ($annotation) {
                 return $annotation instanceof AnnotationInterface;
             });
-            $refMap[$id] = $this->registerContainer($container, $id, $annotations);
+            if ($annotations) {
+                $this->assertAnnotationsAreUnique($annotations, sprintf('class "%s"', $class));
+                $refMap[$id] = $this->registerContainer($container, $id, $annotations);
+            }
 
             foreach ($classRefl->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodRefl) {
                 if ($methodRefl->isAbstract() || $methodRefl->isConstructor() || $methodRefl->isDestructor() || 'setContainer' === $methodRefl->name) {
@@ -91,10 +96,23 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                     }
                 }
 
-                $entryId = $id.'::'.$methodRefl->name;
-                $refMap[$entryId] = $this->registerContainer($container, $entryId, $annotations);
+                if ($methodAnnotations) {
+                    $this->assertAnnotationsAreUnique($methodAnnotations, sprintf('method "%s::%s()"', $class, $methodRefl->name));
+
+                    $entryId = $id . '::' . $methodRefl->name;
+                    $refMap[$entryId] = $this->registerContainer($container, $entryId, $methodAnnotations);
+                }
 
                 foreach ($argumentAnnotations as $argumentName => $annotations) {
+                    if (!$annotations) {
+                        continue;
+                    }
+
+                    $this->assertAnnotationsAreUnique(
+                        $annotations,
+                        sprintf('argument "%s::%s($%s)"', $class, $methodRefl->name, $argumentName)
+                    );
+
                     $entryId = $id.'::'.$methodRefl->name.'$'.$argumentName;
                     $refMap[$entryId] = $this->registerContainer($container, $entryId, $annotations);
                 }
@@ -103,6 +121,21 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
 
         $refId = ServiceLocatorTagPass::register($container, $refMap);
         $container->setAlias('jungi.controller_annotation_locator', (string) $refId);
+    }
+
+    private function assertAnnotationsAreUnique(array $annotations, string $where): void
+    {
+        $classes = [];
+        foreach ($annotations as $annotation) {
+            $class = get_class($annotation);
+            if (in_array($class, $classes, true)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Annotation "%s" occurred more than once at %s.',
+                    $class,
+                    $where
+                ));
+            }
+        }
     }
 
     private function registerContainer(ContainerBuilder $container, string $id, array $objects): Reference
