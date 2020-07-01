@@ -2,8 +2,8 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller;
 
+use Jungi\FrameworkExtraBundle\Controller\AbstractController;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
-use Jungi\FrameworkExtraBundle\Tests\Fixtures\FooController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
@@ -93,4 +93,17 @@ class FooData
 {
     public $hello = 'world';
     public $sensitive = 'ups';
+}
+
+class FooController extends AbstractController
+{
+    public function withEntity($entity, $status, $headers)
+    {
+        return $this->entity($entity, $status, $headers);
+    }
+
+    public function withNormalizedEntity($entity, $context, $status, $headers)
+    {
+        return $this->normalizedEntity($entity, $context, $status, $headers);
+    }
 }
