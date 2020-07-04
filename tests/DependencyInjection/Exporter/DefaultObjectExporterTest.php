@@ -1,13 +1,13 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\Tests\DependencyInjection;
+namespace Jungi\FrameworkExtraBundle\Tests\DependencyInjection\Exporter;
 
 use Jungi\FrameworkExtraBundle\Annotation\AnnotationInterface;
-use Jungi\FrameworkExtraBundle\DependencyInjection\DefaultObjectExporter;
-use Jungi\FrameworkExtraBundle\DependencyInjection\StatefulObject;
+use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
 
 class DefaultObjectExporterTest extends TestCase
 {
@@ -25,12 +25,12 @@ class DefaultObjectExporterTest extends TestCase
     /** @test */
     public function exportExportableObject(): void
     {
-        $object = new ExportableObject('exportable');
+        $object = new StatefulObject('exportable');
         $definition = (new DefaultObjectExporter())->export($object);
 
-        $this->assertEquals(ExportableObject::class, $definition->getClass());
-        $this->assertEquals([ExportableObject::class, 'fromState'], $definition->getFactory());
-        $this->assertSame(['name' => 'exportable'], $definition->getArgument(0));
+        $this->assertEquals(StatefulObject::class, $definition->getClass());
+        $this->assertEquals([StatefulObject::class, '__set_state'], $definition->getFactory());
+        $this->assertSame(['value' => 'exportable'], $definition->getArgument(0));
     }
 
     /** @test */
@@ -40,18 +40,18 @@ class DefaultObjectExporterTest extends TestCase
         $definition = (new DefaultObjectExporter())->export($object);
 
         $this->assertEquals(ExtendedObject::class, $definition->getClass());
-        $this->assertEquals([ExtendedObject::class, 'fromState'], $definition->getFactory());
+        $this->assertEquals([ExtendedObject::class, '__set_state'], $definition->getFactory());
         $this->assertSame(['name' => 'extended', 'base' => true], $definition->getArgument(0));
     }
 
     /** @test */
     public function exportCompoundObject(): void
     {
-        $object = new CompoundObject('foo', [new SerializableObject('serializable'), new ExportableObject('exportable')]);
+        $object = new CompoundObject('foo', [new SerializableObject('serializable'), new StatefulObject('exportable')]);
         $definition = (new DefaultObjectExporter())->export($object);
 
         $this->assertEquals(CompoundObject::class, $definition->getClass());
-        $this->assertSame([CompoundObject::class, 'fromState'], $definition->getFactory());
+        $this->assertSame([CompoundObject::class, '__set_state'], $definition->getFactory());
 
         $argument = $definition->getArgument(0);
         $this->assertArrayHasKey('name', $argument);
@@ -65,28 +65,38 @@ class DefaultObjectExporterTest extends TestCase
         $this->assertEquals(serialize(new SerializableObject('serializable')), $argument['children'][0]->getArgument(0));
 
         $this->assertInstanceOf(Definition::class, $argument['children'][1]);
-        $this->assertEquals(ExportableObject::class, $argument['children'][1]->getClass());
-        $this->assertEquals([ExportableObject::class, 'fromState'], $argument['children'][1]->getFactory());
-        $this->assertEquals(['name' => 'exportable'], $argument['children'][1]->getArgument(0));
+        $this->assertEquals(StatefulObject::class, $argument['children'][1]->getClass());
+        $this->assertEquals([StatefulObject::class, '__set_state'], $argument['children'][1]->getFactory());
+        $this->assertEquals(['value' => 'exportable'], $argument['children'][1]->getArgument(0));
     }
 
     /** @test */
     public function exportObjectWithResource(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to dump an object that contains resources.');
+        $this->expectExceptionMessage('Unable to export resources.');
 
-        $object = new ObjectWithResource(tmpfile());
+        $object = new StatefulObject(tmpfile());
+        (new DefaultObjectExporter())->export($object);
+    }
+
+    /** @test */
+    public function exportObjectWitCallback(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Could not serialize object of the type "%s"', SerializableObject::class));
+
+        $object = new SerializableObject(function() {});
         (new DefaultObjectExporter())->export($object);
     }
 }
 
-class CompoundObject implements AnnotationInterface, StatefulObject
+class CompoundObject implements AnnotationInterface, Exportable
 {
     private $name;
     private $children;
 
-    public static function fromState(array $data): self
+    public static function __set_state(array $data): self
     {
         return new self($data['name'], $data['children']);
     }
@@ -98,43 +108,28 @@ class CompoundObject implements AnnotationInterface, StatefulObject
     }
 }
 
-class ObjectWithResource implements StatefulObject
-{
-    private $file;
-
-    public static function fromState(array $data): self
-    {
-        return new self($data['file']);
-    }
-
-    public function __construct($file)
-    {
-        $this->file = $file;
-    }
-}
-
 class SerializableObject
 {
-    private $name;
+    private $value;
 
-    public function __construct(string $name)
+    public function __construct($value)
     {
-        $this->name = $name;
+        $this->value = $value;
     }
 }
 
-class ExportableObject implements StatefulObject
+class StatefulObject
 {
-    private $name;
+    private $value;
 
-    public static function fromState(array $data): self
+    public static function __set_state(array $data): self
     {
-        return new self($data['name']);
+        return new self($data['value']);
     }
 
-    public function __construct(string $name)
+    public function __construct($value)
     {
-        $this->name = $name;
+        $this->value = $value;
     }
 }
 
@@ -148,11 +143,11 @@ class BaseObject
     }
 }
 
-class ExtendedObject extends BaseObject implements StatefulObject
+class ExtendedObject extends BaseObject implements Exportable
 {
     private $name;
 
-    public static function fromState(array $data): self
+    public static function __set_state(array $data): self
     {
         return new self($data['name'], $data['base']);
     }

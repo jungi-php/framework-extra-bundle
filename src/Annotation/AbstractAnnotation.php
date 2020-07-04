@@ -2,14 +2,14 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
-use Jungi\FrameworkExtraBundle\DependencyInjection\StatefulObject;
+use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-abstract class AbstractAnnotation implements AnnotationInterface, StatefulObject
+abstract class AbstractAnnotation implements AnnotationInterface, Exportable
 {
-    public static function fromState(array $data)
+    public static function __set_state(array $data)
     {
         return new static($data);
     }

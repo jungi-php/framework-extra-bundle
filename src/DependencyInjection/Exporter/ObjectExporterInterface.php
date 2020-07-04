@@ -1,6 +1,6 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\DependencyInjection;
+namespace Jungi\FrameworkExtraBundle\DependencyInjection\Exporter;
 
 use Symfony\Component\DependencyInjection\Definition;
 

@@ -7,6 +7,6 @@ namespace Jungi\FrameworkExtraBundle\DependencyInjection;
  *
  * @author Piotr Kugla <piku235@gmail.com>
  */
-interface ExportableObject
+interface Exportable
 {
 }
