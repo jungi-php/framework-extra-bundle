@@ -4,6 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\DependencyInjection\Compiler;
 
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
+use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
 use Jungi\FrameworkExtraBundle\Controller\AbstractController;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterControllerAnnotationLocatorsPass;
@@ -33,12 +34,13 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
         $definition = $container->findDefinition('jungi.controller_annotation_locator');
         $locators = $definition->getArgument(0);
 
-        $this->assertCount(5, $locators);
+        $this->assertCount(6, $locators);
         $this->assertArrayHasKey('foo', $locators);
         $this->assertArrayHasKey('foo::withAnnotations', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$body', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$foo', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$bar', $locators);
+        $this->assertArrayHasKey('foo::abstractAction$foo', $locators);
 
         $locator = $container->getDefinition((string)$locators['foo']->getValues()[0]);
         $this->assertLocatorDefinition([ResponseBody::class], $locator);
@@ -54,6 +56,9 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string)$locators['foo::withAnnotations$bar']->getValues()[0]);
         $this->assertLocatorDefinition([QueryParam::class], $locator);
+
+        $locator = $container->getDefinition((string)$locators['foo::abstractAction$foo']->getValues()[0]);
+        $this->assertLocatorDefinition([RequestParam::class], $locator);
     }
 
     /** @test */
@@ -151,8 +156,8 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
 
 abstract class AbstractFooController extends AbstractController
 {
-    /** @ResponseBody */
-    abstract protected function abstractAction();
+    /** @QueryParam("foo") */
+    abstract public function abstractAction(string $foo);
 }
 
 /**
@@ -184,14 +189,14 @@ class FooController extends AbstractFooController
     {
     }
 
-    /** @ResponseBody */
-    protected function protectedAction()
+    /** @RequestParam("foo") */
+    public function abstractAction(string $foo)
     {
 
     }
 
     /** @ResponseBody */
-    protected function abstractAction()
+    protected function protectedAction()
     {
 
     }
