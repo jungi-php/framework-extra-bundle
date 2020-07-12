@@ -10,6 +10,7 @@ use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterControllerAn
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -29,9 +30,9 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
         $pass = new RegisterControllerAnnotationLocatorsPass('controller');
         $pass->process($container);
 
-        $this->assertTrue($container->hasAlias('jungi.controller_annotation_locator'));
-
         $definition = $container->findDefinition('jungi.controller_annotation_locator');
+        $this->assertNotNull($definition);
+
         $locators = $definition->getArgument(0);
 
         $this->assertCount(5, $locators);
@@ -41,19 +42,19 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('foo::withAnnotations$bar', $locators);
         $this->assertArrayHasKey('foo::abstractAction$foo', $locators);
 
-        $locator = $container->getDefinition((string)$locators['foo::withAnnotations']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo::withAnnotations']->getValues()[0]);
         $this->assertLocatorDefinition([ResponseBody::class], $locator);
 
-        $locator = $container->getDefinition((string)$locators['foo::withAnnotations$body']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo::withAnnotations$body']->getValues()[0]);
         $this->assertLocatorDefinition([RequestBody::class], $locator);
 
-        $locator = $container->getDefinition((string)$locators['foo::withAnnotations$foo']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo::withAnnotations$foo']->getValues()[0]);
         $this->assertLocatorDefinition([QueryParam::class], $locator);
 
-        $locator = $container->getDefinition((string)$locators['foo::withAnnotations$bar']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo::withAnnotations$bar']->getValues()[0]);
         $this->assertLocatorDefinition([QueryParam::class], $locator);
 
-        $locator = $container->getDefinition((string)$locators['foo::abstractAction$foo']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo::abstractAction$foo']->getValues()[0]);
         $this->assertLocatorDefinition([RequestParam::class], $locator);
     }
 
@@ -67,20 +68,57 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
         $pass = new RegisterControllerAnnotationLocatorsPass('controller');
         $pass->process($container);
 
-        $this->assertTrue($container->hasAlias('jungi.controller_annotation_locator'));
-
         $definition = $container->findDefinition('jungi.controller_annotation_locator');
+        $this->assertNotNull($definition);
+
         $locators = $definition->getArgument(0);
 
         $this->assertCount(2, $locators);
         $this->assertArrayHasKey('foo', $locators);
         $this->assertArrayHasKey('foo$body', $locators);
 
-        $locator = $container->getDefinition((string)$locators['foo']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo']->getValues()[0]);
         $this->assertLocatorDefinition([ResponseBody::class], $locator);
 
-        $locator = $container->getDefinition((string)$locators['foo$body']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locators['foo$body']->getValues()[0]);
         $this->assertLocatorDefinition([RequestBody::class], $locator);
+    }
+
+    /** @test */
+    public function locatorsAreRegisteredWithAliases()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', FooController::class)
+            ->addTag('controller');
+
+        $container->setAlias('foo_alias', new Alias('foo', true));
+        $container->setAlias('bar_alias', new Alias('foo', true));
+        $container->setAlias('zoo_alias', 'foo');
+
+        $pass = new RegisterControllerAnnotationLocatorsPass('controller');
+        $pass->process($container);
+
+        $definition = $container->findDefinition('jungi.controller_annotation_locator');
+        $this->assertNotNull($definition);
+
+        $locators = $definition->getArgument(0);
+
+        $this->assertCount(15, $locators);
+        $this->assertArrayHasKey('foo::withAnnotations', $locators);
+        $this->assertArrayHasKey('foo::withAnnotations$body', $locators);
+        $this->assertArrayHasKey('foo::withAnnotations$foo', $locators);
+        $this->assertArrayHasKey('foo::withAnnotations$bar', $locators);
+        $this->assertArrayHasKey('foo::abstractAction$foo', $locators);
+        $this->assertArrayHasKey('foo_alias::withAnnotations', $locators);
+        $this->assertArrayHasKey('foo_alias::withAnnotations$body', $locators);
+        $this->assertArrayHasKey('foo_alias::withAnnotations$foo', $locators);
+        $this->assertArrayHasKey('foo_alias::withAnnotations$bar', $locators);
+        $this->assertArrayHasKey('foo_alias::abstractAction$foo', $locators);
+        $this->assertArrayHasKey('bar_alias::withAnnotations', $locators);
+        $this->assertArrayHasKey('bar_alias::withAnnotations$body', $locators);
+        $this->assertArrayHasKey('bar_alias::withAnnotations$foo', $locators);
+        $this->assertArrayHasKey('bar_alias::withAnnotations$bar', $locators);
+        $this->assertArrayHasKey('bar_alias::abstractAction$foo', $locators);
     }
 
     /** @test */

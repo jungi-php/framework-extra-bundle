@@ -36,6 +36,13 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
     public function process(ContainerBuilder $container)
     {
         $refMap = array();
+        $aliases = array();
+
+        foreach ($container->getAliases() as $alias => $id) {
+            if ($id->isPublic() && !$id->isPrivate()) {
+                $aliases[(string) $id][] = $alias;
+            }
+        }
 
         foreach ($container->findTaggedServiceIds($this->controllerTag) as $id => $tags) {
             $definition = $container->getDefinition($id);
@@ -109,15 +116,25 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                     }
                 }
 
-                $localId = '__invoke' === $methodRefl->name ? $id : $id.'::'.$methodRefl->name;
+                $suffixId = '__invoke' === $methodRefl->name ? '' : '::'. $methodRefl->name;
 
                 if ($methodAnnotations) {
-                    $refMap[$localId] = $this->registerAnnotationLocator($container, $localId, array_values($methodAnnotations));
+                    $refMap[$id . $suffixId] = $this->registerAnnotationLocator($container, $id . $suffixId, array_values($methodAnnotations));
                 }
 
                 foreach ($argumentAnnotations as $argumentName => $annotations) {
-                    $entryId = $localId.'$'.$argumentName;
+                    $entryId = $id . $suffixId . '$' . $argumentName;
                     $refMap[$entryId] = $this->registerAnnotationLocator($container, $entryId, array_values($annotations));
+                }
+
+                foreach ($aliases[$id] ?? [] as $alias) {
+                    if ($methodAnnotations) {
+                        $refMap[$alias . $suffixId] = clone $refMap[$id . $suffixId];
+                    }
+
+                    foreach ($argumentAnnotations as $argumentName => $annotations) {
+                        $refMap[$alias . $suffixId . '$' . $argumentName] = clone $refMap[$id . $suffixId . '$' . $argumentName];
+                    }
                 }
             }
         }
