@@ -84,10 +84,6 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                             ));
                         }
 
-                        if (!isset($argumentAnnotations[$annotation->getArgumentName()])) {
-                            $argumentAnnotations[$annotation->getArgumentName()] = [];
-                        }
-
                         if (isset($argumentAnnotations[$annotation->getArgumentName()][$annotationClass])) {
                             throw new InvalidArgumentException(sprintf(
                                 'Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".',
