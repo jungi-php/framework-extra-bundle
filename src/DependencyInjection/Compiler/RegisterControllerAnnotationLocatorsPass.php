@@ -79,7 +79,7 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                             throw new InvalidArgumentException(sprintf(
                                 'Expected to have the argument "%s" in "%s::%s()", but it\'s not present.',
                                 $annotation->getArgumentName(),
-                                $class,
+                                $methodRefl->class,
                                 $methodRefl->name
                             ));
                         }
@@ -90,11 +90,11 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
 
                         if (isset($argumentAnnotations[$annotation->getArgumentName()][$annotationClass])) {
                             throw new InvalidArgumentException(sprintf(
-                                'Annotation "%s" occurred more than once at argument "%s::%s($%s)".',
+                                'Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".',
                                 $annotationClass,
-                                $class,
-                                $methodRefl->name,
-                                $annotation->getArgumentName()
+                                $annotation->getArgumentName(),
+                                $methodRefl->class,
+                                $methodRefl->name
                             ));
                         }
 
@@ -102,9 +102,9 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                     } elseif ($annotation instanceof AnnotationInterface) {
                         if (isset($methodAnnotations[$annotationClass])) {
                             throw new InvalidArgumentException(sprintf(
-                                'Annotation "%s" occurred more than once at method "%s::%s()".',
+                                'Annotation "%s" occurred more than once at "%s::%s()".',
                                 $annotationClass,
-                                $class,
+                                $methodRefl->class,
                                 $methodRefl->name
                             ));
                         }
@@ -113,14 +113,15 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                     }
                 }
 
+                $localId = '__invoke' === $methodRefl->name ? $id : $id.'::'.$methodRefl->name;
+
                 if ($methodAnnotations) {
-                    $entryId = $id.'::'.$methodRefl->name;
-                    $refMap[$entryId] = $this->registerContainer($container, $entryId, array_values($methodAnnotations));
+                    $refMap[$localId] = $this->registerAnnotationLocator($container, $localId, array_values($methodAnnotations));
                 }
 
                 foreach ($argumentAnnotations as $argumentName => $annotations) {
-                    $entryId = $id.'::'.$methodRefl->name.'$'.$argumentName;
-                    $refMap[$entryId] = $this->registerContainer($container, $entryId, array_values($annotations));
+                    $entryId = $localId.'$'.$argumentName;
+                    $refMap[$entryId] = $this->registerAnnotationLocator($container, $entryId, array_values($annotations));
                 }
             }
         }
@@ -129,7 +130,7 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
         $container->setAlias('jungi.controller_annotation_locator', (string) $refId);
     }
 
-    private function registerContainer(ContainerBuilder $container, string $id, array $objects): Reference
+    private function registerAnnotationLocator(ContainerBuilder $container, string $id, array $objects): Reference
     {
         $exportedObjects = [];
         foreach ($objects as $object) {

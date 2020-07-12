@@ -48,30 +48,3 @@ class FooController
     }
 }
 ```
-
-or
-
-```php
-namespace App\Controller;
-
-use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-
-/**
- * @ResponseBody
- */
-class FooController
-{
-    public function fooAction()
-    {
-        return array('hello' => 'world');
-    }
-
-    public function fooAction()
-    {
-        $result = new \stdClass();
-        $result->bar = 'bar';
-
-        return $result;
-    }
-}
-```

@@ -6,10 +6,10 @@ use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-use Jungi\FrameworkExtraBundle\Controller\AbstractController;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterControllerAnnotationLocatorsPass;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class RegisterControllerAnnotationLocatorsPassTest extends TestCase
 {
     /** @test */
-    public function controllerAnnotationLocatorsAreRegistered()
+    public function locatorsAreRegistered()
     {
         $container = new ContainerBuilder();
         $container->register('foo', FooController::class)
@@ -34,16 +34,12 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
         $definition = $container->findDefinition('jungi.controller_annotation_locator');
         $locators = $definition->getArgument(0);
 
-        $this->assertCount(6, $locators);
-        $this->assertArrayHasKey('foo', $locators);
+        $this->assertCount(5, $locators);
         $this->assertArrayHasKey('foo::withAnnotations', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$body', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$foo', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$bar', $locators);
         $this->assertArrayHasKey('foo::abstractAction$foo', $locators);
-
-        $locator = $container->getDefinition((string)$locators['foo']->getValues()[0]);
-        $this->assertLocatorDefinition([ResponseBody::class], $locator);
 
         $locator = $container->getDefinition((string)$locators['foo::withAnnotations']->getValues()[0]);
         $this->assertLocatorDefinition([ResponseBody::class], $locator);
@@ -62,27 +58,35 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
     }
 
     /** @test */
-    public function childDefinition(): void
+    public function locatorsAreRegisteredOnInvokable()
     {
-        $this->markTestSkipped('todo');
-    }
-
-    /** @test */
-    public function duplicatedAnnotationOnClass(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Annotation "%s" occurred more than once at class "%s".',
-            ResponseBody::class,
-            BadController::class
-        ));
-
         $container = new ContainerBuilder();
-        $container->register('foo', BadController::class)
+        $container->register('foo', InvokableController::class)
             ->addTag('controller');
 
         $pass = new RegisterControllerAnnotationLocatorsPass('controller');
         $pass->process($container);
+
+        $this->assertTrue($container->hasAlias('jungi.controller_annotation_locator'));
+
+        $definition = $container->findDefinition('jungi.controller_annotation_locator');
+        $locators = $definition->getArgument(0);
+
+        $this->assertCount(2, $locators);
+        $this->assertArrayHasKey('foo', $locators);
+        $this->assertArrayHasKey('foo$body', $locators);
+
+        $locator = $container->getDefinition((string)$locators['foo']->getValues()[0]);
+        $this->assertLocatorDefinition([ResponseBody::class], $locator);
+
+        $locator = $container->getDefinition((string)$locators['foo$body']->getValues()[0]);
+        $this->assertLocatorDefinition([RequestBody::class], $locator);
+    }
+
+    /** @test */
+    public function childDefinition(): void
+    {
+        $this->markTestSkipped('todo');
     }
 
     /** @test */
@@ -90,7 +94,7 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
-            'Annotation "%s" occurred more than once at method "%s::bad()".',
+            'Annotation "%s" occurred more than once at "%s::bad()".',
             ResponseBody::class,
             BadControllerMethod::class
         ));
@@ -108,7 +112,7 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
-            'Annotation "%s" occurred more than once at argument "%s::bad($foo)".',
+            'Annotation "%s" occurred more than once for the argument "foo" at "%s::bad()".',
             QueryParam::class,
             BadControllerArgument::class
         ));
@@ -160,10 +164,6 @@ abstract class AbstractFooController extends AbstractController
     abstract public function abstractAction(string $foo);
 }
 
-/**
- * @ForeignAnnotation
- * @ResponseBody
- */
 class FooController extends AbstractFooController
 {
     /**
@@ -208,13 +208,16 @@ class FooController extends AbstractFooController
     }
 }
 
-/**
- * @ResponseBody
- * @ResponseBody
- */
-class BadController
+class InvokableController extends AbstractController
 {
+    /**
+     * @RequestBody("body")
+     * @ResponseBody
+     */
+    public function __invoke(string $body)
+    {
 
+    }
 }
 
 class BadControllerMethod
