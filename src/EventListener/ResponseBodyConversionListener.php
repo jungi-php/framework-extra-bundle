@@ -26,8 +26,8 @@ final class ResponseBodyConversionListener implements EventSubscriberInterface
 
     public function onKernelView(ViewEvent $event)
     {
-        $id = RequestUtils::getControllerAsCallableSyntax($event->getRequest());
-        if (!$this->annotationLocator->has($id) || !$this->annotationLocator->get($id)->has(ResponseBody::class)) {
+        $id = RequestUtils::getControllerAsCallableString($event->getRequest());
+        if (null === $id || !$this->annotationLocator->has($id) || !$this->annotationLocator->get($id)->has(ResponseBody::class)) {
             return;
         }
 

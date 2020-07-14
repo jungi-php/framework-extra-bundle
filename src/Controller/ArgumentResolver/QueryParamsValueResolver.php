@@ -26,7 +26,11 @@ final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
+        if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
+            return false;
+        }
+
+        $id = $controller.'$'.$argument->getName();
 
         return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has(QueryParams::class);
     }

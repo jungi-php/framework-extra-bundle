@@ -9,21 +9,17 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestUtils
 {
-    public static function getControllerAsCallableSyntax(Request $request): string
+    public static function getControllerAsCallableString(Request $request): ?string
     {
         $controller = $request->attributes->get('_controller');
         if (null === $controller) {
-            throw new \InvalidArgumentException('Controller attribute is missing.');
+            throw new \InvalidArgumentException('Attribute "_controller" cannot be found in the request.');
         }
 
-        if (is_array($controller)) {
-            return ltrim($controller[0], '\\').'::'.$controller[1];
+        if (is_array($controller) && is_callable($controller, true) && is_string($controller[0])) {
+            $controller = $controller[0].'::'.$controller[1];
         }
 
-        if (!is_string($controller)) {
-            throw new \UnexpectedValueException(sprintf('Expected to get string, got: %s.', gettype($controller)));
-        }
-
-        return $controller;
+        return is_string($controller) ? ltrim($controller, '\\') : null;
     }
 }

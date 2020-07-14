@@ -44,7 +44,11 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
+        if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
+            return false;
+        }
+
+        $id = $controller.'$'.$argument->getName();
 
         return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has(RequestBody::class);
     }
@@ -64,7 +68,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
             ));
         }
 
-        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
+        $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
         /** @var RequestBody $annotation */
         $annotation = $this->annotationLocator->get($id)->get(RequestBody::class);
 

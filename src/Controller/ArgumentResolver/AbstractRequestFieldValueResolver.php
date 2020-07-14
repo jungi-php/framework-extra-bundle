@@ -35,7 +35,11 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
+        if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
+            return false;
+        }
+
+        $id = $controller.'$'.$argument->getName();
 
         return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has($this->annotationClass);
     }
@@ -46,7 +50,7 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
             throw new \InvalidArgumentException('Variadic arguments are not supported.');
         }
 
-        $id = RequestUtils::getControllerAsCallableSyntax($request).'$'.$argument->getName();
+        $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
 
         /** @var RequestFieldAnnotationInterface $annotation */
         $annotation = $this->annotationLocator->get($id)->get($this->annotationClass);
