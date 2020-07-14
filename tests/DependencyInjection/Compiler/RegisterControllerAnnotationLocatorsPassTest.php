@@ -11,6 +11,7 @@ use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -122,9 +123,84 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
     }
 
     /** @test */
-    public function childDefinition(): void
+    public function locatorsAreRegisteredFromChildDefinition(): void
     {
-        $this->markTestSkipped('todo');
+        $container = new ContainerBuilder();
+
+        $container->register('parent', FooController::class);
+        $container->setDefinition('child', new ChildDefinition('parent'))
+            ->addTag('controller');
+
+        $pass = new RegisterControllerAnnotationLocatorsPass('controller');
+        $pass->process($container);
+
+        $definition = $container->findDefinition('jungi.controller_annotation_locator');
+        $this->assertNotNull($definition);
+
+        $locators = $definition->getArgument(0);
+
+        $this->assertCount(5, $locators);
+        $this->assertArrayHasKey('child::withAnnotations', $locators);
+        $this->assertArrayHasKey('child::withAnnotations$body', $locators);
+        $this->assertArrayHasKey('child::withAnnotations$foo', $locators);
+        $this->assertArrayHasKey('child::withAnnotations$bar', $locators);
+        $this->assertArrayHasKey('child::abstractAction$foo', $locators);
+    }
+
+    /** @test */
+    public function locatorsAreRegisteredUsingClassFromParameters(): void
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('controller_class', FooController::class);
+        $container->register('foo', '%controller_class%')
+            ->addTag('controller');
+
+        $pass = new RegisterControllerAnnotationLocatorsPass('controller');
+        $pass->process($container);
+
+        $definition = $container->findDefinition('jungi.controller_annotation_locator');
+        $this->assertNotNull($definition);
+
+        $locators = $definition->getArgument(0);
+
+        $this->assertCount(5, $locators);
+        $this->assertArrayHasKey('foo::withAnnotations', $locators);
+        $this->assertArrayHasKey('foo::withAnnotations$body', $locators);
+        $this->assertArrayHasKey('foo::withAnnotations$foo', $locators);
+        $this->assertArrayHasKey('foo::withAnnotations$bar', $locators);
+        $this->assertArrayHasKey('foo::abstractAction$foo', $locators);
+    }
+
+    /** @test */
+    public function invalidClass()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Class "%s" used for service "foo" cannot be found.', NotExistingController::class));
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', NotExistingController::class)
+            ->addTag('controller');
+
+        $pass = new RegisterControllerAnnotationLocatorsPass('controller');
+        $pass->process($container);
+    }
+
+    /** @test */
+    public function invalidClassFromParameter()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Class "%s" used for service "foo" cannot be found.', NotExistingController::class));
+
+        $container = new ContainerBuilder();
+
+        $container->setParameter('controller_class', NotExistingController::class);
+        $container->register('foo', '%controller_class%')
+            ->addTag('controller');
+
+        $pass = new RegisterControllerAnnotationLocatorsPass('controller');
+        $pass->process($container);
     }
 
     /** @test */
