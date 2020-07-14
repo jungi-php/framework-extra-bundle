@@ -89,11 +89,15 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
     public function locatorsAreRegisteredWithAliases()
     {
         $container = new ContainerBuilder();
+
         $container->register('foo', FooController::class)
+            ->addTag('controller');
+        $container->register('invokable', InvokableController::class)
             ->addTag('controller');
 
         $container->setAlias('foo_alias', new Alias('foo', true));
         $container->setAlias('bar_alias', new Alias('foo', true));
+        $container->setAlias('mee_alias', new Alias('invokable', true));
         $container->setAlias('zoo_alias', 'foo');
 
         $pass = new RegisterControllerAnnotationLocatorsPass('controller');
@@ -104,7 +108,11 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
 
         $locators = $definition->getArgument(0);
 
-        $this->assertCount(15, $locators);
+        $this->assertCount(19, $locators);
+        $this->assertArrayHasKey('invokable', $locators);
+        $this->assertArrayHasKey('invokable$body', $locators);
+        $this->assertArrayHasKey('mee_alias', $locators);
+        $this->assertArrayHasKey('mee_alias$body', $locators);
         $this->assertArrayHasKey('foo::withAnnotations', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$body', $locators);
         $this->assertArrayHasKey('foo::withAnnotations$foo', $locators);
