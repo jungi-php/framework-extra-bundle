@@ -2,10 +2,12 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -17,12 +19,12 @@ final class RequestParamValueResolver extends AbstractNamedValueArgumentValueRes
         parent::__construct(RequestParam::class, $converter, $annotationLocator);
     }
 
-    public function getArgumentValue(Request $request, string $name, ?string $type)
+    public function getArgumentValue(Request $request, NamedValueArgumentInterface $annotation, ArgumentMetadata $metadata)
     {
-        if ($this !== $result = $request->files->get($name, $this)) {
+        if ($this !== $result = $request->files->get($annotation->getName(), $this)) {
             return $result;
         }
 
-        return $request->request->get($name);
+        return $request->request->get($annotation->getName());
     }
 }

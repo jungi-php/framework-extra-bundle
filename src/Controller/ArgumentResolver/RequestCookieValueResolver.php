@@ -2,10 +2,12 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Annotation\RequestCookie;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -17,8 +19,8 @@ final class RequestCookieValueResolver extends AbstractNamedValueArgumentValueRe
         parent::__construct(RequestCookie::class, $converter, $annotationLocator);
     }
 
-    public function getArgumentValue(Request $request, string $name, ?string $type)
+    public function getArgumentValue(Request $request, NamedValueArgumentInterface $annotation, ArgumentMetadata $metadata)
     {
-        return $request->cookies->get($name);
+        return $request->cookies->get($annotation->getName());
     }
 }

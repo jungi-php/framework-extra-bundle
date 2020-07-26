@@ -55,7 +55,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         /** @var NamedValueArgumentInterface $annotation */
         $annotation = $this->annotationLocator->get($id)->get($this->annotationClass);
 
-        $value = $this->getArgumentValue($request, $annotation->getName(), $argument->getType());
+        $value = $this->getArgumentValue($request, $annotation, $argument);
 
         if (null === $value && $argument->hasDefaultValue()) {
             $value = $argument->getDefaultValue();
@@ -80,5 +80,5 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         }
     }
 
-    abstract protected function getArgumentValue(Request $request, string $name, ?string $type);
+    abstract protected function getArgumentValue(Request $request, NamedValueArgumentInterface $annotation, ArgumentMetadata $metadata);
 }
