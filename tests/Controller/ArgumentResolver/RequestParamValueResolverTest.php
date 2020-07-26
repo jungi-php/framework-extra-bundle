@@ -3,7 +3,7 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
-use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestParamValueResolverTest extends AbstractRequestFieldValueResolverTest
+class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
     public function uploadedFileArgument()
     {
@@ -49,7 +49,7 @@ class RequestParamValueResolverTest extends AbstractRequestFieldValueResolverTes
         return new Request([], $parameters);
     }
 
-    protected function createAnnotation(string $name): RequestFieldAnnotationInterface
+    protected function createAnnotation(string $name): NamedValueArgumentInterface
     {
         return new RequestParam(array('value' => $name));
     }

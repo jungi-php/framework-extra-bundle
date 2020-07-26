@@ -8,14 +8,14 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class QueryParam extends AbstractAnnotation implements RequestFieldAnnotationInterface
+class QueryParam extends AbstractAnnotation implements NamedValueArgumentInterface
 {
     /**
      * @Required
      *
      * @var string
      */
-    private $fieldName;
+    private $name;
 
     /**
      * @Required
@@ -27,12 +27,12 @@ class QueryParam extends AbstractAnnotation implements RequestFieldAnnotationInt
     public function __construct(array $data)
     {
         $this->argumentName = $data['argumentName'] ?? $data['argument'] ?? $data['value'] ?? null;
-        $this->fieldName = $data['fieldName'] ?? $data['field'] ?? $data['value'] ?? null;
+        $this->name = $data['name'] ?? $data['value'] ?? null;
     }
 
-    public function getFieldName(): string
+    public function getName(): string
     {
-        return $this->fieldName;
+        return $this->name;
     }
 
     public function getArgumentName(): string

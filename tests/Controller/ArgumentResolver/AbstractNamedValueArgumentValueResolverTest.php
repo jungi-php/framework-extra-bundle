@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-abstract class AbstractRequestFieldValueResolverTest extends TestCase
+abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
 {
     /** @test */
     public function supports()
@@ -212,5 +212,5 @@ abstract class AbstractRequestFieldValueResolverTest extends TestCase
 
     abstract protected function createRequestWithParameters(array $parameters): Request;
 
-    abstract protected function createAnnotation(string $name): RequestFieldAnnotationInterface;
+    abstract protected function createAnnotation(string $name): NamedValueArgumentInterface;
 }

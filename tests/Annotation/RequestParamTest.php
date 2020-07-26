@@ -13,25 +13,20 @@ class RequestParamTest extends TestCase
     /** @test */
     public function create()
     {
-        $annotation = new RequestParam(array('value' => 'foo'));
-
+        $annotation = new RequestParam(['value' => 'foo']);
         $this->assertEquals('foo', $annotation->getArgumentName());
-        $this->assertEquals('foo', $annotation->getFieldName());
+        $this->assertEquals('foo', $annotation->getName());
 
-        $annotation = new RequestParam(array(
-            'value' => 'foo',
-            'field' => 'bar',
-        ));
-
+        $annotation = new RequestParam(['value' => 'foo', 'name' => 'bar']);
         $this->assertEquals('foo', $annotation->getArgumentName());
-        $this->assertEquals('bar', $annotation->getFieldName());
+        $this->assertEquals('bar', $annotation->getName());
 
-        $annotation = new RequestParam(array(
-            'value' => 'foo',
-            'argument' => 'bar',
-        ));
-
+        $annotation = new RequestParam(['value' => 'foo', 'argument' => 'bar']);
         $this->assertEquals('bar', $annotation->getArgumentName());
-        $this->assertEquals('foo', $annotation->getFieldName());
+        $this->assertEquals('foo', $annotation->getName());
+
+        $annotation = new RequestParam(['value' => 'foo', 'argumentName' => 'bar']);
+        $this->assertEquals('bar', $annotation->getArgumentName());
+        $this->assertEquals('foo', $annotation->getName());
     }
 }

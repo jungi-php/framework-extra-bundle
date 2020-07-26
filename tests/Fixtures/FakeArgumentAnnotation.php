@@ -2,9 +2,9 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
-use Jungi\FrameworkExtraBundle\Annotation\ArgumentAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\ArgumentInterface;
 
-final class FakeArgumentAnnotation implements ArgumentAnnotationInterface
+final class FakeArgumentAnnotation implements ArgumentInterface
 {
     private $name;
 

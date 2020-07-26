@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-final class RequestHeaderValueResolver extends AbstractRequestFieldValueResolver
+final class RequestHeaderValueResolver extends AbstractNamedValueArgumentValueResolver
 {
     public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
         parent::__construct(RequestHeader::class, $converter, $annotationLocator);
     }
 
-    public function getFieldValue(Request $request, string $name, ?string $type)
+    public function getArgumentValue(Request $request, string $name, ?string $type)
     {
         if ('array' === $type) {
             return $request->headers->all($name);

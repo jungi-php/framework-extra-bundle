@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-final class RequestParamValueResolver extends AbstractRequestFieldValueResolver
+final class RequestParamValueResolver extends AbstractNamedValueArgumentValueResolver
 {
     public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
         parent::__construct(RequestParam::class, $converter, $annotationLocator);
     }
 
-    public function getFieldValue(Request $request, string $name, ?string $type)
+    public function getArgumentValue(Request $request, string $name, ?string $type)
     {
         if ($this !== $result = $request->files->get($name, $this)) {
             return $result;

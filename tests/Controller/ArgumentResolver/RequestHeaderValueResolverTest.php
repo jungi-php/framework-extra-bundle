@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Annotation\RequestHeader;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestHeaderValueResolverTest extends AbstractRequestFieldValueResolverTest
+class RequestHeaderValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
     public function argumentTypeSameAsParameterType()
     {
@@ -57,8 +57,8 @@ class RequestHeaderValueResolverTest extends AbstractRequestFieldValueResolverTe
         return $request;
     }
 
-    protected function createAnnotation(string $name): RequestFieldAnnotationInterface
+    protected function createAnnotation(string $name): NamedValueArgumentInterface
     {
-        return new RequestHeader(array('argument' => $name, 'field' => $name));
+        return new RequestHeader(array('argument' => $name, 'name' => $name));
     }
 }

@@ -13,25 +13,20 @@ class RequestCookieTest extends TestCase
     /** @test */
     public function create()
     {
-        $annotation = new RequestCookie(array('value' => 'foo'));
-
+        $annotation = new RequestCookie(['value' => 'foo']);
         $this->assertEquals('foo', $annotation->getArgumentName());
-        $this->assertEquals('foo', $annotation->getFieldName());
+        $this->assertEquals('foo', $annotation->getName());
 
-        $annotation = new RequestCookie(array(
-            'value' => 'foo',
-            'field' => 'bar',
-        ));
-
+        $annotation = new RequestCookie(['value' => 'foo', 'name' => 'bar']);
         $this->assertEquals('foo', $annotation->getArgumentName());
-        $this->assertEquals('bar', $annotation->getFieldName());
+        $this->assertEquals('bar', $annotation->getName());
 
-        $annotation = new RequestCookie(array(
-            'value' => 'foo',
-            'argument' => 'bar',
-        ));
-
+        $annotation = new RequestCookie(['value' => 'foo', 'argument' => 'bar']);
         $this->assertEquals('bar', $annotation->getArgumentName());
-        $this->assertEquals('foo', $annotation->getFieldName());
+        $this->assertEquals('foo', $annotation->getName());
+
+        $annotation = new RequestCookie(['value' => 'foo', 'argumentName' => 'bar']);
+        $this->assertEquals('bar', $annotation->getArgumentName());
+        $this->assertEquals('foo', $annotation->getName());
     }
 }

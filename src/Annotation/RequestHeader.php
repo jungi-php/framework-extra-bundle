@@ -8,14 +8,14 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestHeader extends AbstractAnnotation implements RequestFieldAnnotationInterface
+class RequestHeader extends AbstractAnnotation implements NamedValueArgumentInterface
 {
     /**
      * @Required
      *
      * @var string
      */
-    private $fieldName;
+    private $name;
 
     /**
      * @Required
@@ -27,12 +27,12 @@ class RequestHeader extends AbstractAnnotation implements RequestFieldAnnotation
     public function __construct(array $data)
     {
         $this->argumentName = $data['argumentName'] ?? $data['argument'] ?? $data['value'] ?? null;
-        $this->fieldName = $data['fieldName'] ?? $data['field'] ?? null;
+        $this->name = $data['name'] ?? null;
     }
 
-    public function getFieldName(): string
+    public function getName(): string
     {
-        return $this->fieldName;
+        return $this->name;
     }
 
     public function getArgumentName(): string

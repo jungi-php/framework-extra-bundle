@@ -14,17 +14,14 @@ class RequestBodyTest extends TestCase
     public function create()
     {
         $annotation = new RequestBody(['value' => 'foo']);
-
         $this->assertEquals('foo', $annotation->getArgumentName());
         $this->assertNull($annotation->getArgumentType());
 
-        $annotation = new RequestBody(['value' => 'foo', 'type' => 'int[]']);
-
+        $annotation = new RequestBody(['argument' => 'foo', 'type' => 'int[]']);
         $this->assertEquals('foo', $annotation->getArgumentName());
         $this->assertEquals('int[]', $annotation->getArgumentType());
 
-        $annotation = new RequestBody(['value' => 'foo', 'type' => 'int[][]']);
-
+        $annotation = new RequestBody(['argumentName' => 'foo', 'argumentType' => 'int[][]']);
         $this->assertEquals('foo', $annotation->getArgumentName());
         $this->assertEquals('int[][]', $annotation->getArgumentType());
     }

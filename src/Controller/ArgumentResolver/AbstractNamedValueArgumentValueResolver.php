@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolverInterface
+abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueResolverInterface
 {
     private $annotationClass;
     private $converter;
@@ -24,8 +24,8 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
 
     public function __construct(string $annotationClass, ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
-        if (!is_subclass_of($annotationClass, RequestFieldAnnotationInterface::class)) {
-            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', RequestFieldAnnotationInterface::class, $annotationClass));
+        if (!is_subclass_of($annotationClass, NamedValueArgumentInterface::class)) {
+            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValueArgumentInterface::class, $annotationClass));
         }
 
         $this->annotationClass = $annotationClass;
@@ -52,33 +52,33 @@ abstract class AbstractRequestFieldValueResolver implements ArgumentValueResolve
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
 
-        /** @var RequestFieldAnnotationInterface $annotation */
+        /** @var NamedValueArgumentInterface $annotation */
         $annotation = $this->annotationLocator->get($id)->get($this->annotationClass);
 
-        $fieldValue = $this->getFieldValue($request, $annotation->getFieldName(), $argument->getType());
+        $value = $this->getArgumentValue($request, $annotation->getName(), $argument->getType());
 
-        if (null === $fieldValue && $argument->hasDefaultValue()) {
-            $fieldValue = $argument->getDefaultValue();
+        if (null === $value && $argument->hasDefaultValue()) {
+            $value = $argument->getDefaultValue();
         }
 
-        if (null === $fieldValue) {
+        if (null === $value) {
             if ($argument->isNullable()) {
                 yield null; return;
             }
 
-            throw new BadRequestHttpException(sprintf('Request field "%s" is not present.', $annotation->getFieldName()));
+            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $annotation->getName()));
         }
 
-        if (null === $argument->getType() || TypeUtils::isValueOfType($fieldValue, $argument->getType())) {
-            yield $fieldValue; return;
+        if (null === $argument->getType() || TypeUtils::isValueOfType($value, $argument->getType())) {
+            yield $value; return;
         }
 
         try {
-            yield $this->converter->convert($fieldValue, $argument->getType());
+            yield $this->converter->convert($value, $argument->getType());
         } catch (TypeConversionException $e) {
-            throw new BadRequestHttpException(sprintf('Cannot convert request field "%s".', $annotation->getFieldName()), $e);
+            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $annotation->getName()), $e);
         }
     }
 
-    abstract protected function getFieldValue(Request $request, string $name, ?string $type);
+    abstract protected function getArgumentValue(Request $request, string $name, ?string $type);
 }

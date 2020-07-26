@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-final class RequestCookieValueResolver extends AbstractRequestFieldValueResolver
+final class RequestCookieValueResolver extends AbstractNamedValueArgumentValueResolver
 {
     public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
         parent::__construct(RequestCookie::class, $converter, $annotationLocator);
     }
 
-    public function getFieldValue(Request $request, string $name, ?string $type)
+    public function getArgumentValue(Request $request, string $name, ?string $type)
     {
         return $request->cookies->get($name);
     }

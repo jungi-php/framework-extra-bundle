@@ -5,7 +5,7 @@ namespace Jungi\FrameworkExtraBundle\DependencyInjection\Compiler;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Jungi\FrameworkExtraBundle\Annotation\AnnotationInterface;
-use Jungi\FrameworkExtraBundle\Annotation\ArgumentAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\ArgumentInterface;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\ObjectExporterInterface;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
@@ -81,7 +81,7 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                 foreach ($this->annotationReader->getMethodAnnotations($methodRefl) as $annotation) {
                     $annotationClass = get_class($annotation);
 
-                    if ($annotation instanceof ArgumentAnnotationInterface) {
+                    if ($annotation instanceof ArgumentInterface) {
                         if (!in_array($annotation->getArgumentName(), $existingParameters, true)) {
                             throw new InvalidArgumentException(sprintf(
                                 'Expected to have the argument "%s" in "%s::%s()", but it\'s not present.',

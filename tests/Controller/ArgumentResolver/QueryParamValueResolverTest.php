@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestFieldAnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class QueryParamValueResolverTest extends AbstractRequestFieldValueResolverTest
+class QueryParamValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
     protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $container): ArgumentValueResolverInterface
     {
@@ -25,7 +25,7 @@ class QueryParamValueResolverTest extends AbstractRequestFieldValueResolverTest
         return new Request($parameters);
     }
 
-    protected function createAnnotation(string $name): RequestFieldAnnotationInterface
+    protected function createAnnotation(string $name): NamedValueArgumentInterface
     {
         return new QueryParam(array('value' => $name));
     }
