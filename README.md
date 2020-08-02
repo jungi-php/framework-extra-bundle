@@ -1,7 +1,7 @@
 JungiFrameworkExtraBundle
 =========================
 
-Just like the SensioFrameworkExtraBundle this bundle adds extra features on top of existing in the Symfony FrameworkBundle.
+Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on top of existing in the Symfony `FrameworkBundle`.
 The main aim of this bundle is to facilitate the request/response operations.
 
 [![Build Status](https://img.shields.io/travis/piku235/JungiFrameworkExtraBundle/master.svg?style=flat-square)](https://travis-ci.org/piku235/JungiFrameworkExtraBundle)
@@ -14,10 +14,6 @@ Annotations:
 * **@QueryParam** - Converts a request query parameter to the controller method argument.
 * **@QueryParams** - Converts the request query parameters to the controller method argument.
 * **@ResponseBody** - Maps the controller method result to an appropriate entity response.
-
-Also includes:
-* **Entity response** - a response with the mapped entity to the text representation. Uses the content negotiation 
-to decide to what media type map the entity.
 
 ### Quick insight
 
