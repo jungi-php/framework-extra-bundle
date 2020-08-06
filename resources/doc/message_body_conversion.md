@@ -2,7 +2,7 @@ Message Body Conversion
 =======================
 
 The conversion is managed by `MessageBodyConversionManager`. Internally it delegates the conversion to registered mappers.
-By default the `SerializerMapperAdapter` is used if available.
+By default, the `SerializerMapperAdapter` is used if available.
 
 ### Add/replace own mapper
 

@@ -1,12 +1,12 @@
 Annotations
 -----------
 
-The core feature of this bundle, they mainly exist to facilitate handling requests and responses. 
+The core feature of this bundle, the below annotations mainly exist to facilitate handling requests and responses. 
 
 #### `@RequestBody`
 
 This annotation is one with the most features in it. It decodes the request message body and passes it to a method 
-argument in a controller. It supports scalar, object, collection and file based method arguments.
+argument in a controller. It supports scalars, objects, collections and file based method arguments.
 
 ##### Scalars
 
@@ -56,8 +56,9 @@ class UserController
 
 ##### Collections
 
-Unfortunately, at the current state PHP does not support declaring a collection with a desired type. In order to 
-achieve that, the `argumentType` parameter has been provided. It accepts types of the well-known syntax `type[]`.
+Unfortunately, at the current state, PHP does not support declaring a collection with a desired type. In order to 
+achieve that, the `argumentType|type` parameter has been provided. It accepts types of the well-known syntax `type[]` 
+and it is limited only for collection types.
 
 ```php
 namespace App\Controller;
@@ -80,7 +81,7 @@ class RoleController
 
 ##### Files
 
-When the request message body contains a file, you can typehint your method argument as `UploadedFile`, `File`, 
+When the request message body contains a file, you can declare your method argument as `UploadedFile`, `File`, 
 `SplFileInfo` or `SplFileObject`. Thanks to the `TmpFileUtils` you can query those objects for any public method
 like `getFilename()`, `getPathname()` and so on.
 
@@ -107,13 +108,11 @@ class PictureController
 
 It's a bit a special one, it covers all public methods like `getClientOriginalName()` or `getClientMimeType()`.
 
-The `getClientOriginalName()` method works thanks to the `Content-Disposition` header. In general this header is used 
-in responses and in `multipart/form-data` requests. The `Content-Disposition` must be set to `inline` and the `filename` 
-param must be provided.
+The `getClientOriginalName()` uses the `Content-Disposition` header. In general this header is used in responses and 
+in `multipart/form-data` requests. For this to work, the `Content-Disposition` must be set to `inline` and the `filename` 
+parameter must be provided.
 
-On the contrary the `getClientMimeType()` works by using the `Content-Type` header.
-
-**Example:**
+On the contrary the `getClientMimeType()` uses the `Content-Type` header.
 
 ```
 POST /pictures HTTP/1.1
@@ -146,11 +145,8 @@ class PictureController
 
 #### `@RequestParam`
 
-It binds a request parameter to a method argument in a controller. It supports `multipart/form-data` requests and that 
+It binds a request parameter to a method argument in a controller. It supports `multipart/form-data` requests, and that 
 means you can even access a file through this annotation.
-
-Providing only the `value` in the annotation means the argument name, and the parameter name will be populated with
-this value.
 
 ```php
 namespace App\Controller;
@@ -165,21 +161,22 @@ class PictureController
      * @Route("/pictures", methods={"POST"})
      *
      * @RequestParam("file")
-     * @RequestParam(name="description", argument="desc")
+     * @RequestParam(name="desc", argument="description")
      */
-    public function savePicture(UploadedFile $file, string $desc)
+    public function savePicture(UploadedFile $file, string $description)
     {
         // ...
     }
 }
 ```
 
+> Providing only the `value` in the annotation means that the argument name, and the parameter name will be populated 
+> with this value.
+> If a method argument cannot be nullable, and a request parameter cannot be found, a **400** HTTP response is returned.
+
 #### `@QueryParam`
 
 It binds a query parameter to a method argument in a controller.
-
-Providing only the `value` in the annotation means the argument name, and the parameter name will be populated with
-this value.
 
 ```php
 namespace App\Controller;
@@ -192,14 +189,19 @@ class UserController
     /**
      * @Route("/users", methods={"GET"})
      *
+     * @QueryParam(name="q", argument="searchQuery")
      * @QueryParam("limit")
      */
-    public function getUsers(?int $limit)
+    public function getUsers(?string $searchQuery, ?int $limit)
     {
         // ...
     }
 }
 ```
+
+> Providing only the `value` in the annotation means that the argument name, and the parameter name will be populated 
+> with this value.
+> If a method argument cannot be nullable, and a query parameter cannot be found, a **400** HTTP response is returned.
 
 #### `@QueryParams`
 
@@ -230,9 +232,6 @@ class UserController
 
 It binds a cookie value to a method argument in a controller.
 
-Providing only the `value` in the annotation means the argument name, and the parameter name will be populated with
-this value.
-
 ```php
 namespace App\Controller;
 
@@ -253,10 +252,13 @@ class SessionController
 }
 ```
 
+> Providing only the `value` in the annotation means that the argument name, and the cookie name will be populated with
+> this value.
+> If a method argument cannot be nullable, and a request cookie cannot be found, a **400** HTTP response is returned.
+
 #### `@RequestHeader`
 
-It binds a header value to a method argument in a controller. It requires to provide two options: `name` (a header name)
-and `argumentName`.
+It binds a header value to a method argument in a controller.
 
 ```php
 namespace App\Controller;
@@ -279,16 +281,19 @@ class ReportController
     /**
      * @Route("/reports/monthly-visitors", methods={"GET"})
      *
-     * @RequestHeader(name="Accept", argument="acceptableMediaType")
+     * @RequestHeader(name="Accept", argument="acceptableMediaTypes")
      */
-    public function getMonthlyVisitorsReport(array $acceptableMediaType)
+    public function getMonthlyVisitorsReport(array $acceptableMediaTypes)
     {
         // ...
     }
 }
 ```
 
-As you can see in the example, when a method argument is type hinted as `array` it will pass all values of a header.
+> If a method argument cannot be nullable, and a request header cannot be found, a **400** HTTP response is returned.
+
+As you can see in the example, when a method argument is declared as `array` it will pass all values of the header 
+to it.
 
 #### `@ResponseBody`
 
