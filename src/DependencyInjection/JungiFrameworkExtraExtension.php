@@ -19,7 +19,7 @@ final class JungiFrameworkExtraExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.xml');
 
         if ($config['serializer'] && interface_exists(SerializerInterface::class)) {
