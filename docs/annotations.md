@@ -1,14 +1,12 @@
-Annotations
------------
+# Annotations
 
-The core feature of this bundle, the below annotations mainly exist to facilitate handling requests and responses. 
+The core feature of this bundle, the below annotations mainly exist to facilitate handling requests and responses.
 
-#### `@RequestBody`
+## `@RequestBody`
 
-This annotation is one with the most features in it. It decodes the request message body and passes it to a method 
-argument in a controller. It supports scalars, objects, collections and file based method arguments.
+This annotation is one with the most features in it. It decodes the request message body and passes it to a method argument in a controller. It supports scalars, objects, collections, and file-based method arguments.
 
-##### Scalars
+### Scalars
 
 For scalar method arguments the `ConverterManager` is used if necessary.
 
@@ -31,9 +29,9 @@ class MessageController
 }
 ```
 
-##### Objects
+### Objects
 
-In the contrary to the scalar types it uses the `MessageBodyMapperManager` to decode the request message body.
+On the contrary to the scalar types, it uses the `MessageBodyMapperManager` to decode the request message body.
 
 ```php
 namespace App\Controller;
@@ -54,11 +52,9 @@ class UserController
 }
 ```
 
-##### Collections
+### Collections
 
-Unfortunately, at the current state, PHP does not support declaring a collection with a desired type. In order to 
-achieve that, the `argumentType|type` parameter has been provided. It accepts types of the well-known syntax `type[]` 
-and it is limited only for collection types.
+Unfortunately, at the current state, PHP does not support declaring a collection with the desired type. In order to achieve that, the `argumentType|type` parameter has been provided. It accepts types of well-known syntax `type[]`, and it is limited only for collection types.
 
 ```php
 namespace App\Controller;
@@ -79,11 +75,9 @@ class RoleController
 }
 ```
 
-##### Files
+### Files
 
-When the request message body contains a file, you can declare your method argument as `UploadedFile`, `File`, 
-`SplFileInfo` or `SplFileObject`. Thanks to the `TmpFileUtils` you can query those objects for any public method
-like `getFilename()`, `getPathname()` and so on.
+When the request message body contains a file, you can declare your method argument as `UploadedFile`, `File`, `SplFileInfo` or `SplFileObject`. Thanks to the `TmpFileUtils` you can query those objects for any public method like `getFilename()`, `getPathname()` and so on.
 
 ```php
 namespace App\Controller;
@@ -104,17 +98,15 @@ class PictureController
 }
 ```
 
-###### UploadedFile
+#### UploadedFile
 
 It's a bit a special one, it covers all public methods like `getClientOriginalName()` or `getClientMimeType()`.
 
-The `getClientOriginalName()` uses the `Content-Disposition` header. In general this header is used in responses and 
-in `multipart/form-data` requests. For this to work, the `Content-Disposition` must be set to `inline` and the `filename` 
-parameter must be provided.
+The `getClientOriginalName()` uses the `Content-Disposition` header. In general, this header is used in responses and in `multipart/form-data` requests. For this to work, the `Content-Disposition` must be set to `inline`, and the `filename` parameter must be provided.
 
 On the contrary the `getClientMimeType()` uses the `Content-Type` header.
 
-```
+```text
 POST /pictures HTTP/1.1
 Content-Type: image/png
 Content-Disposition: inline; filename=foo.png
@@ -143,10 +135,9 @@ class PictureController
 }
 ```
 
-#### `@RequestParam`
+## `@RequestParam`
 
-It binds a request parameter to a method argument in a controller. It supports `multipart/form-data` requests, and that 
-means you can even access a file through this annotation.
+It binds a request parameter to a method argument in a controller. It supports `multipart/form-data` requests and that means you can even access a file through this annotation.
 
 ```php
 namespace App\Controller;
@@ -170,11 +161,11 @@ class PictureController
 }
 ```
 
-> Providing only the `value` in the annotation means that the argument name, and the parameter name will be populated 
-> with this value.
-> If a method argument cannot be nullable, and a request parameter cannot be found, a **400** HTTP response is returned.
+{% hint style="info" %}
+Providing only the `value` in the annotation means that the argument name and the parameter name will be populated with this value. If a method argument cannot be nullable, and a request parameter cannot be found, a **400** HTTP response is returned.
+{% endhint %}
 
-#### `@QueryParam`
+## `@QueryParam`
 
 It binds a query parameter to a method argument in a controller.
 
@@ -199,14 +190,13 @@ class UserController
 }
 ```
 
-> Providing only the `value` in the annotation means that the argument name, and the parameter name will be populated 
-> with this value.
-> If a method argument cannot be nullable, and a query parameter cannot be found, a **400** HTTP response is returned.
+{% hint style="info" %}
+Providing only the `value` in the annotation means that the argument name and the parameter name will be populated with this value. If a method argument cannot be nullable, and a query parameter cannot be found, a **400** HTTP response is returned.
+{% endhint %}
 
-#### `@QueryParams`
+## `@QueryParams`
 
-It is similar to the `@QueryParam`, but instead of a single query parameter it takes all query parameters to pass them
-as a single method argument in a controller. This annotation requires an argument to be of an object type.
+It is similar to the `@QueryParam`, but instead of a single query parameter, it takes all query parameters to pass them as a single method argument in a controller. This annotation requires an argument to be of an object type.
 
 ```php
 namespace App\Controller;
@@ -228,7 +218,7 @@ class UserController
 }
 ```
 
-#### `@RequestCookie`
+## `@RequestCookie`
 
 It binds a cookie value to a method argument in a controller.
 
@@ -252,11 +242,11 @@ class SessionController
 }
 ```
 
-> Providing only the `value` in the annotation means that the argument name, and the cookie name will be populated with
-> this value.
-> If a method argument cannot be nullable, and a request cookie cannot be found, a **400** HTTP response is returned.
+{% hint style="info" %}
+Providing only the `value` in the annotation means that the argument name and the cookie name will be populated with this value. If a method argument cannot be nullable, and a request cookie cannot be found, a **400** HTTP response is returned.
+{% endhint %}
 
-#### `@RequestHeader`
+## `@RequestHeader`
 
 It binds a header value to a method argument in a controller.
 
@@ -290,15 +280,15 @@ class ReportController
 }
 ```
 
-> If a method argument cannot be nullable, and a request header cannot be found, a **400** HTTP response is returned.
+{% hint style="info" %}
+If a method argument cannot be nullable, and a request header cannot be found, a **400** HTTP response is returned.
+{% endhint %}
 
-As you can see in the example, when a method argument is declared as `array` it will pass all values of the header 
-to it.
+As you can see in the example when a method argument is declared as `array` it will pass all values of the header to it.
 
-#### `@ResponseBody`
+## `@ResponseBody`
 
-You can use this annotation to encode your result from a controller method. In order to select an appropriate content 
-type it uses the content negotiation that is described [here](https://github.com/piku235/JungiFrameworkExtraBundle/blob/master/resources/doc/content_negotiation.md).
+You can use this annotation to encode your result from a controller method. In order to select an appropriate content type, it uses the content negotiation that is described [here](content_negotiation.md).
 
 ```php
 namespace App\Controller;
@@ -316,3 +306,4 @@ class FooController
     }
 }
 ```
+

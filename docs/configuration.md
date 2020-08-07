@@ -1,5 +1,4 @@
-Configuration
-=============
+# Configuration
 
 ```yaml
 jungi_framework_extra:
@@ -8,5 +7,5 @@ jungi_framework_extra:
         default_content_type: application/json # default
 ```
 
-If you use the `symfony/serializer` component, but you don't wish to use the available serializer adapters, 
-set the `serializer` to `false`.
+If you use the `symfony/serializer` component, but you don't wish to use the available serializer adapters, set the `serializer` to `false`.
+

@@ -1,12 +1,11 @@
-JungiFrameworkExtraBundle
-=========================
+# JungiFrameworkExtraBundle
 
-Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on top of existing in the Symfony `FrameworkBundle`.
-The main aim of this bundle is to facilitate the request/response operations.
+Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on top of existing in the Symfony `FrameworkBundle`. The main aim of this bundle is to facilitate the request/response operations.
 
 [![Build Status](https://img.shields.io/travis/piku235/JungiFrameworkExtraBundle/master.svg?style=flat-square)](https://travis-ci.org/piku235/JungiFrameworkExtraBundle)
 
 Annotations:
+
 * **@RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
 * **@RequestHeader** - Converts a request header to the controller method argument.
 * **@RequestCookie** - Converts a request cookie to the controller method argument.
@@ -15,7 +14,7 @@ Annotations:
 * **@QueryParams** - Converts the request query parameters to the controller method argument.
 * **@ResponseBody** - Maps the controller method result to an appropriate entity response.
 
-### Quick insight
+## Quick insight
 
 ```php
 namespace App\Controller;
@@ -88,13 +87,13 @@ class UserController
 }
 ```
 
-### Installation
+## Installation
 
-```
+```text
 composer require jungi/framework-extra-bundle
 ```
 
-If you're using in your project symfony flex you're already done! Otherwise you need to enable the bundle manually.
+If you're using in your project symfony flex you're already done! Otherwise, you need to enable the bundle manually.
 
 ```php
 public function registerBundles()
@@ -107,5 +106,7 @@ public function registerBundles()
 }
 ```
 
-### Documentation
-[click me](https://github.com/piku235/JungiFrameworkExtraBundle/blob/master/resources/doc/index.md)
+## Documentation
+
+[click me](docs/)
+
