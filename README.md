@@ -108,5 +108,5 @@ public function registerBundles()
 
 ## Documentation
 
-[click me](docs/)
+[click me](https://piku235.gitbook.io/jungiframeworkextrabundle/docs)
 
