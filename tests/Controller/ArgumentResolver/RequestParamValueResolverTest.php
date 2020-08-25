@@ -3,7 +3,7 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
@@ -49,7 +49,7 @@ class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResol
         return new Request([], $parameters);
     }
 
-    protected function createAnnotation(string $name): NamedValueArgumentInterface
+    protected function createAnnotation(string $name): NamedValueArgument
     {
         return new RequestParam(array('value' => $name));
     }

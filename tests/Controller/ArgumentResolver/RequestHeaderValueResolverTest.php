@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Annotation\RequestHeader;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
@@ -57,7 +57,7 @@ class RequestHeaderValueResolverTest extends AbstractNamedValueArgumentValueReso
         return $request;
     }
 
-    protected function createAnnotation(string $name): NamedValueArgumentInterface
+    protected function createAnnotation(string $name): NamedValueArgument
     {
         return new RequestHeader(array('argument' => $name, 'name' => $name));
     }

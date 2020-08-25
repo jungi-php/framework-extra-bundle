@@ -4,8 +4,8 @@ namespace Jungi\FrameworkExtraBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
-use Jungi\FrameworkExtraBundle\Annotation\AnnotationInterface;
-use Jungi\FrameworkExtraBundle\Annotation\ArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\Annotation;
+use Jungi\FrameworkExtraBundle\Annotation\Argument;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\ObjectExporterInterface;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
@@ -81,28 +81,28 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                 foreach ($this->annotationReader->getMethodAnnotations($methodRefl) as $annotation) {
                     $annotationClass = get_class($annotation);
 
-                    if ($annotation instanceof ArgumentInterface) {
-                        if (!in_array($annotation->getArgumentName(), $existingParameters, true)) {
+                    if ($annotation instanceof Argument) {
+                        if (!in_array($annotation->argument(), $existingParameters, true)) {
                             throw new InvalidArgumentException(sprintf(
                                 'Expected to have the argument "%s" in "%s::%s()", but it\'s not present.',
-                                $annotation->getArgumentName(),
+                                $annotation->argument(),
                                 $methodRefl->class,
                                 $methodRefl->name
                             ));
                         }
 
-                        if (isset($argumentAnnotations[$annotation->getArgumentName()][$annotationClass])) {
+                        if (isset($argumentAnnotations[$annotation->argument()][$annotationClass])) {
                             throw new InvalidArgumentException(sprintf(
                                 'Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".',
                                 $annotationClass,
-                                $annotation->getArgumentName(),
+                                $annotation->argument(),
                                 $methodRefl->class,
                                 $methodRefl->name
                             ));
                         }
 
-                        $argumentAnnotations[$annotation->getArgumentName()][$annotationClass] = $annotation;
-                    } elseif ($annotation instanceof AnnotationInterface) {
+                        $argumentAnnotations[$annotation->argument()][$annotationClass] = $annotation;
+                    } elseif ($annotation instanceof Annotation) {
                         if (isset($methodAnnotations[$annotationClass])) {
                             throw new InvalidArgumentException(sprintf(
                                 'Annotation "%s" occurred more than once at "%s::%s()".',

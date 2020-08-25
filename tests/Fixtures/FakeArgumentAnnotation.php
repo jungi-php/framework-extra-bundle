@@ -2,9 +2,9 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
-use Jungi\FrameworkExtraBundle\Annotation\ArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\Argument;
 
-final class FakeArgumentAnnotation implements ArgumentInterface
+final class FakeArgumentAnnotation implements Argument
 {
     private $name;
 
@@ -13,7 +13,7 @@ final class FakeArgumentAnnotation implements ArgumentInterface
         $this->name = $data['value'] ?? 'fake';
     }
 
-    public function getArgumentName(): string
+    public function argument(): string
     {
         return $this->name;
     }

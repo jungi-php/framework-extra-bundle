@@ -5,7 +5,7 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-interface ArgumentInterface extends AnnotationInterface
+interface NamedValueArgument extends Argument
 {
-    public function getArgumentName(): string;
+    public function name(): string;
 }

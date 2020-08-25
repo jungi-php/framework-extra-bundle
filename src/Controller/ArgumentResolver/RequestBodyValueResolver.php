@@ -72,18 +72,18 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         /** @var RequestBody $annotation */
         $annotation = $this->annotationLocator->get($id)->get(RequestBody::class);
 
-        if (null !== $annotation->getArgumentType()) {
+        if (null !== $annotation->type()) {
             if ('array' !== $argument->getType()) {
                 throw new \InvalidArgumentException(sprintf(
                     'Expected argument "%s" to be type hinted as "array", got "%s", the annotation indicates "%s".',
                     $argument->getName(),
                     $argument->getType(),
-                    $annotation->getArgumentType()
+                    $annotation->type()
                 ));
             }
 
-            $argumentType = $annotation->getArgumentType();
-            $verifyType = TypeUtils::getCollectionBaseElementType($annotation->getArgumentType());
+            $argumentType = $annotation->type();
+            $verifyType = TypeUtils::getCollectionBaseElementType($annotation->type());
         } else {
             $argumentType = $verifyType = $argument->getType();
         }

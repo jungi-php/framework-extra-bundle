@@ -13,8 +13,7 @@ class QueryParamsTest extends TestCase
     /** @test */
     public function create()
     {
-        $this->assertEquals('foo', (new QueryParams(['value' => 'foo']))->getArgumentName());
-        $this->assertEquals('foo', (new QueryParams(['argumentName' => 'foo']))->getArgumentName());
-        $this->assertEquals('bar', (new QueryParams(['value' => 'foo', 'argument' => 'bar']))->getArgumentName());
+        $this->assertEquals('foo', (new QueryParams(['value' => 'foo']))->argument());
+        $this->assertEquals('bar', (new QueryParams(['value' => 'foo', 'argument' => 'bar']))->argument());
     }
 }

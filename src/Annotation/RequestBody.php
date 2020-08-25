@@ -2,7 +2,6 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
-use Doctrine\Common\Annotations\Annotation\Required;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 
 /**
@@ -11,37 +10,28 @@ use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestBody extends AbstractAnnotation implements ArgumentInterface
+final class RequestBody extends AbstractAnnotation implements Argument
 {
-    /**
-     * @Required
-     *
-     * @var string
-     */
-    private $argumentName;
-
-    /**
-     * @var string|null
-     */
-    private $argumentType;
+    private $argument;
+    private $type;
 
     public function __construct(array $data)
     {
-        $this->argumentName = $data['argumentName'] ?? $data['argument'] ?? $data['value'] ?? null;
+        $this->argument = $data['argument'] ?? $data['value'] ?? null;
 
-        if ($type = $data['argumentType'] ?? $data['type'] ?? null) {
+        if (null !== $type = $data['type'] ?? null) {
             $this->setArgumentType($type);
         }
     }
 
-    public function getArgumentName(): string
+    public function argument(): string
     {
-        return $this->argumentName;
+        return $this->argument;
     }
 
-    public function getArgumentType(): ?string
+    public function type(): ?string
     {
-        return $this->argumentType;
+        return $this->type;
     }
 
     private function setArgumentType(string $type): void
@@ -50,6 +40,6 @@ class RequestBody extends AbstractAnnotation implements ArgumentInterface
             throw new \InvalidArgumentException('Argument type can be specified only for a collection.');
         }
 
-        $this->argumentType = $type;
+        $this->type = $type;
     }
 }

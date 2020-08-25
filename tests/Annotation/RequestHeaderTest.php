@@ -14,15 +14,11 @@ class RequestHeaderTest extends TestCase
     public function create()
     {
         $annotation = new RequestHeader(['value' => 'foo', 'name' => 'bar']);
-        $this->assertEquals('foo', $annotation->getArgumentName());
-        $this->assertEquals('bar', $annotation->getName());
+        $this->assertEquals('foo', $annotation->argument());
+        $this->assertEquals('bar', $annotation->name());
 
         $annotation = new RequestHeader(['value' => 'foo', 'argument' => 'zoo', 'name' => 'bar']);
-        $this->assertEquals('zoo', $annotation->getArgumentName());
-        $this->assertEquals('bar', $annotation->getName());
-
-        $annotation = new RequestHeader(['argumentName' => 'foo', 'name' => 'bar']);
-        $this->assertEquals('foo', $annotation->getArgumentName());
-        $this->assertEquals('bar', $annotation->getName());
+        $this->assertEquals('zoo', $annotation->argument());
+        $this->assertEquals('bar', $annotation->name());
     }
 }

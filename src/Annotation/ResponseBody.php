@@ -10,6 +10,6 @@ use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
  * @Annotation
  * @Target({"METHOD"})
  */
-class ResponseBody implements AnnotationInterface, Exportable
+final class ResponseBody implements Annotation, Exportable
 {
 }

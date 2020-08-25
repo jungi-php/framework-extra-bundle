@@ -8,35 +8,24 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class RequestParam extends AbstractAnnotation implements NamedValueArgumentInterface
+final class RequestParam extends AbstractAnnotation implements NamedValueArgument
 {
-    /**
-     * @Required
-     *
-     * @var string
-     */
     private $name;
-
-    /**
-     * @Required
-     *
-     * @var string
-     */
-    private $argumentName;
+    private $argument;
 
     public function __construct(array $data)
     {
-        $this->argumentName = $data['argumentName'] ?? $data['argument'] ?? $data['value'] ?? null;
         $this->name = $data['name'] ?? $data['value'] ?? null;
+        $this->argument = $data['argument'] ?? $data['value'] ?? null;
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function getArgumentName(): string
+    public function argument(): string
     {
-        return $this->argumentName;
+        return $this->argument;
     }
 }

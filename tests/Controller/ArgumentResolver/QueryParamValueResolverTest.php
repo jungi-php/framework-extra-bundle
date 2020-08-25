@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
@@ -25,7 +25,7 @@ class QueryParamValueResolverTest extends AbstractNamedValueArgumentValueResolve
         return new Request($parameters);
     }
 
-    protected function createAnnotation(string $name): NamedValueArgumentInterface
+    protected function createAnnotation(string $name): NamedValueArgument
     {
         return new QueryParam(array('value' => $name));
     }

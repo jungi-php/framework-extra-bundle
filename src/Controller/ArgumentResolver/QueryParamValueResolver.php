@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
@@ -19,8 +19,8 @@ final class QueryParamValueResolver extends AbstractNamedValueArgumentValueResol
         parent::__construct(QueryParam::class, $converter, $annotationLocator);
     }
 
-    protected function getArgumentValue(Request $request, NamedValueArgumentInterface $annotation, ArgumentMetadata $metadata)
+    protected function getArgumentValue(Request $request, NamedValueArgument $annotation, ArgumentMetadata $metadata)
     {
-        return $request->query->get($annotation->getName());
+        return $request->query->get($annotation->name());
     }
 }

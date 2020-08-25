@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\DependencyInjection\Exporter;
 
-use Jungi\FrameworkExtraBundle\Annotation\AnnotationInterface;
+use Jungi\FrameworkExtraBundle\Annotation\Annotation;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
@@ -91,7 +91,7 @@ class DefaultObjectExporterTest extends TestCase
     }
 }
 
-class CompoundObject implements AnnotationInterface, Exportable
+class CompoundObject implements Annotation, Exportable
 {
     private $name;
     private $children;

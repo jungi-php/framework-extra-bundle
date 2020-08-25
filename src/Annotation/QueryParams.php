@@ -2,30 +2,23 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
-use Doctrine\Common\Annotations\Annotation\Required;
-
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
  * @Annotation
  * @Target({"METHOD"})
  */
-class QueryParams extends AbstractAnnotation implements ArgumentInterface
+final class QueryParams extends AbstractAnnotation implements Argument
 {
-    /**
-     * @Required
-     *
-     * @var string
-     */
-    private $argumentName;
+    private $argument;
 
     public function __construct(array $data)
     {
-        $this->argumentName = $data['argumentName'] ?? $data['argument'] ?? $data['value'] ?? null;
+        $this->argument = $data['argument'] ?? $data['value'] ?? null;
     }
 
-    public function getArgumentName(): string
+    public function argument(): string
     {
-        return $this->argumentName;
+        return $this->argument;
     }
 }

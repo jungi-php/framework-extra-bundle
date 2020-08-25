@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgumentInterface;
+use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
@@ -24,8 +24,8 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
 
     public function __construct(string $annotationClass, ConverterInterface $converter, ContainerInterface $annotationLocator)
     {
-        if (!is_subclass_of($annotationClass, NamedValueArgumentInterface::class)) {
-            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValueArgumentInterface::class, $annotationClass));
+        if (!is_subclass_of($annotationClass, NamedValueArgument::class)) {
+            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValueArgument::class, $annotationClass));
         }
 
         $this->annotationClass = $annotationClass;
@@ -52,7 +52,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
 
-        /** @var NamedValueArgumentInterface $annotation */
+        /** @var NamedValueArgument $annotation */
         $annotation = $this->annotationLocator->get($id)->get($this->annotationClass);
 
         $value = $this->getArgumentValue($request, $annotation, $argument);
@@ -66,7 +66,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
                 yield null; return;
             }
 
-            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $annotation->getName()));
+            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $annotation->name()));
         }
 
         if (null === $argument->getType() || TypeUtils::isValueOfType($value, $argument->getType())) {
@@ -76,9 +76,9 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         try {
             yield $this->converter->convert($value, $argument->getType());
         } catch (TypeConversionException $e) {
-            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $annotation->getName()), $e);
+            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $annotation->name()), $e);
         }
     }
 
-    abstract protected function getArgumentValue(Request $request, NamedValueArgumentInterface $annotation, ArgumentMetadata $metadata);
+    abstract protected function getArgumentValue(Request $request, NamedValueArgument $annotation, ArgumentMetadata $metadata);
 }
