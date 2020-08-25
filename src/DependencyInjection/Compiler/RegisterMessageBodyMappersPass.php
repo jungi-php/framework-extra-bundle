@@ -21,17 +21,10 @@ final class RegisterMessageBodyMappersPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('jungi.message_body_mapper') as $id => $attributes) {
             foreach ($attributes as $attribute) {
                 if (!isset($attribute['media_type'])) {
-                    throw new InvalidArgumentException(sprintf(
-                        'Service "%s" must define the "media_type" attribute on "jungi.message_conversion_mapper" tag.'.
-                        $id
-                    ));
+                    throw new InvalidArgumentException(sprintf('Service "%s" must define the "media_type" attribute on "jungi.message_conversion_mapper" tag.', $id));
                 }
                 if (!MediaTypeUtils::isSpecific($attribute['media_type'])) {
-                    throw new InvalidArgumentException(sprintf(
-                        'Service "%s" has the invalid media type "%s", it should be specific eg. "application/json".'.
-                        $id,
-                        $attribute['media_type']
-                    ));
+                    throw new InvalidArgumentException(sprintf('Service "%s" has the invalid media type "%s", it should be specific eg. "application/json".', $id, $attribute['media_type']));
                 }
 
                 $map[$attribute['media_type']] = new Reference($id);

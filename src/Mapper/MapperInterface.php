@@ -12,11 +12,6 @@ interface MapperInterface
     /**
      * Maps from data to type.
      *
-     * @param string $data
-     * @param string $type
-     *
-     * @return object
-     *
      * @throws \InvalidArgumentException On non supported data
      * @throws MalformedDataException
      */
@@ -26,8 +21,6 @@ interface MapperInterface
      * Maps data to type.
      *
      * @param mixed $data
-     *
-     * @return string
      *
      * @throws \InvalidArgumentException On non supported data
      */

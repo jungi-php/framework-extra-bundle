@@ -29,12 +29,7 @@ class ResponseFactory
     }
 
     /**
-     * @param Request $request
-     * @param mixed   $entity
-     * @param int     $status
-     * @param array   $headers
-     *
-     * @return Response
+     * @param mixed $entity
      *
      * @throws NotAcceptableMediaTypeException
      */
@@ -45,11 +40,7 @@ class ResponseFactory
         $contentType = $this->selectResponseContentType($acceptableMediaTypes, $supportedMediaTypes);
 
         if (!$contentType) {
-            throw new NotAcceptableMediaTypeException(
-                MediaTypeDescriptor::listToString($acceptableMediaTypes),
-                MediaTypeDescriptor::listToString($supportedMediaTypes),
-                'Could not select any content type for response.'
-            );
+            throw new NotAcceptableMediaTypeException(MediaTypeDescriptor::listToString($acceptableMediaTypes), MediaTypeDescriptor::listToString($supportedMediaTypes), 'Could not select any content type for response.');
         }
 
         $headers['Content-Type'] = $contentType->toString();
@@ -64,8 +55,6 @@ class ResponseFactory
     /**
      * @param MediaTypeDescriptor[] $acceptableMediaTypes
      * @param MediaTypeDescriptor[] $supportedMediaTypes
-     *
-     * @return MediaTypeDescriptor|null
      */
     private function selectResponseContentType(array $acceptableMediaTypes, array $supportedMediaTypes): ?MediaTypeDescriptor
     {
@@ -86,8 +75,6 @@ class ResponseFactory
      * a. request format
      * b. Accept header
      * c. otherwise default content type
-     *
-     * @param Request $request
      *
      * @return MediaTypeDescriptor[]
      */

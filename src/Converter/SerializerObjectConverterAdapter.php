@@ -27,7 +27,7 @@ final class SerializerObjectConverterAdapter implements ConverterInterface
 
         try {
             return $this->denormalizer->denormalize($data, $type, null, $this->context);
-        } catch (NotNormalizableValueException|\TypeError $e) {
+        } catch (NotNormalizableValueException | \TypeError $e) {
             throw new TypeConversionException($e->getMessage(), 0, $e);
         }
     }

@@ -18,9 +18,6 @@ class MessageBodyMapperManager
      */
     private $mappers;
 
-    /**
-     * @param ServiceProviderInterface $mappers
-     */
     public function __construct(ServiceProviderInterface $mappers)
     {
         $this->mappers = $mappers;
@@ -35,12 +32,6 @@ class MessageBodyMapperManager
     }
 
     /**
-     * @param string $messageBody
-     * @param string $mediaType
-     * @param string $type
-     *
-     * @return object
-     *
      * @throws UnsupportedMediaTypeException
      * @throws MalformedDataException
      */
@@ -57,10 +48,7 @@ class MessageBodyMapperManager
     }
 
     /**
-     * @param mixed  $data
-     * @param string $mediaType
-     *
-     * @return string
+     * @param mixed $data
      *
      * @throws UnsupportedMediaTypeException
      */

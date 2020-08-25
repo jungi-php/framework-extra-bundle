@@ -8,10 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Utils;
 final class TypeUtils
 {
     /**
-     * @param mixed  $value
-     * @param string $type
-     *
-     * @return bool
+     * @param mixed $value
      *
      * @throws \InvalidArgumentException
      */

@@ -18,11 +18,9 @@ class NotAcceptableMediaTypeException extends \RuntimeException
     protected $supportedMediaTypes;
 
     /**
-     * @param string[]        $notAcceptableMediaTypes
-     * @param string[]        $supportedMediaTypes
-     * @param string          $message
-     * @param int             $code
-     * @param \Throwable|null $previous
+     * @param string[] $notAcceptableMediaTypes
+     * @param string[] $supportedMediaTypes
+     * @param int      $code
      */
     public function __construct(array $notAcceptableMediaTypes, array $supportedMediaTypes, string $message, $code = 0, \Throwable $previous = null)
     {

@@ -2,10 +2,10 @@
 
 namespace Jungi\FrameworkExtraBundle\DependencyInjection\Exporter;
 
+use Exception;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Exception;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -18,7 +18,7 @@ final class DefaultObjectExporter implements ObjectExporterInterface
 
         // when the object implements __set_state is automatically considered as exportable
         if (method_exists($object, '__set_state')) {
-            $properties = array();
+            $properties = [];
             $refl = new \ReflectionClass($object);
 
             do {
@@ -46,11 +46,7 @@ final class DefaultObjectExporter implements ObjectExporterInterface
         try {
             $serialized = serialize($object);
         } catch (Exception $e) {
-            throw new InvalidArgumentException(
-                sprintf('Could not serialize object of the type "%s": %s.', $class, $e->getMessage()),
-                null,
-                $e
-            );
+            throw new InvalidArgumentException(sprintf('Could not serialize object of the type "%s": %s.', $class, $e->getMessage()), null, $e);
         }
 
         return (new Definition($class))

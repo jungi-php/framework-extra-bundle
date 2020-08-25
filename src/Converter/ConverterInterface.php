@@ -12,8 +12,7 @@ interface ConverterInterface
     /**
      * Converts data to type.
      *
-     * @param mixed  $data
-     * @param string $type
+     * @param mixed $data
      *
      * @return mixed
      *

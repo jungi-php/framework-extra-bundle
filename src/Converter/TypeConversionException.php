@@ -7,5 +7,4 @@ namespace Jungi\FrameworkExtraBundle\Converter;
  */
 class TypeConversionException extends \InvalidArgumentException
 {
-
 }

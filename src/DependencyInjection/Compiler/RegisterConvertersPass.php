@@ -20,10 +20,7 @@ final class RegisterConvertersPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('jungi.converter') as $id => $attributes) {
             foreach ($attributes as $attribute) {
                 if (!isset($attribute['type'])) {
-                    throw new InvalidArgumentException(sprintf(
-                        'Service "%s" must define the "type" attribute on "jungi.converter" tag.'.
-                        $id
-                    ));
+                    throw new InvalidArgumentException(sprintf('Service "%s" must define the "type" attribute on "jungi.converter" tag.', $id));
                 }
 
                 $map[$attribute['type']] = new Reference($id);

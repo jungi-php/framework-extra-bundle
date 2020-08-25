@@ -5,11 +5,11 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
-use Jungi\FrameworkExtraBundle\Utils\TmpFileUtils;
 use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
+use Jungi\FrameworkExtraBundle\Utils\TmpFileUtils;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -56,16 +56,10 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
         if (!$argument->getType()) {
-            throw new \InvalidArgumentException(sprintf(
-                'Argument "%s" must have the type specified for the request body conversion.',
-                $argument->getName()
-            ));
+            throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request body conversion.', $argument->getName()));
         }
         if ($argument->isNullable()) {
-            throw new \InvalidArgumentException(sprintf(
-                'Argument "%s" cannot be nullable for the request body conversion.',
-                $argument->getName()
-            ));
+            throw new \InvalidArgumentException(sprintf('Argument "%s" cannot be nullable for the request body conversion.', $argument->getName()));
         }
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
@@ -74,12 +68,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
         if (null !== $annotation->type()) {
             if ('array' !== $argument->getType()) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Expected argument "%s" to be type hinted as "array", got "%s", the annotation indicates "%s".',
-                    $argument->getName(),
-                    $argument->getType(),
-                    $annotation->type()
-                ));
+                throw new \InvalidArgumentException(sprintf('Expected argument "%s" to be type hinted as "array", got "%s", the annotation indicates "%s".', $argument->getName(), $argument->getType(), $annotation->type()));
             }
 
             $argumentType = $annotation->type();

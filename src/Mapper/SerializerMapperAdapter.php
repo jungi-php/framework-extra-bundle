@@ -60,9 +60,7 @@ final class SerializerMapperAdapter implements MapperInterface
         if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface
             || !$serializer instanceof EncoderInterface || !$serializer instanceof DecoderInterface
         ) {
-            throw new \InvalidArgumentException(
-                'Expected a serializer that also implements NormalizerInterface, DenormalizerInterface, EncoderInterface and DecoderInterface.'
-            );
+            throw new \InvalidArgumentException('Expected a serializer that also implements NormalizerInterface, DenormalizerInterface, EncoderInterface and DecoderInterface.');
         }
 
         if (!$serializer->supportsEncoding($this->format) || !$serializer->supportsDecoding($this->format)) {

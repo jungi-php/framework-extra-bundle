@@ -13,8 +13,6 @@ class UnsupportedMediaTypeException extends \RuntimeException
     protected $mediaType;
 
     /**
-     * @param string $mediaType
-     *
      * @return static
      */
     public static function mapperNotRegistered(string $mediaType): self
@@ -23,10 +21,7 @@ class UnsupportedMediaTypeException extends \RuntimeException
     }
 
     /**
-     * @param string          $mediaType
-     * @param string          $message
-     * @param int             $code
-     * @param \Throwable|null $previous
+     * @param int $code
      */
     public function __construct(string $mediaType, string $message, $code = 0, \Throwable $previous = null)
     {
@@ -35,9 +30,6 @@ class UnsupportedMediaTypeException extends \RuntimeException
         $this->mediaType = $mediaType;
     }
 
-    /**
-     * @return string
-     */
     public function getMediaType(): string
     {
         return $this->mediaType;

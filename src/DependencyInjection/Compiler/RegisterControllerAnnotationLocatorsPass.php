@@ -35,8 +35,8 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
 
     public function process(ContainerBuilder $container)
     {
-        $refMap = array();
-        $aliases = array();
+        $refMap = [];
+        $aliases = [];
 
         foreach ($container->getAliases() as $alias => $id) {
             if ($id->isPublic() && !$id->isPrivate()) {
@@ -72,8 +72,8 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                     continue;
                 }
 
-                $methodAnnotations = array();
-                $argumentAnnotations = array();
+                $methodAnnotations = [];
+                $argumentAnnotations = [];
                 $existingParameters = array_map(function ($parameter) {
                     return $parameter->name;
                 }, $methodRefl->getParameters());
@@ -83,57 +83,41 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
 
                     if ($annotation instanceof Argument) {
                         if (!in_array($annotation->argument(), $existingParameters, true)) {
-                            throw new InvalidArgumentException(sprintf(
-                                'Expected to have the argument "%s" in "%s::%s()", but it\'s not present.',
-                                $annotation->argument(),
-                                $methodRefl->class,
-                                $methodRefl->name
-                            ));
+                            throw new InvalidArgumentException(sprintf('Expected to have the argument "%s" in "%s::%s()", but it\'s not present.', $annotation->argument(), $methodRefl->class, $methodRefl->name));
                         }
 
                         if (isset($argumentAnnotations[$annotation->argument()][$annotationClass])) {
-                            throw new InvalidArgumentException(sprintf(
-                                'Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".',
-                                $annotationClass,
-                                $annotation->argument(),
-                                $methodRefl->class,
-                                $methodRefl->name
-                            ));
+                            throw new InvalidArgumentException(sprintf('Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".', $annotationClass, $annotation->argument(), $methodRefl->class, $methodRefl->name));
                         }
 
                         $argumentAnnotations[$annotation->argument()][$annotationClass] = $annotation;
                     } elseif ($annotation instanceof Annotation) {
                         if (isset($methodAnnotations[$annotationClass])) {
-                            throw new InvalidArgumentException(sprintf(
-                                'Annotation "%s" occurred more than once at "%s::%s()".',
-                                $annotationClass,
-                                $methodRefl->class,
-                                $methodRefl->name
-                            ));
+                            throw new InvalidArgumentException(sprintf('Annotation "%s" occurred more than once at "%s::%s()".', $annotationClass, $methodRefl->class, $methodRefl->name));
                         }
 
                         $methodAnnotations[$annotationClass] = $annotation;
                     }
                 }
 
-                $suffixId = '__invoke' === $methodRefl->name ? '' : '::'. $methodRefl->name;
+                $suffixId = '__invoke' === $methodRefl->name ? '' : '::'.$methodRefl->name;
 
                 if ($methodAnnotations) {
-                    $refMap[$id . $suffixId] = $this->registerAnnotationLocator($container, $id . $suffixId, array_values($methodAnnotations));
+                    $refMap[$id.$suffixId] = $this->registerAnnotationLocator($container, $id.$suffixId, array_values($methodAnnotations));
                 }
 
                 foreach ($argumentAnnotations as $argumentName => $annotations) {
-                    $entryId = $id . $suffixId . '$' . $argumentName;
+                    $entryId = $id.$suffixId.'$'.$argumentName;
                     $refMap[$entryId] = $this->registerAnnotationLocator($container, $entryId, array_values($annotations));
                 }
 
                 foreach ($aliases[$id] ?? [] as $alias) {
                     if ($methodAnnotations) {
-                        $refMap[$alias . $suffixId] = clone $refMap[$id . $suffixId];
+                        $refMap[$alias.$suffixId] = clone $refMap[$id.$suffixId];
                     }
 
                     foreach ($argumentAnnotations as $argumentName => $annotations) {
-                        $refMap[$alias . $suffixId . '$' . $argumentName] = clone $refMap[$id . $suffixId . '$' . $argumentName];
+                        $refMap[$alias.$suffixId.'$'.$argumentName] = clone $refMap[$id.$suffixId.'$'.$argumentName];
                     }
                 }
             }
