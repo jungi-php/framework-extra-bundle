@@ -6,6 +6,7 @@ use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\NotAcceptableMediaTypeException;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -89,6 +90,16 @@ class ResponseFactoryTest extends TestCase
     public function entityResponseWithFallbackDefaultContentType()
     {
         $this->assertEntityResponseFor('application/json', 'application/json', new Request());
+    }
+
+    /** @test */
+    public function entityResponseOnNoRegisteredMessageBodyMappers()
+    {
+        $this->expectException('LogicException');
+        $this->expectDeprecationMessage('You need to register at least one message body mapper');
+
+        $factory = new ResponseFactory('application/json', new MessageBodyMapperManager(new ServiceLocator([])));
+        $factory->createEntityResponse(new Request(), 'foo');
     }
 
     /** @test */

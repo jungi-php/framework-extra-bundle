@@ -32,13 +32,18 @@ class ResponseFactory
      * @param mixed $entity
      *
      * @throws NotAcceptableMediaTypeException
+     * @throws \LogicException
      */
     public function createEntityResponse(Request $request, $entity, int $status = 200, array $headers = []): Response
     {
         $acceptableMediaTypes = $this->resolveAcceptableMediaTypes($request);
         $supportedMediaTypes = MediaTypeDescriptor::parseList($this->messageBodyMapperManager->getSupportedMediaTypes());
-        $contentType = $this->selectResponseContentType($acceptableMediaTypes, $supportedMediaTypes);
 
+        if (!$supportedMediaTypes) {
+            throw new \LogicException('You need to register at least one message body mapper for an entity response. For a JSON content type, you can use the built-in message body mapper by running "composer require symfony/serializer".');
+        }
+
+        $contentType = $this->selectResponseContentType($acceptableMediaTypes, $supportedMediaTypes);
         if (!$contentType) {
             throw new NotAcceptableMediaTypeException(MediaTypeDescriptor::listToString($acceptableMediaTypes), MediaTypeDescriptor::listToString($supportedMediaTypes), 'Could not select any content type for response.');
         }
