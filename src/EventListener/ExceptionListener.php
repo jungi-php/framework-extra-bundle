@@ -22,7 +22,7 @@ final class ExceptionListener implements EventSubscriberInterface
         switch (true) {
             case $e instanceof NotAcceptableMediaTypeException:
                 $event->setThrowable(new NotAcceptableHttpException(sprintf(
-                    'Could not response with any acceptable content types. Only following are supported: %s.',
+                    'Could not respond with any acceptable content types. Only following are supported: %s.',
                     implode(', ', $e->getSupportedMediaTypes())
                 ), $e));
                 break;
