@@ -13,3 +13,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Instead of 406 HTTP response, return 500 HTTP response in case of no registered message body mapper.
 - Typo in the message of not acceptable http exception.
+
+[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.0.0...HEAD
