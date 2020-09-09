@@ -71,10 +71,13 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
                 throw new \InvalidArgumentException(sprintf('Expected argument "%s" to be type hinted as "array", got "%s", the annotation indicates "%s".', $argument->getName(), $argument->getType(), $annotation->type()));
             }
 
+            if (!TypeUtils::isCollection($annotation->type())) {
+                throw new \InvalidArgumentException(sprintf('Expected a collection type, got "%s".', $annotation->type()));
+            }
+
             $argumentType = $annotation->type();
-            $verifyType = TypeUtils::getCollectionBaseElementType($annotation->type());
         } else {
-            $argumentType = $verifyType = $argument->getType();
+            $argumentType = $argument->getType();
         }
 
         // when request parameters are available
@@ -84,21 +87,6 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
             } catch (TypeConversionException $e) {
                 throw new BadRequestHttpException('Request body parameters are invalid.', $e);
             }
-        }
-
-        // when argument type is not of class type
-        if (!class_exists($verifyType)) {
-            try {
-                yield $this->converter->convert($request->getContent(), $argumentType); return;
-            } catch (TypeConversionException $e) {
-                throw new BadRequestHttpException('Request body is malformed.', $e);
-            }
-        }
-
-        $contentType = $request->headers->get('CONTENT_TYPE');
-
-        if (null === $contentType) {
-            throw new BadRequestHttpException('The request content type must be specified.');
         }
 
         // file as the request body

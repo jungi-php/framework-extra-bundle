@@ -63,37 +63,6 @@ class RequestBodyValueResolverTest extends TestCase
 
     /**
      * @test
-     * @dataProvider provideConvertibleTypes
-     */
-    public function convertRequestBody(string $argumentType, ?string $annotatedAsType)
-    {
-        $annotationLocator = new ServiceLocator(array(
-            'FooController$foo' => function() use ($annotatedAsType) {
-                return new SimpleContainer(array(
-                    RequestBody::class => new RequestBody(['value' => 'foo', 'type' => $annotatedAsType])
-                ));
-            }
-        ));
-
-        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello-world');
-        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
-
-        $argument = new ArgumentMetadata('foo', $argumentType, false, false, null);
-
-        $converter = $this->createMock(ConverterInterface::class);
-        $converter
-            ->expects($this->once())
-            ->method('convert')
-            ->with($request->getContent(), $annotatedAsType ?: $argumentType);
-
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
-
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
-        $resolver->resolve($request, $argument)->current();
-    }
-
-    /**
-     * @test
      * @dataProvider provideMapableTypes
      */
     public function mapRequestBody(string $argumentType, ?string $annotatedAsType)
@@ -116,7 +85,7 @@ class RequestBodyValueResolverTest extends TestCase
         $mapperManager
             ->expects($this->once())
             ->method('mapFrom')
-            ->with($request->getContent(), $request->headers->get('CONTENT_TYPE'), $annotatedAsType ?: $argumentType);
+            ->with('hello-world', 'application/vnd.jungi.test', $annotatedAsType ?: $argumentType);
 
         $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, $argument)->current();
@@ -161,7 +130,6 @@ class RequestBodyValueResolverTest extends TestCase
             ->expects($this->once())
             ->method('convert')
             ->with($expectedData, $argument->getType());
-
 
         $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
         $resolver->resolve($request, $argument)->current();
@@ -378,24 +346,13 @@ class RequestBodyValueResolverTest extends TestCase
         yield ['SplFileObject'];
     }
 
-    public function provideConvertibleTypes()
-    {
-        yield ['string', null];
-        yield ['int', null];
-        yield ['float', null];
-        yield ['bool', null];
-        yield ['array', null];
-        yield ['array', 'string[]'];
-        yield ['array', 'int[]'];
-        yield ['array', 'float[]'];
-        yield ['array', 'bool[]'];
-        yield ['array', 'string[][]'];
-    }
-
     public function provideMapableTypes()
     {
+        yield ['string', null];
         yield ['stdClass', null];
         yield ['array', 'stdClass[]'];
         yield ['array', 'stdClass[][]'];
+        yield ['array', 'string[]'];
+        yield ['array', 'string[][]'];
     }
 }

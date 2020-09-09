@@ -31,7 +31,7 @@ final class SerializerMapperAdapter implements MapperInterface
         $this->setSerializer($serializer);
     }
 
-    public function mapFrom(string $data, string $type): object
+    public function mapFrom(string $data, string $type)
     {
         try {
             return $this->serializer->deserialize($data, $type, $this->format, $this->context);

@@ -3,22 +3,22 @@
 namespace Jungi\FrameworkExtraBundle\Mapper;
 
 /**
- * Maps data from a text representation to an object and vice versa.
+ * Maps data from a text representation to a desired type and vice versa.
  *
  * @author Piotr Kugla <piku235@gmail.com>
  */
 interface MapperInterface
 {
     /**
-     * Maps from data to type.
+     * Maps from text data to type.
      *
      * @throws \InvalidArgumentException On non supported data
      * @throws MalformedDataException
      */
-    public function mapFrom(string $data, string $type): object;
+    public function mapFrom(string $data, string $type);
 
     /**
-     * Maps data to type.
+     * Maps PHP data to text.
      *
      * @param mixed $data
      *

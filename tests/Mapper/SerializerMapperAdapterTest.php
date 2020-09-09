@@ -9,6 +9,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -19,7 +20,7 @@ use Symfony\Component\Serializer\Serializer;
 class SerializerMapperAdapterTest extends TestCase
 {
     /** @test */
-    public function mapFromData()
+    public function mapFromObjectData()
     {
         $expected = new Foo('xml-world');
         $message = <<< 'EOXML'
@@ -33,11 +34,29 @@ EOXML;
         $this->assertEquals($expected, $mapper->mapFrom($message, Foo::class));
     }
 
+    /** @test */
+    public function mapFromScalarData()
+    {
+        $message = '"hello world"';
+
+        $mapper = new SerializerMapperAdapter('json', new Serializer([], [new JsonEncoder()]));
+        $this->assertEquals('hello world', $mapper->mapFrom($message, 'string'));
+    }
+
+    /** @test */
+    public function mapFromCollectionData()
+    {
+        $message = '["hello", "world"]';
+
+        $mapper = new SerializerMapperAdapter('json', new Serializer([new ArrayDenormalizer()], [new JsonEncoder()]));
+        $this->assertEquals(['hello', 'world'], $mapper->mapFrom($message, 'string[]'));
+    }
+
     /**
      * @test
      * @group client_error
      */
-    public function mapFromMalformedData()
+    public function mapFromMalformedObjectData()
     {
         $this->expectException(MalformedDataException::class);
         $message = <<< 'EOXML'
@@ -47,6 +66,32 @@ EOXML;
 
         $mapper = $this->createXmlSerializerMapperAdapter();
         $mapper->mapFrom($message, Foo::class);
+    }
+
+    /**
+     * @test
+     * @group client_error
+     */
+    public function mapFromMalformedScalarData()
+    {
+        $this->expectException(MalformedDataException::class);
+        $message = '"hello world"';
+
+        $mapper = new SerializerMapperAdapter('json', new Serializer([], [new JsonEncoder()]));
+        $mapper->mapFrom($message, 'int');
+    }
+
+    /**
+     * @test
+     * @group client_error
+     */
+    public function mapFromMalformedCollectionData()
+    {
+        $this->expectException(MalformedDataException::class);
+        $message = '[123,234]';
+
+        $mapper = new SerializerMapperAdapter('json', new Serializer([new ArrayDenormalizer()], [new JsonEncoder()]));
+        $mapper->mapFrom($message, 'string[]');
     }
 
     /**
