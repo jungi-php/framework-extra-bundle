@@ -35,7 +35,7 @@ class MessageBodyMapperManager
      * @throws UnsupportedMediaTypeException
      * @throws MalformedDataException
      */
-    public function mapFrom(string $messageBody, string $mediaType, string $type): object
+    public function mapFrom(string $messageBody, string $mediaType, string $type)
     {
         if (!$this->mappers->has($mediaType)) {
             throw UnsupportedMediaTypeException::mapperNotRegistered($mediaType);
