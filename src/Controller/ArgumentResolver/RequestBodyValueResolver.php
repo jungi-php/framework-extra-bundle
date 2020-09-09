@@ -27,6 +27,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
     private $messageBodyMapperManager;
     private $converter;
     private $annotationLocator;
+    private $defaultContentType;
 
     private static $fileClassTypes = [
         UploadedFile::class,
@@ -35,11 +36,12 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         \SplFileObject::class,
     ];
 
-    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $annotationLocator)
+    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $annotationLocator, string $defaultContentType = 'text/plain')
     {
         $this->messageBodyMapperManager = $messageBodyMapperManager;
         $this->converter = $converter;
         $this->annotationLocator = $annotationLocator;
+        $this->defaultContentType = $defaultContentType;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
@@ -61,6 +63,8 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         if ($argument->isNullable()) {
             throw new \InvalidArgumentException(sprintf('Argument "%s" cannot be nullable for the request body conversion.', $argument->getName()));
         }
+
+        $contentType = $request->headers->get('CONTENT_TYPE') ?: $this->defaultContentType;
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
         /** @var RequestBody $annotation */

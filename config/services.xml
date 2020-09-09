@@ -56,6 +56,7 @@
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
             <argument type="service" id="jungi.converter.request_body_parameter" />
             <argument type="service" id="jungi.controller_annotation_locator" />
+            <argument />
         </service>
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver">
             <tag name="controller.argument_value_resolver" />

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Use the default content type `text/plain` (can be overwritten in the configuration) in the `RequestBodyValueResolver` when the `Content-Type` is unavailable.
 - Added `text/plain` mapper.
 - Information about no registered message body mappers when creating an entity response.
 

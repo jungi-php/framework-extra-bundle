@@ -18,6 +18,12 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->booleanNode('serializer')->defaultTrue()->end()
+                ->arrayNode('request')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default_content_type')->defaultValue('text/plain')->end()
+                    ->end()
+                ->end()
                 ->arrayNode('entity_response')
                     ->addDefaultsIfNotSet()
                     ->children()
