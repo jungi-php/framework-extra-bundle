@@ -281,6 +281,23 @@ class RegisterControllerAnnotationLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
+    /** @test */
+    public function invalidRequestBodyAnnotationType(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Expected the argument "foo" to be annotated as a collection type, got "string" in "%s::bad()"',
+            BadControllerRequestBodyAnnotationType::class
+        ));
+
+        $container = new ContainerBuilder();
+        $container->register('foo', BadControllerRequestBodyAnnotationType::class)
+            ->addTag('controller');
+
+        $pass = new RegisterControllerAnnotationLocatorsPass('controller');
+        $pass->process($container);
+    }
+
     private function assertLocatorDefinition(array $expectedAnnotationClasses, Definition $locator): void
     {
         $this->assertEquals(SimpleContainer::class, $locator->getClass());
@@ -400,6 +417,17 @@ class BadControllerRequestBodyArgumentType
      * @RequestBody("foo", type="string[]")
      */
     public function bad(string $foo)
+    {
+
+    }
+}
+
+class BadControllerRequestBodyAnnotationType
+{
+    /**
+     * @RequestBody("foo", type="string")
+     */
+    public function bad(array $foo)
     {
 
     }

@@ -10,6 +10,7 @@ use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\ObjectExporterInterface;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
+use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -103,8 +104,12 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
 
                     if ($annotation instanceof RequestBody && null !== $annotation->type()) {
                         $paramRefl = $existingParameters[$annotation->argument()];
+
                         if (!$paramRefl->isArray()) {
                             throw new InvalidArgumentException(sprintf('Expected the argument "%s" to be of "%s" type, got "%s" in "%s::%s()".', $annotation->argument(), $annotation->type(), $paramRefl->getType()->getName(), $methodRefl->class, $methodRefl->name));
+                        }
+                        if (!TypeUtils::isCollection($annotation->type())) {
+                            throw new InvalidArgumentException(sprintf('Expected the argument "%s" to be annotated as a collection type, got "%s" in "%s::%s()".', $annotation->argument(), $annotation->type(), $methodRefl->class, $methodRefl->name));
                         }
                     }
                 }

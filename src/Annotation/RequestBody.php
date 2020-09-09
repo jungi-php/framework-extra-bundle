@@ -2,8 +2,6 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
-use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
-
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
@@ -18,10 +16,7 @@ final class RequestBody extends AbstractAnnotation implements Argument
     public function __construct(array $data)
     {
         $this->argument = $data['argument'] ?? $data['value'] ?? null;
-
-        if (null !== $type = $data['type'] ?? null) {
-            $this->setArgumentType($type);
-        }
+        $this->type = $data['type'] ?? null;
     }
 
     public function argument(): string
@@ -32,14 +27,5 @@ final class RequestBody extends AbstractAnnotation implements Argument
     public function type(): ?string
     {
         return $this->type;
-    }
-
-    private function setArgumentType(string $type): void
-    {
-        if (!TypeUtils::isCollection($type)) {
-            throw new \InvalidArgumentException('Argument can be annotated only as a collection.');
-        }
-
-        $this->type = $type;
     }
 }

@@ -21,12 +21,4 @@ class RequestBodyTest extends TestCase
         $this->assertEquals('foo', $annotation->argument());
         $this->assertEquals('int[]', $annotation->type());
     }
-
-    /** @test */
-    public function invalid()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        new RequestBody(['value' => 'foo', 'type' => 'array']);
-    }
 }
