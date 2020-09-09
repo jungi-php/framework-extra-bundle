@@ -37,7 +37,7 @@ final class RequestBody extends AbstractAnnotation implements Argument
     private function setArgumentType(string $type): void
     {
         if (!TypeUtils::isCollection($type)) {
-            throw new \InvalidArgumentException('Argument type can be specified only for a collection.');
+            throw new \InvalidArgumentException('Argument can be annotated only as a collection.');
         }
 
         $this->type = $type;

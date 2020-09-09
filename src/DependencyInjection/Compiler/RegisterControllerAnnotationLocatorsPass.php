@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Jungi\FrameworkExtraBundle\Annotation\Annotation;
 use Jungi\FrameworkExtraBundle\Annotation\Argument;
+use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\ObjectExporterInterface;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
@@ -74,18 +75,19 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
 
                 $methodAnnotations = [];
                 $argumentAnnotations = [];
-                $existingParameters = array_map(function ($parameter) {
-                    return $parameter->name;
-                }, $methodRefl->getParameters());
+                $existingParameters = [];
+
+                foreach ($methodRefl->getParameters() as $paramRefl) {
+                    $existingParameters[$paramRefl->name] = $paramRefl;
+                }
 
                 foreach ($this->annotationReader->getMethodAnnotations($methodRefl) as $annotation) {
                     $annotationClass = get_class($annotation);
 
                     if ($annotation instanceof Argument) {
-                        if (!in_array($annotation->argument(), $existingParameters, true)) {
+                        if (!isset($existingParameters[$annotation->argument()])) {
                             throw new InvalidArgumentException(sprintf('Expected to have the argument "%s" in "%s::%s()", but it\'s not present.', $annotation->argument(), $methodRefl->class, $methodRefl->name));
                         }
-
                         if (isset($argumentAnnotations[$annotation->argument()][$annotationClass])) {
                             throw new InvalidArgumentException(sprintf('Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".', $annotationClass, $annotation->argument(), $methodRefl->class, $methodRefl->name));
                         }
@@ -97,6 +99,13 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                         }
 
                         $methodAnnotations[$annotationClass] = $annotation;
+                    }
+
+                    if ($annotation instanceof RequestBody && null !== $annotation->type()) {
+                        $paramRefl = $existingParameters[$annotation->argument()];
+                        if (!$paramRefl->isArray()) {
+                            throw new InvalidArgumentException(sprintf('Expected the argument "%s" to be of "%s" type, got "%s" in "%s::%s()".', $annotation->argument(), $annotation->type(), $paramRefl->getType()->getName(), $methodRefl->class, $methodRefl->name));
+                        }
                     }
                 }
 

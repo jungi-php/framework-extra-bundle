@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Information about no registered message body mappers when creating an entity response.
 
 ### Changed
+- Moved validation of `@RequestBody` argument type from `RequestBodyValueResolver` to `RegisterControllerAnnotationLocatorsPass`.
 - Extended ability of mapping data to any type in `MapperInterface`.
 - Use mappers instead of converters on non-object types (scalars, collections) in the `RequestBodyValueResolver`.
 - Instead of 406 HTTP response, return 500 HTTP response in case of no registered message body mapper.

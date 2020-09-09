@@ -317,31 +317,6 @@ class RequestBodyValueResolverTest extends TestCase
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
     }
 
-    /** @test */
-    public function inappropriateArgumentTypeAnnotation()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectDeprecationMessage('Expected argument "foo" to be type hinted as "array"');
-
-        $annotationLocator = new ServiceLocator(array(
-            'FooController$foo' => function() {
-                return new SimpleContainer(array(
-                    RequestBody::class => new RequestBody(['value' => 'foo', 'type' => 'stdClass[]'])
-                ));
-            }
-        ));
-
-        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], '[{"hello": "world"}, {"hello": "me"}]');
-        $request->headers->set('Content-Type', 'application/json');
-
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class),
-            $annotationLocator
-        );
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null))->current();
-    }
-
     public function provideRegularFileClassTypes()
     {
         yield [File::class];
