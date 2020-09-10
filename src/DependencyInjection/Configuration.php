@@ -21,7 +21,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('request')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('default_content_type')->defaultValue('text/plain')->end()
+                        ->scalarNode('default_content_type')->defaultValue('application/json')->end()
                     ->end()
                 ->end()
                 ->arrayNode('entity_response')

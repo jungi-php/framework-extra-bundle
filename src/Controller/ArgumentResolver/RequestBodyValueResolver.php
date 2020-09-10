@@ -36,7 +36,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         \SplFileObject::class,
     ];
 
-    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $annotationLocator, string $defaultContentType = 'text/plain')
+    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $annotationLocator, string $defaultContentType = 'application/json')
     {
         $this->messageBodyMapperManager = $messageBodyMapperManager;
         $this->converter = $converter;

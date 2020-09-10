@@ -30,13 +30,6 @@
         <service id="jungi.converter.request_header" alias="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
         <service id="jungi.converter.request_cookie" alias="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
 
-        <service id="jungi.message_body_mapper.text" class="Jungi\FrameworkExtraBundle\Mapper\ConverterMapperAdapter">
-            <tag name="jungi.message_body_mapper" media-type="text/plain" />
-
-            <argument>string</argument>
-            <argument type="service" id="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
-        </service>
-
         <service id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" class="Jungi\FrameworkExtraBundle\Http\ResponseFactory" public="true">
             <argument />
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
