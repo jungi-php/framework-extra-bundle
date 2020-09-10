@@ -3,6 +3,7 @@
 namespace Jungi\FrameworkExtraBundle\Mapper;
 
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
+use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -20,7 +21,11 @@ final class ConverterMapperAdapter implements MapperInterface
 
     public function mapFrom(string $data, string $type)
     {
-        return $this->converter->convert($data, $type);
+        try {
+            return $this->converter->convert($data, $type);
+        } catch (TypeConversionException $e) {
+            throw new MalformedDataException($e->getMessage(), null, $e);
+        }
     }
 
     public function mapTo($data): string

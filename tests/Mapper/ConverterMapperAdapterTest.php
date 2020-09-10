@@ -3,13 +3,15 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Mapper;
 
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
+use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Mapper\ConverterMapperAdapter;
+use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class ConverterAdapterTest extends TestCase
+class ConverterMapperAdapterTest extends TestCase
 {
     /** @test */
     public function mapFrom(): void
@@ -23,6 +25,21 @@ class ConverterAdapterTest extends TestCase
 
         $mapper = new ConverterMapperAdapter('string', $converter);
         $mapper->mapFrom('123', 'int');
+    }
+
+    /** @test */
+    public function mapFromMalformedData(): void
+    {
+        $this->expectException(MalformedDataException::class);
+
+        $converter = $this->createMock(ConverterInterface::class);
+        $converter
+            ->expects($this->once())
+            ->method('convert')
+            ->willThrowException(new TypeConversionException());
+
+        $mapper = new ConverterMapperAdapter('string', $converter);
+        $mapper->mapFrom('foo', 'int');
     }
 
     /** @test */
