@@ -20,4 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Typo in the message of not acceptable http exception.
 
+### Deprecated
+- Config option "default_content_type" at "entity_response". Moved to the root node "jungi_framework_extra".
+
 [unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.0.0...HEAD

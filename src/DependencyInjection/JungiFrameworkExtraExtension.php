@@ -28,9 +28,9 @@ final class JungiFrameworkExtraExtension extends Extension
         }
 
         $responseFactory = $container->getDefinition(ResponseFactory::class);
-        $responseFactory->replaceArgument(0, $config['entity_response']['default_content_type']);
+        $responseFactory->replaceArgument(0, $config['entity_response']['default_content_type'] ?? $config['default_content_type']);
 
         $requestBodyValueResolver = $container->getDefinition(RequestBodyValueResolver::class);
-        $requestBodyValueResolver->replaceArgument(3, $config['request']['default_content_type']);
+        $requestBodyValueResolver->replaceArgument(3, $config['default_content_type']);
     }
 }
