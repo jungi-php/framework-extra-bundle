@@ -228,9 +228,9 @@ class RequestBodyValueResolverTest extends TestCase
         $mapperManager
             ->expects($this->once())
             ->method('mapFrom')
-            ->with('123', 'text/plain', 'int');
+            ->with('123', 'application/vnd.jungi.test', 'int');
 
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator);
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, $annotationLocator, 'application/vnd.jungi.test');
         $resolver->resolve($request, $argument)->current();
     }
 
