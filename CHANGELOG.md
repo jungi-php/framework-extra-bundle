@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2020-09-11
+
 ### Added
 - Use the default content type `application/json` (can be overwritten in the configuration) when the request `Content-Type` is unavailable in the `RequestBodyValueResolver`.
 - Information about no registered message body mappers when creating an entity response.
@@ -24,4 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 - Config option "default_content_type" at "entity_response". Moved to the root node "jungi_framework_extra".
 
-[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.0.0...v1.1.0
