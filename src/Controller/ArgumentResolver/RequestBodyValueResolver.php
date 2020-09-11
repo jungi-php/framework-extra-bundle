@@ -2,7 +2,8 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
@@ -10,7 +11,6 @@ use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Utils\TmpFileUtils;
-use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,9 +24,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 {
+    private const DEFAULT_CONTENT_TYPE = 'application/json';
+
+    private $attributeClass;
     private $messageBodyMapperManager;
     private $converter;
-    private $annotationLocator;
+    private $attributeLocator;
     private $defaultContentType;
 
     private static $fileClassTypes = [
@@ -36,11 +39,22 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         \SplFileObject::class,
     ];
 
-    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $annotationLocator, string $defaultContentType = 'application/json')
+    public static function onAttribute(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType = self::DEFAULT_CONTENT_TYPE): self
     {
+        return new self(Attribute\RequestBody::class, $messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
+    }
+
+    public static function onAnnotation(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType = self::DEFAULT_CONTENT_TYPE): self
+    {
+        return new self(Annotation\RequestBody::class, $messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
+    }
+
+    private function __construct(string $attributeClass, MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType)
+    {
+        $this->attributeClass = $attributeClass;
         $this->messageBodyMapperManager = $messageBodyMapperManager;
         $this->converter = $converter;
-        $this->annotationLocator = $annotationLocator;
+        $this->attributeLocator = $attributeLocator;
         $this->defaultContentType = $defaultContentType;
     }
 
@@ -52,7 +66,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
         $id = $controller.'$'.$argument->getName();
 
-        return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has(RequestBody::class);
+        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has($this->attributeClass);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
@@ -67,9 +81,9 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         $contentType = $request->headers->get('CONTENT_TYPE') ?: $this->defaultContentType;
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
-        /** @var RequestBody $annotation */
-        $annotation = $this->annotationLocator->get($id)->get(RequestBody::class);
-        $argumentType = $annotation->type() ?: $argument->getType();
+        /** @var Attribute\RequestBody $attribute */
+        $attribute = $this->attributeLocator->get($id)->get($this->attributeClass);
+        $argumentType = $attribute->type() ?: $argument->getType();
 
         // when request parameters are available
         if ($parameters = array_replace_recursive($request->request->all(), $request->files->all())) {

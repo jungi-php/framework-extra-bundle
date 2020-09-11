@@ -20,5 +20,9 @@ class RequestBodyTest extends TestCase
         $annotation = new RequestBody(['value' => 'zoo', 'argument' => 'foo', 'type' => 'int[]']);
         $this->assertEquals('foo', $annotation->argument());
         $this->assertEquals('int[]', $annotation->type());
+
+        $annotation = RequestBody::__set_state(['argument' => 'foo', 'type' => 'int[]']);
+        $this->assertEquals('foo', $annotation->argument());
+        $this->assertEquals('int[]', $annotation->type());
     }
 }

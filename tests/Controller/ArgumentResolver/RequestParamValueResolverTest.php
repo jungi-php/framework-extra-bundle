@@ -2,8 +2,9 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
@@ -18,11 +19,12 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
+    /** @test */
     public function uploadedFileArgument()
     {
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$file' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('file')]);
+                return $this->createAttributeContainer([$this->createAttribute('file')]);
             }
         ));
 
@@ -31,7 +33,7 @@ class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResol
             ->expects($this->never())
             ->method('convert');
 
-        $resolver = $this->createArgumentValueResolver($converter, $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($converter, $attributeLocator);
         $request = new Request([], [], ['_controller' => 'FooController'], [], [
             'file' => new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain'),
         ]);
@@ -39,9 +41,14 @@ class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResol
         $resolver->resolve($request, new ArgumentMetadata('file', UploadedFile::class, false, false, null))->current();
     }
 
-    protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $annotationLocator): ArgumentValueResolverInterface
+    protected function createAttributeArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface
     {
-        return new RequestParamValueResolver($converter, $annotationLocator);
+        return RequestParamValueResolver::onAttribute($converter, $attributeLocator);
+    }
+
+    protected function createAnnotationArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface
+    {
+        return RequestParamValueResolver::onAnnotation($converter, $attributeLocator);
     }
 
     protected function createRequestWithParameters(array $parameters): Request
@@ -49,8 +56,13 @@ class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResol
         return new Request([], $parameters);
     }
 
+    protected function createAttribute(string $name): NamedValueArgument
+    {
+        return new Attribute\RequestParam($name);
+    }
+
     protected function createAnnotation(string $name): NamedValueArgument
     {
-        return new RequestParam(array('value' => $name));
+        return new Annotation\RequestParam(['name' => $name]);
     }
 }

@@ -15,5 +15,6 @@ class QueryParamsTest extends TestCase
     {
         $this->assertEquals('foo', (new QueryParams(['value' => 'foo']))->argument());
         $this->assertEquals('bar', (new QueryParams(['value' => 'foo', 'argument' => 'bar']))->argument());
+        $this->assertEquals('bar', (QueryParams::__set_state(['argument' => 'bar']))->argument());
     }
 }

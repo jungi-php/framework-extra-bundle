@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
-use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
+use Jungi\FrameworkExtraBundle\Attribute\ResponseBody as BaseResponseBody;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -10,6 +10,6 @@ use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
  * @Annotation
  * @Target({"METHOD"})
  */
-final class ResponseBody implements Annotation, Exportable
+final class ResponseBody extends BaseResponseBody implements Annotation
 {
 }

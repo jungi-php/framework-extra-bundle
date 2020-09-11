@@ -2,8 +2,9 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\RequestCookie;
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
@@ -20,9 +21,14 @@ class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueReso
         $this->markTestSkipped('always as string value');
     }
 
-    protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $annotationLocator): ArgumentValueResolverInterface
+    protected function createAttributeArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface
     {
-        return new RequestCookieValueResolver($converter, $annotationLocator);
+        return RequestCookieValueResolver::onAttribute($converter, $attributeLocator);
+    }
+
+    protected function createAnnotationArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface
+    {
+        return RequestCookieValueResolver::onAnnotation($converter, $attributeLocator);
     }
 
     protected function createRequestWithParameters(array $parameters): Request
@@ -30,8 +36,13 @@ class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueReso
         return new Request([], [], [], $parameters);
     }
 
+    protected function createAttribute(string $name): NamedValueArgument
+    {
+        return new Attribute\RequestCookie($name);
+    }
+
     protected function createAnnotation(string $name): NamedValueArgument
     {
-        return new RequestCookie(array('value' => $name));
+        return new Annotation\RequestCookie(['name' => $name]);
     }
 }

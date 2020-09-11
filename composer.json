@@ -5,7 +5,7 @@
     "type": "symfony-bundle",
     "license": "MIT",
     "require": {
-        "php": "^7.2.9",
+        "php": ">=7.2.9",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",

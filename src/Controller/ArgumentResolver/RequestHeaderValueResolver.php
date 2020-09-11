@@ -2,8 +2,9 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
-use Jungi\FrameworkExtraBundle\Annotation\RequestHeader;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,17 +15,22 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class RequestHeaderValueResolver extends AbstractNamedValueArgumentValueResolver
 {
-    public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
+    public static function onAttribute(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        parent::__construct(RequestHeader::class, $converter, $annotationLocator);
+        return new self(Attribute\RequestHeader::class, $converter, $attributeLocator);
     }
 
-    public function getArgumentValue(Request $request, NamedValueArgument $annotation, ArgumentMetadata $metadata)
+    public static function onAnnotation(ConverterInterface $converter, ContainerInterface $attributeLocator): self
+    {
+        return new self(Annotation\RequestHeader::class, $converter, $attributeLocator);
+    }
+
+    public function getArgumentValue(string $name, Request $request, NamedValueArgument $attribute, ArgumentMetadata $metadata)
     {
         if ('array' === $metadata->getType()) {
-            return $request->headers->all($annotation->name());
+            return $request->headers->all($name);
         }
 
-        return $request->headers->get($annotation->name());
+        return $request->headers->get($name);
     }
 }

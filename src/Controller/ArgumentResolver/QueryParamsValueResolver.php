@@ -2,7 +2,8 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Psr\Container\ContainerInterface;
@@ -15,13 +16,25 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 {
+    private $attributeClass;
     private $converter;
-    private $annotationLocator;
+    private $attributeLocator;
 
-    public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
+    public static function onAttribute(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
+        return new self(Attribute\QueryParams::class, $converter, $attributeLocator);
+    }
+
+    public static function onAnnotation(ConverterInterface $converter, ContainerInterface $attributeLocator): self
+    {
+        return new self(Annotation\QueryParams::class, $converter, $attributeLocator);
+    }
+
+    private function __construct(string $attributeClass, ConverterInterface $converter, ContainerInterface $attributeLocator)
+    {
+        $this->attributeClass = $attributeClass;
         $this->converter = $converter;
-        $this->annotationLocator = $annotationLocator;
+        $this->attributeLocator = $attributeLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
@@ -32,7 +45,7 @@ final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 
         $id = $controller.'$'.$argument->getName();
 
-        return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has(QueryParams::class);
+        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has($this->attributeClass);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)

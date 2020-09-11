@@ -2,12 +2,12 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
-use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
-use Jungi\FrameworkExtraBundle\Tests\Fixtures\FakeArgumentAnnotation;
-use PHPUnit\Framework\TestCase;
+use Jungi\FrameworkExtraBundle\Tests\Fixtures\DummyObject;
+use Jungi\FrameworkExtraBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -20,41 +20,49 @@ class QueryParamsValueResolverTest extends TestCase
     /** @test */
     public function supports()
     {
-        $annotationLocator = new ServiceLocator(array(
+        // Attribute
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return new SimpleContainer(array(
-                    QueryParams::class => new QueryParams(['value' => 'foo']),
-                ));
+                return $this->createAttributeContainer([new Attribute\QueryParams()]);
             }
         ));
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = QueryParamsValueResolver::onAttribute($this->createMock(ConverterInterface::class), $attributeLocator);
 
         $request = new Request([], [], ['_controller' => 'FooController']);
         $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', null, false, false, null)));
 
-        $annotationLocator = new ServiceLocator(array(
+        // Dummy
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return new SimpleContainer(array(
-                    FakeArgumentAnnotation::class => new FakeArgumentAnnotation(),
-                ));
+                return $this->createAttributeContainer([new DummyObject()]);
             }
         ));
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = QueryParamsValueResolver::onAttribute($this->createMock(ConverterInterface::class), $attributeLocator);
         $request = new Request([], [], ['_controller' => 'FooController']);
 
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
+
+        // Annotation
+        $attributeLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return $this->createAttributeContainer([new Annotation\QueryParams(['value' => 'foo'])]);
+            }
+        ));
+        $resolver = QueryParamsValueResolver::onAnnotation($this->createMock(ConverterInterface::class), $attributeLocator);
+
+        $request = new Request([], [], ['_controller' => 'FooController']);
+        $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
+        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', null, false, false, null)));
     }
 
     /** @test */
     public function requestWithQueryParameters()
     {
         $type = 'stdClass';
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return new SimpleContainer(array(
-                    QueryParams::class => new QueryParams(['value' => 'foo']),
-                ));
+                return $this->createAttributeContainer([new Attribute\QueryParams()]);
             }
         ));
 
@@ -66,7 +74,7 @@ class QueryParamsValueResolverTest extends TestCase
             ->method('convert')
             ->with($request->query->all(), $type);
 
-        $resolver = new QueryParamsValueResolver($converter, $annotationLocator);
+        $resolver = QueryParamsValueResolver::onAttribute($converter, $attributeLocator);
         $resolver->resolve($request, new ArgumentMetadata('foo', $type, false, false, null))->current();
     }
 
@@ -76,7 +84,7 @@ class QueryParamsValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" cannot be nullable');
 
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class), new ServiceLocator([]));
+        $resolver = QueryParamsValueResolver::onAttribute($this->createMock(ConverterInterface::class), new ServiceLocator([]));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null, true))->current();
     }
 
@@ -86,7 +94,7 @@ class QueryParamsValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must have the type specified');
 
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class), new ServiceLocator([]));
+        $resolver = QueryParamsValueResolver::onAttribute($this->createMock(ConverterInterface::class), new ServiceLocator([]));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null))->current();
     }
 
@@ -96,7 +104,7 @@ class QueryParamsValueResolverTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must be of concrete class type');
 
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class), new ServiceLocator([]));
+        $resolver = QueryParamsValueResolver::onAttribute($this->createMock(ConverterInterface::class), new ServiceLocator([]));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null))->current();
     }
 }

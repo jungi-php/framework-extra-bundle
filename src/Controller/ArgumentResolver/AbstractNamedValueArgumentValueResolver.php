@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
@@ -14,23 +14,24 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
+ * @internal
  * @author Piotr Kugla <piku235@gmail.com>
  */
 abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueResolverInterface
 {
-    private $annotationClass;
+    private $attributeClass;
     private $converter;
-    private $annotationLocator;
+    private $attributeLocator;
 
-    public function __construct(string $annotationClass, ConverterInterface $converter, ContainerInterface $annotationLocator)
+    protected function __construct(string $attributeClass, ConverterInterface $converter, ContainerInterface $attributeLocator)
     {
-        if (!is_subclass_of($annotationClass, NamedValueArgument::class)) {
-            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValueArgument::class, $annotationClass));
+        if (!is_subclass_of($attributeClass, NamedValueArgument::class)) {
+            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValueArgument::class, $attributeClass));
         }
 
-        $this->annotationClass = $annotationClass;
+        $this->attributeClass = $attributeClass;
         $this->converter = $converter;
-        $this->annotationLocator = $annotationLocator;
+        $this->attributeLocator = $attributeLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
@@ -41,7 +42,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
 
         $id = $controller.'$'.$argument->getName();
 
-        return $this->annotationLocator->has($id) && $this->annotationLocator->get($id)->has($this->annotationClass);
+        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has($this->attributeClass);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
@@ -51,11 +52,10 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         }
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
+        $attribute = $this->attributeLocator->get($id)->get($this->attributeClass);
 
-        /** @var NamedValueArgument $annotation */
-        $annotation = $this->annotationLocator->get($id)->get($this->annotationClass);
-
-        $value = $this->getArgumentValue($request, $annotation, $argument);
+        $name = $attribute->name() ?: $argument->getName();
+        $value = $this->getArgumentValue($name, $request, $attribute, $argument);
 
         if (null === $value && $argument->hasDefaultValue()) {
             $value = $argument->getDefaultValue();
@@ -66,7 +66,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
                 yield null; return;
             }
 
-            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $annotation->name()));
+            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $name));
         }
 
         if (null === $argument->getType() || TypeUtils::isValueOfType($value, $argument->getType())) {
@@ -76,9 +76,9 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         try {
             yield $this->converter->convert($value, $argument->getType());
         } catch (TypeConversionException $e) {
-            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $annotation->name()), $e);
+            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $name), $e);
         }
     }
 
-    abstract protected function getArgumentValue(Request $request, NamedValueArgument $annotation, ArgumentMetadata $metadata);
+    abstract protected function getArgumentValue(string $name, Request $request, NamedValueArgument $attribute, ArgumentMetadata $metadata);
 }

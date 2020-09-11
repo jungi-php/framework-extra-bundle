@@ -2,8 +2,9 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
-use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,17 +15,22 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class RequestParamValueResolver extends AbstractNamedValueArgumentValueResolver
 {
-    public function __construct(ConverterInterface $converter, ContainerInterface $annotationLocator)
+    public static function onAttribute(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        parent::__construct(RequestParam::class, $converter, $annotationLocator);
+        return new self(Attribute\RequestParam::class, $converter, $attributeLocator);
     }
 
-    public function getArgumentValue(Request $request, NamedValueArgument $annotation, ArgumentMetadata $metadata)
+    public static function onAnnotation(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        if ($this !== $result = $request->files->get($annotation->name(), $this)) {
+        return new self(Annotation\RequestParam::class, $converter, $attributeLocator);
+    }
+
+    public function getArgumentValue(string $name, Request $request, NamedValueArgument $attribute, ArgumentMetadata $metadata)
+    {
+        if ($this !== $result = $request->files->get($name, $this)) {
             return $result;
         }
 
-        return $request->request->get($annotation->name());
+        return $request->request->get($name);
     }
 }

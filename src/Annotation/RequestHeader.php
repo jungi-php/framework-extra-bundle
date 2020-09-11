@@ -2,26 +2,25 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
+use Jungi\FrameworkExtraBundle\Attribute\RequestHeader as BaseRequestHeader;
+
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
  * @Annotation
  * @Target({"METHOD"})
  */
-final class RequestHeader extends AbstractAnnotation implements NamedValueArgument
+final class RequestHeader extends BaseRequestHeader implements Argument
 {
-    private $name;
+    use StatefulTrait;
+
     private $argument;
 
     public function __construct(array $data)
     {
-        $this->name = $data['name'] ?? null;
-        $this->argument = $data['argument'] ?? $data['value'] ?? null;
-    }
+        parent::__construct($data['name']);
 
-    public function name(): string
-    {
-        return $this->name;
+        $this->argument = $data['argument'] ?? $data['value'] ?? null;
     }
 
     public function argument(): string

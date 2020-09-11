@@ -20,5 +20,9 @@ class RequestHeaderTest extends TestCase
         $annotation = new RequestHeader(['value' => 'foo', 'argument' => 'zoo', 'name' => 'bar']);
         $this->assertEquals('zoo', $annotation->argument());
         $this->assertEquals('bar', $annotation->name());
+
+        $annotation = RequestHeader::__set_state(['argument' => 'zoo', 'name' => 'bar']);
+        $this->assertEquals('zoo', $annotation->argument());
+        $this->assertEquals('bar', $annotation->name());
     }
 }

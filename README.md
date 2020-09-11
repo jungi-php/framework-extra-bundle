@@ -4,17 +4,19 @@ Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on to
 
 [![Build Status](https://img.shields.io/travis/piku235/JungiFrameworkExtraBundle/master.svg?style=flat-square)](https://travis-ci.org/piku235/JungiFrameworkExtraBundle)
 
-Annotations:
+Attributes (aka annotations):
 
-* **@RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
-* **@RequestHeader** - Converts a request header to the controller method argument.
-* **@RequestCookie** - Converts a request cookie to the controller method argument.
-* **@RequestParam** - Converts a request body parameter to the controller method argument.
-* **@QueryParam** - Converts a request query parameter to the controller method argument.
-* **@QueryParams** - Converts the request query parameters to the controller method argument.
-* **@ResponseBody** - Maps the controller method result to an appropriate entity response.
+* **RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
+* **RequestHeader** - Converts a request header to the controller method argument.
+* **RequestCookie** - Converts a request cookie to the controller method argument.
+* **RequestParam** - Converts a request body parameter to the controller method argument.
+* **QueryParam** - Converts a request query parameter to the controller method argument.
+* **QueryParams** - Converts the request query parameters to the controller method argument.
+* **ResponseBody** - Maps the controller method result to an appropriate entity response.
 
 ## Quick insight
+
+### Annotations
 
 ```php
 namespace App\Controller;
@@ -79,6 +81,57 @@ class UserController
      * @ResponseBody
      */
     public function filterUsers(FilterUsersDto $filterData)
+    {
+        // ..
+        /** @var UserData[] $filteredUsers */
+        return $filteredUsers;
+    }
+}
+```
+
+### Attributes (PHP 8.0)
+
+```php
+namespace App\Controller;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Attribute\Route;
+use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
+use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
+use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
+use Jungi\FrameworkExtraBundle\Attribute\QueryParam;
+use Jungi\FrameworkExtraBundle\Attribute\RequestParam;
+
+#[Route('/users')]
+class UserController
+{
+    #[Route('/{userId}/residential-address', methods: ['PATCH'])]
+    public function changeResidentialAddress(string $userId, #[RequestBody] UserResidentialAddressData $data)
+    {
+        // ..
+    }
+
+    #[Route('/{userId}/files/{fileName}', methods: ['PUT'])]
+    public function uploadFile(string $userId, string $fileName, #[RequestBody] UploadedFile $file)
+    {
+        // ..
+    }
+
+    #[Route('/{userId}/avatar', methods: ['PATCH'])]
+    public function replaceAvatar(string $userId, #[RequestParam] UploadedFile $file,  #[RequestParam] string $title)
+    {
+        // ..
+    }
+
+    #[Route('', methods: ['GET'])]
+    public function getUsers(#[QueryParam] ?int $limit = null, #[QueryParam] ?int $offset = null)
+    {
+        // ..
+    }
+
+    #[Route('', methods: ['GET'])]
+    #[ResponseBody]
+    public function filterUsers(#[QueryParams] FilterUsersDto $filterData)
     {
         // ..
         /** @var UserData[] $filteredUsers */

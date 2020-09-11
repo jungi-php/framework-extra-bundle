@@ -2,26 +2,25 @@
 
 namespace Jungi\FrameworkExtraBundle\Annotation;
 
+use Jungi\FrameworkExtraBundle\Attribute\RequestParam as BaseRequestParam;
+
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
  * @Annotation
  * @Target({"METHOD"})
  */
-final class RequestParam extends AbstractAnnotation implements NamedValueArgument
+final class RequestParam extends BaseRequestParam implements Argument
 {
-    private $name;
+    use StatefulTrait;
+
     private $argument;
 
     public function __construct(array $data)
     {
-        $this->name = $data['name'] ?? $data['value'] ?? null;
-        $this->argument = $data['argument'] ?? $data['value'] ?? null;
-    }
+        parent::__construct($data['name'] ?? $data['value'] ?? null);
 
-    public function name(): string
-    {
-        return $this->name;
+        $this->argument = $data['argument'] ?? $data['value'] ?? null;
     }
 
     public function argument(): string

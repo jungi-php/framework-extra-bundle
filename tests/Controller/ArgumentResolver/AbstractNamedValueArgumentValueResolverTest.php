@@ -2,12 +2,11 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
-use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
-use Jungi\FrameworkExtraBundle\Tests\Fixtures\FakeArgumentAnnotation;
-use PHPUnit\Framework\TestCase;
+use Jungi\FrameworkExtraBundle\Tests\Fixtures\DummyObject;
+use Jungi\FrameworkExtraBundle\Tests\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,12 +19,13 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     /** @test */
     public function supports()
     {
-        $annotationLocator = new ServiceLocator(array(
+        // Attribute
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
-        $resolver = $this->createArgumentValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($this->createMock(ConverterInterface::class), $attributeLocator);
 
         $request = new Request([], [], ['_controller' => 'FooController']);
         $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
@@ -34,23 +34,36 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
         $request = new Request([], [], ['_controller' => 'BarController']);
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
 
-        $annotationLocator = new ServiceLocator(array(
+        // Dummy
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([new FakeArgumentAnnotation()]);
+                return $this->createAttributeContainer([new DummyObject()]);
             }
         ));
-        $resolver = $this->createArgumentValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($this->createMock(ConverterInterface::class), $attributeLocator);
         $request = new Request([], [], ['_controller' => 'FooController']);
 
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
+
+        // Annotation
+        $attributeLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return $this->createAttributeContainer([$this->createAnnotation('foo')]);
+            }
+        ));
+        $resolver = $this->createAnnotationArgumentValueResolver($this->createMock(ConverterInterface::class), $attributeLocator);
+
+        $request = new Request([], [], ['_controller' => 'FooController']);
+        $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null)));
+        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', null, false, false, null)));
     }
 
     /** @test */
     public function parameterConversion()
     {
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
@@ -60,7 +73,7 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
             ->method('convert')
             ->with('1992-12-10 23:23:23', \DateTimeImmutable::class);
 
-        $resolver = $this->createArgumentValueResolver($converter, $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($converter, $attributeLocator);
         $request = $this->createRequestWithParameters(array(
             'foo' => '1992-12-10 23:23:23'
         ));
@@ -72,9 +85,9 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     /** @test */
     public function argumentWithoutType()
     {
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
@@ -83,7 +96,7 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
             ->expects($this->never())
             ->method('convert');
 
-        $resolver = $this->createArgumentValueResolver($converter, $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($converter, $attributeLocator);
         $request = $this->createRequestWithParameters(array(
             'foo' => 'bar'
         ));
@@ -95,9 +108,9 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     /** @test */
     public function argumentTypeSameAsParameterType()
     {
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
@@ -106,7 +119,7 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
             ->expects($this->never())
             ->method('convert');
 
-        $resolver = $this->createArgumentValueResolver($converter, $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($converter, $attributeLocator);
         $request = $this->createRequestWithParameters(array(
             'foo' => 123
         ));
@@ -120,9 +133,9 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
@@ -131,7 +144,7 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
             ->method('convert')
             ->willThrowException(new TypeConversionException('Type conversion failed.'));
 
-        $resolver = $this->createArgumentValueResolver($converter, $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($converter, $attributeLocator);
         $request = $this->createRequestWithParameters(array(
             'foo' => 'bar'
         ));
@@ -145,7 +158,7 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $resolver = $this->createArgumentValueResolver($this->createMock(ConverterInterface::class), new ServiceLocator([]));
+        $resolver = $this->createAttributeArgumentValueResolver($this->createMock(ConverterInterface::class), new ServiceLocator([]));
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, true, false, null))->current();
     }
 
@@ -154,13 +167,13 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
-        $resolver = $this->createArgumentValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($this->createMock(ConverterInterface::class), $attributeLocator);
         $request = new Request([], [], ['_controller' => 'FooController']);
 
         $resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null))->current();
@@ -169,13 +182,13 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     /** @test */
     public function nullableArgument()
     {
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
-        $resolver = $this->createArgumentValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($this->createMock(ConverterInterface::class), $attributeLocator);
         $request = new Request([], [], ['_controller' => 'FooController']);
 
         $this->assertNull($resolver->resolve($request, new ArgumentMetadata('foo', null, false, false, null, true))->current());
@@ -184,33 +197,27 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     /** @test */
     public function defaultArgumentValue()
     {
-        $annotationLocator = new ServiceLocator(array(
+        $attributeLocator = new ServiceLocator(array(
             'FooController$foo' => function() {
-                return $this->createAnnotationContainer([$this->createAnnotation('foo')]);
+                return $this->createAttributeContainer([$this->createAttribute('foo')]);
             }
         ));
 
         $defaultValue = 'bar';
-        $resolver = $this->createArgumentValueResolver($this->createMock(ConverterInterface::class), $annotationLocator);
+        $resolver = $this->createAttributeArgumentValueResolver($this->createMock(ConverterInterface::class), $attributeLocator);
         $request = new Request([], [], ['_controller' => 'FooController']);
 
         $value = $resolver->resolve($request, new ArgumentMetadata('foo', null, false, true, $defaultValue))->current();
         $this->assertEquals($defaultValue, $value);
     }
 
-    protected function createAnnotationContainer(array $annotations): ContainerInterface
-    {
-        $map = array();
-        foreach ($annotations as $annotation) {
-            $map[get_class($annotation)] = $annotation;
-        }
+    abstract protected function createAttributeArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface;
 
-        return new SimpleContainer($map);
-    }
-
-    abstract protected function createArgumentValueResolver(ConverterInterface $converter, ContainerInterface $annotationLocator): ArgumentValueResolverInterface;
+    abstract protected function createAnnotationArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface;
 
     abstract protected function createRequestWithParameters(array $parameters): Request;
+
+    abstract protected function createAttribute(string $name): NamedValueArgument;
 
     abstract protected function createAnnotation(string $name): NamedValueArgument;
 }

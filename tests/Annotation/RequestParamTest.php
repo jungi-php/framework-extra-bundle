@@ -24,5 +24,9 @@ class RequestParamTest extends TestCase
         $annotation = new RequestParam(['value' => 'foo', 'argument' => 'bar']);
         $this->assertEquals('bar', $annotation->argument());
         $this->assertEquals('foo', $annotation->name());
+
+        $annotation = RequestParam::__set_state(['name' => 'foo', 'argument' => 'bar']);
+        $this->assertEquals('bar', $annotation->argument());
+        $this->assertEquals('foo', $annotation->name());
     }
 }

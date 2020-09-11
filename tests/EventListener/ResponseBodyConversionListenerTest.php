@@ -2,11 +2,11 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\EventListener;
 
-use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
+use Jungi\FrameworkExtraBundle\Annotation;
+use Jungi\FrameworkExtraBundle\Attribute;
 use Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
-use PHPUnit\Framework\TestCase;
+use Jungi\FrameworkExtraBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,15 +19,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class ResponseBodyConversionListenerTest extends TestCase
 {
     /** @test */
-    public function responseBodyMapped()
+    public function responseBodyMappedOnAttribute()
     {
-        $annotationLocator = new ServiceLocator(array(
-            'FooController::bar' => function() {
-                return new SimpleContainer(array(
-                    ResponseBody::class => new ResponseBody()
-                ));
-            },
-        ));
         $request = new Request([], [], ['_controller' => 'FooController::bar']);
 
         $httpKernel = $this->createMock(HttpKernelInterface::class);
@@ -40,7 +33,40 @@ class ResponseBodyConversionListenerTest extends TestCase
             ->with($request, 'foo')
             ->willReturn($response);
 
-        $listener = new ResponseBodyConversionListener($responseFactory, $annotationLocator);
+        $attributeLocator = new ServiceLocator(array(
+            'FooController::bar' => function() {
+                return $this->createAttributeContainer([new Attribute\ResponseBody()]);
+            },
+        ));
+        $listener = ResponseBodyConversionListener::onAttribute($responseFactory, $attributeLocator);
+
+        $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, 'foo');
+        $listener->onKernelView($event);
+
+        $this->assertSame($response, $event->getResponse());
+    }
+
+    /** @test */
+    public function responseBodyMappedOnAnnotation()
+    {
+        $request = new Request([], [], ['_controller' => 'FooController::bar']);
+
+        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $response = new Response();
+
+        $responseFactory = $this->createMock(ResponseFactory::class);
+        $responseFactory
+            ->expects($this->once())
+            ->method('createEntityResponse')
+            ->with($request, 'foo')
+            ->willReturn($response);
+
+        $attributeLocator = new ServiceLocator(array(
+            'FooController::bar' => function() {
+                return $this->createAttributeContainer([new Annotation\ResponseBody()]);
+            },
+        ));
+        $listener = ResponseBodyConversionListener::onAnnotation($responseFactory, $attributeLocator);
 
         $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, 'foo');
         $listener->onKernelView($event);
@@ -52,7 +78,7 @@ class ResponseBodyConversionListenerTest extends TestCase
     public function unavailableResponseBody()
     {
         $httpKernel = $this->createMock(HttpKernelInterface::class);
-        $listener = new ResponseBodyConversionListener($this->createMock(ResponseFactory::class), new ServiceLocator([]));
+        $listener = ResponseBodyConversionListener::onAttribute($this->createMock(ResponseFactory::class), new ServiceLocator([]));
         $request = new Request([], [], ['_controller' => 'FooController::bar']);
 
         $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, null);

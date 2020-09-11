@@ -24,5 +24,9 @@ class QueryParamTest extends TestCase
         $annotation = new QueryParam(['value' => 'foo', 'argument' => 'bar']);
         $this->assertEquals('bar', $annotation->argument());
         $this->assertEquals('foo', $annotation->name());
+
+        $annotation = QueryParam::__set_state(['name' => 'foo', 'argument' => 'bar']);
+        $this->assertEquals('bar', $annotation->argument());
+        $this->assertEquals('foo', $annotation->name());
     }
 }
