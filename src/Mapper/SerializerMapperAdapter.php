@@ -4,6 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Mapper;
 
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -35,7 +36,7 @@ final class SerializerMapperAdapter implements MapperInterface
     {
         try {
             return $this->serializer->deserialize($data, $type, $this->format, $this->context);
-        } catch (UnexpectedValueException | MissingConstructorArgumentsException | \TypeError $e) {
+        } catch (InvalidArgumentException | UnexpectedValueException | MissingConstructorArgumentsException | \TypeError $e) {
             if ($e instanceof NotNormalizableValueException
                 && !$this->serializer->supportsDenormalization($data, $type, $this->format)
             ) {

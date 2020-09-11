@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Instead of 406 HTTP response, return 500 HTTP response in case of no registered message body mapper.
 
 ### Fixed
+- Handle exception on mapping to an array when scalar data has been provided in `SerializerMapperAdapter`.
 - Typo in the message of not acceptable http exception.
 
 ### Deprecated
