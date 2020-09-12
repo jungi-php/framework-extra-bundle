@@ -3,9 +3,9 @@
 namespace Jungi\FrameworkExtraBundle\Http;
 
 /**
- * @internal
- *
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class MediaTypeDescriptor
 {

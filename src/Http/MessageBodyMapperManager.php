@@ -7,9 +7,9 @@ use Jungi\FrameworkExtraBundle\Mapper\MapperInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
- * @final
- *
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @final
  */
 class MessageBodyMapperManager
 {

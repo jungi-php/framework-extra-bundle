@@ -5,9 +5,9 @@ namespace Jungi\FrameworkExtraBundle\Http;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
 /**
- * @internal
- *
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class ContentDispositionDescriptor
 {

@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class RequestUtils
 {

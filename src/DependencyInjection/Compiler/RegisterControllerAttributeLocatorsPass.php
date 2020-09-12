@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class RegisterControllerAttributeLocatorsPass implements CompilerPassInterface
 {

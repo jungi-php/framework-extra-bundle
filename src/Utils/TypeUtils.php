@@ -4,6 +4,8 @@ namespace Jungi\FrameworkExtraBundle\Utils;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class TypeUtils
 {

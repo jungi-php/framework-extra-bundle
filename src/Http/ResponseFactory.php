@@ -6,9 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @final
- *
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @final
+ * @internal
  */
 class ResponseFactory
 {

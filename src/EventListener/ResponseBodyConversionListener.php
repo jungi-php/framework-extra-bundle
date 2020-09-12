@@ -13,6 +13,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class ResponseBodyConversionListener implements EventSubscriberInterface
 {

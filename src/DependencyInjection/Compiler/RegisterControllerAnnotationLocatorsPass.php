@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInterface
 {

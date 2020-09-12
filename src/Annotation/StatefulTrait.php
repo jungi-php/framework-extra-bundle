@@ -4,6 +4,8 @@ namespace Jungi\FrameworkExtraBundle\Annotation;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 trait StatefulTrait
 {

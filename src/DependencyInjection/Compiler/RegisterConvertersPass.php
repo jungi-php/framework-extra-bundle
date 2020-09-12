@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class RegisterConvertersPass implements CompilerPassInterface
 {

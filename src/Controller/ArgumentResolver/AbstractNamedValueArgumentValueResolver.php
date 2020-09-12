@@ -14,8 +14,9 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @internal
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueResolverInterface
 {

@@ -7,6 +7,8 @@ use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
+ *
+ * @internal
  */
 final class SimpleContainer implements ContainerInterface
 {
