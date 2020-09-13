@@ -16,5 +16,7 @@ jobs:
     - php: 'nightly'
 
 before_install: composer require --no-progress --no-scripts --no-plugins symfony/flex
-install: composer update
-script: bin/phpunit
+install:
+  - composer update
+  - bin/simple-phpunit install
+script: bin/simple-phpunit

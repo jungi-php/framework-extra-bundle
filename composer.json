@@ -16,8 +16,8 @@
     },
     "require-dev": {
         "symfony/serializer": "^5.1",
-        "phpunit/phpunit": "^8.3",
-        "symfony/property-info": "^4.4|^5.0"
+        "symfony/property-info": "^4.4|^5.0",
+        "symfony/phpunit-bridge": "^5.1"
     },
     "authors": [
         {
