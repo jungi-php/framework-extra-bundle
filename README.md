@@ -16,7 +16,7 @@ Attributes (aka annotations):
 
 ## Quick insight
 
-### Annotations
+### @Annotation
 
 ```php
 namespace App\Controller;
@@ -89,7 +89,7 @@ class UserController
 }
 ```
 
-### Attributes (PHP 8.0)
+### #[Attribute]
 
 ```php
 namespace App\Controller;
