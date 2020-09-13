@@ -3,11 +3,17 @@ php:
   - '7.2'
   - '7.3'
   - '7.4'
+  - 'nightly'
 
 env:
   - SYMFONY_REQUIRE="4.4.*"
   - SYMFONY_REQUIRE="5.0.*"
   - SYMFONY_REQUIRE="5.1.*"
+
+jobs:
+  fast_finish: true
+  allow_failures:
+    - php: 'nightly'
 
 before_install: composer require --no-progress --no-scripts --no-plugins symfony/flex
 install: composer update
