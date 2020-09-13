@@ -7,15 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Added
+### Added
 - Attributes (PHP 8.0).
 
-## Changed
+### Changed
 - Attributes are now key part of the bundle, annotations are used as adapters for attributes and are intended for projects basing on <= PHP 7.4.
 - Updated all argument value resolvers to support both annotations and attributes.
 - Changed internal `Jungi\FrameworkExtraBundle\Annotation\AbstractAnnotation` to `StatefulTrait`.
 
-## Removed
+### Removed
 - internal `Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument`.
 
 ### Fixed
