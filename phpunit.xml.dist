@@ -14,7 +14,4 @@
         </testsuite>
     </testsuites>
 
-    <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled=1" />
-    </php>
 </phpunit>
