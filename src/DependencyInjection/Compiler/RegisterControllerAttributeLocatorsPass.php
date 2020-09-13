@@ -2,11 +2,11 @@
 
 namespace Jungi\FrameworkExtraBundle\DependencyInjection\Compiler;
 
+use Jungi\FrameworkExtraBundle\Attribute\Attribute;
 use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\ObjectExporterInterface;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
-use Jungi\FrameworkExtraBundle\Attribute\Attribute;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -105,8 +105,8 @@ final class RegisterControllerAttributeLocatorsPass implements CompilerPassInter
                     }
 
                     foreach ($methodRefl->getParameters() as $paramRefl) {
-                        if (isset($refMap[$id . $suffixId . '$' . $paramRefl->name])) {
-                            $refMap[$alias . $suffixId . '$' . $paramRefl->name] = clone $refMap[$id . $suffixId . '$' . $paramRefl->name];
+                        if (isset($refMap[$id.$suffixId.'$'.$paramRefl->name])) {
+                            $refMap[$alias.$suffixId.'$'.$paramRefl->name] = clone $refMap[$id.$suffixId.'$'.$paramRefl->name];
                         }
                     }
                 }
@@ -124,7 +124,7 @@ final class RegisterControllerAttributeLocatorsPass implements CompilerPassInter
      */
     private function invokeAttributes(array $attributeRefls): array
     {
-        return array_map(function(\ReflectionAttribute $refl) {
+        return array_map(function (\ReflectionAttribute $refl) {
             return $refl->newInstance();
         }, $attributeRefls);
     }
@@ -149,4 +149,3 @@ final class RegisterControllerAttributeLocatorsPass implements CompilerPassInter
         return new Reference($definitionId);
     }
 }
-

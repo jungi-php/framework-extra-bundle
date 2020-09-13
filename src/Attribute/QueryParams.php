@@ -13,5 +13,4 @@ use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
 #[PhpAttribute(PhpAttribute::TARGET_PARAMETER)]
 class QueryParams implements Attribute, Exportable
 {
-
 }
