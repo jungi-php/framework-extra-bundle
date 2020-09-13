@@ -59,8 +59,7 @@ class RegisterControllerAnnotationLocatorsPassTest extends AbstractRegisterContr
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
-            'Annotation "%s" occurred more than once for the argument "foo" at "%s::bad()".',
-            QueryParam::class,
+            'Argument "foo" has more than one annotation at "%s::bad()".',
             BadControllerArgument::class
         ));
 

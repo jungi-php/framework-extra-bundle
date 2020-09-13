@@ -88,8 +88,8 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                         if (!isset($existingParameters[$annotation->argument()])) {
                             throw new InvalidArgumentException(sprintf('Expected to have the argument "%s" in "%s::%s()", but it\'s not present.', $annotation->argument(), $methodRefl->class, $methodRefl->name));
                         }
-                        if (isset($argumentAnnotations[$annotation->argument()][$annotationClass])) {
-                            throw new InvalidArgumentException(sprintf('Annotation "%s" occurred more than once for the argument "%s" at "%s::%s()".', $annotationClass, $annotation->argument(), $methodRefl->class, $methodRefl->name));
+                        if (isset($argumentAnnotations[$annotation->argument()])) {
+                            throw new InvalidArgumentException(sprintf('Argument "%s" has more than one annotation at "%s::%s()".', $annotation->argument(), $methodRefl->class, $methodRefl->name));
                         }
 
                         $argumentAnnotations[$annotation->argument()][$annotationClass] = $annotation;
