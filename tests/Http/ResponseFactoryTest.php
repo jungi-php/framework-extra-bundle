@@ -96,7 +96,7 @@ class ResponseFactoryTest extends TestCase
     public function entityResponseOnNoRegisteredMessageBodyMappers()
     {
         $this->expectException('LogicException');
-        $this->expectDeprecationMessage('You need to register at least one message body mapper');
+        $this->expectExceptionMessage('You need to register at least one message body mapper');
 
         $factory = new ResponseFactory('application/json', new MessageBodyMapperManager(new ServiceLocator([])));
         $factory->createEntityResponse(new Request(), 'foo');
