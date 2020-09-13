@@ -23,7 +23,7 @@ class TmpFileUtilsTest extends TestCase
         // clear tmpfile references to remove it from the filesystem
         TmpFileUtils::removeReferences();
 
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
     }
 
     /** @test */
@@ -37,7 +37,7 @@ class TmpFileUtilsTest extends TestCase
         $movedFile = tempnam(sys_get_temp_dir(), 'foo');
         rename($file, $movedFile);
 
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
 
         TmpFileUtils::removeReferences();
 

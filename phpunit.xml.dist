@@ -8,7 +8,6 @@
          failOnRisky="true"
          failOnWarning="true">
 
-
     <testsuites>
         <testsuite name="Jungi FrameworkExtraBundle Test Suite">
             <directory>./tests/</directory>
