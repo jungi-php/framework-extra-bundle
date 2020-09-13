@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Removed
 - internal `Jungi\FrameworkExtraBundle\Annotation\NamedValueArgument`.
 
+### Fixed
+- Deprecation of ReflectionParameter::isArray() in `RegisterControllerAnnotationLocatorsPass`.
+
 ## [1.1.0] - 2020-09-11
 
 ### Added

@@ -104,7 +104,7 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                     if ($annotation instanceof RequestBody && null !== $annotation->type()) {
                         $paramRefl = $existingParameters[$annotation->argument()];
 
-                        if (!$paramRefl->isArray()) {
+                        if ('array' !== $paramRefl->getType()->getName()) {
                             throw new InvalidArgumentException(sprintf('Expected the argument "%s" to be of "%s" type, got "%s" in "%s::%s()".', $annotation->argument(), $annotation->type(), $paramRefl->getType()->getName(), $methodRefl->class, $methodRefl->name));
                         }
                         if (!TypeUtils::isCollection($annotation->type())) {
