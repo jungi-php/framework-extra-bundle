@@ -7,7 +7,7 @@ use Attribute as PhpAttribute;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
- * @final
+ * @final-public should be treated as final outside the library, extended only by the annotation
  */
 #[PhpAttribute(PhpAttribute::TARGET_PARAMETER)]
 class RequestBody implements Attribute

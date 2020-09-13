@@ -8,7 +8,7 @@ use Jungi\FrameworkExtraBundle\DependencyInjection\Exportable;
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  *
- * @final
+ * @final-public should be treated as final outside the library, extended only by the annotation
  */
 #[PhpAttribute(PhpAttribute::TARGET_METHOD)]
 class ResponseBody implements Attribute, Exportable
