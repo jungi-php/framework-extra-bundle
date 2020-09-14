@@ -1,6 +1,6 @@
 {
     "name": "jungi/framework-extra-bundle",
-    "description": "Request/response annotations, content negotiation and more for symfony projects",
+    "description": "attributes and annotations for request and response operations, content negotiation, and more for symfony projects",
     "keywords": ["body", "param", "conversion", "mapper"],
     "type": "symfony-bundle",
     "license": "MIT",
