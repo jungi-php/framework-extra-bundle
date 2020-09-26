@@ -7,7 +7,7 @@ namespace Jungi\FrameworkExtraBundle\Attribute;
  *
  * @internal
  */
-interface NamedValueArgument extends Attribute
+interface NamedValue extends Attribute
 {
     public function name(): ?string;
 }

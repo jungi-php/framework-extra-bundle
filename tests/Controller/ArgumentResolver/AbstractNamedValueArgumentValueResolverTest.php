@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\DummyObject;
@@ -217,7 +217,7 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
 
     abstract protected function createRequestWithParameters(array $parameters): Request;
 
-    abstract protected function createAttribute(string $name): NamedValueArgument;
+    abstract protected function createAttribute(string $name): NamedValue;
 
-    abstract protected function createAnnotation(string $name): NamedValueArgument;
+    abstract protected function createAnnotation(string $name): NamedValue;
 }

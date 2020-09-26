@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
@@ -26,8 +26,8 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
 
     protected function __construct(string $attributeClass, ConverterInterface $converter, ContainerInterface $attributeLocator)
     {
-        if (!is_subclass_of($attributeClass, NamedValueArgument::class)) {
-            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValueArgument::class, $attributeClass));
+        if (!is_subclass_of($attributeClass, NamedValue::class)) {
+            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValue::class, $attributeClass));
         }
 
         $this->attributeClass = $attributeClass;
@@ -81,5 +81,5 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         }
     }
 
-    abstract protected function getArgumentValue(string $name, Request $request, NamedValueArgument $attribute, ArgumentMetadata $metadata);
+    abstract protected function getArgumentValue(string $name, Request $request, NamedValue $attribute, ArgumentMetadata $metadata);
 }

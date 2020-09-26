@@ -10,7 +10,7 @@ use Attribute as PhpAttribute;
  * @final-public should be treated as final outside the library, extended only by the annotation
  */
 #[PhpAttribute(PhpAttribute::TARGET_PARAMETER)]
-class QueryParam implements NamedValueArgument
+class QueryParam implements NamedValue
 {
     private $name;
 

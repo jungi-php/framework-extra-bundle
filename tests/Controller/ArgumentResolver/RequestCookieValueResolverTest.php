@@ -4,7 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation;
 use Jungi\FrameworkExtraBundle\Attribute;
-use Jungi\FrameworkExtraBundle\Attribute\NamedValueArgument;
+use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
@@ -36,12 +36,12 @@ class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueReso
         return new Request([], [], [], $parameters);
     }
 
-    protected function createAttribute(string $name): NamedValueArgument
+    protected function createAttribute(string $name): NamedValue
     {
         return new Attribute\RequestCookie($name);
     }
 
-    protected function createAnnotation(string $name): NamedValueArgument
+    protected function createAnnotation(string $name): NamedValue
     {
         return new Annotation\RequestCookie(['name' => $name]);
     }

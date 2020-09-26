@@ -10,7 +10,7 @@ use Attribute as PhpAttribute;
  * @final-public should be treated as final outside the library, extended only by the annotation
  */
 #[PhpAttribute(PhpAttribute::TARGET_PARAMETER)]
-class RequestHeader implements NamedValueArgument
+class RequestHeader implements NamedValue
 {
     private $name;
 
