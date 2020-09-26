@@ -55,8 +55,12 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
         $attribute = $this->attributeLocator->get($id)->get($this->attributeClass);
 
-        $name = $attribute->name() ?: $argument->getName();
-        $value = $this->getArgumentValue($name, $request, $attribute, $argument);
+        $namedValueArgument = new NamedValueArgument(
+            $attribute->name() ?: $argument->getName(),
+            $argument->getType(),
+            $attribute
+        );
+        $value = $this->getArgumentValue($namedValueArgument, $request);
 
         if (null === $value && $argument->hasDefaultValue()) {
             $value = $argument->getDefaultValue();
@@ -67,7 +71,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
                 yield null; return;
             }
 
-            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $name));
+            throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $namedValueArgument->getName()));
         }
 
         if (null === $argument->getType() || TypeUtils::isValueOfType($value, $argument->getType())) {
@@ -77,9 +81,9 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         try {
             yield $this->converter->convert($value, $argument->getType());
         } catch (TypeConversionException $e) {
-            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $name), $e);
+            throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $namedValueArgument->getName()), $e);
         }
     }
 
-    abstract protected function getArgumentValue(string $name, Request $request, NamedValue $attribute, ArgumentMetadata $metadata);
+    abstract protected function getArgumentValue(NamedValueArgument $argument, Request $request);
 }

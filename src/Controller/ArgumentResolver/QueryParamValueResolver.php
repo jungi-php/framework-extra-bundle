@@ -4,11 +4,9 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Annotation;
 use Jungi\FrameworkExtraBundle\Attribute;
-use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -25,8 +23,8 @@ final class QueryParamValueResolver extends AbstractNamedValueArgumentValueResol
         return new self(Annotation\QueryParam::class, $converter, $attributeLocator);
     }
 
-    protected function getArgumentValue(string $name, Request $request, NamedValue $attribute, ArgumentMetadata $metadata)
+    protected function getArgumentValue(NamedValueArgument $argument, Request $request)
     {
-        return $request->query->get($name);
+        return $request->query->get($argument->getName());
     }
 }
