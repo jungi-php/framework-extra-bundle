@@ -53,6 +53,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         }
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
+        /** @var NamedValue $attribute */
         $attribute = $this->attributeLocator->get($id)->get($this->attributeClass);
 
         $namedValueArgument = new NamedValueArgument(
