@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2020-09-27
+
 ### Added
 - Attributes (PHP 8.0).
 
@@ -42,5 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 - Config option "default_content_type" at "entity_response". Moved to the root node "jungi_framework_extra".
 
-[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.0.0...v1.1.0
