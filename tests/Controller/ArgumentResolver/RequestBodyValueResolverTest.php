@@ -238,18 +238,95 @@ class RequestBodyValueResolverTest extends TestCase
     }
 
     /** @test */
-    public function nullableArgument()
+    public function argumentIsSetToNullOnEmptyBodyAndUnavailableContentType()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Argument "foo" cannot be nullable');
+        $attributeLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return $this->createAttributeContainer([new Attribute\RequestBody()]);
+            }
+        ));
+
+        $request = new Request([], [], ['_controller' => 'FooController']);
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, true);
 
         $resolver = RequestBodyValueResolver::onAttribute(
             $this->createMock(MessageBodyMapperManager::class),
             $this->createMock(ConverterInterface::class),
-            new ServiceLocator([])
+            $attributeLocator
         );
 
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null, true))->current();
+        $this->assertNull($resolver->resolve($request, $argument)->current());
+    }
+
+    /** @test */
+    public function mapperIsUsedOnEmptyBodyAndAvailableContentType()
+    {
+        $attributeLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return $this->createAttributeContainer([new Attribute\RequestBody()]);
+            }
+        ));
+
+        $request = new Request([], [], ['_controller' => 'FooController']);
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
+
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, true);
+
+        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $mapperManager
+            ->expects($this->once())
+            ->method('mapFrom')
+            ->with('', 'application/vnd.jungi.test', 'string');
+
+        $resolver = RequestBodyValueResolver::onAttribute(
+            $mapperManager,
+            $this->createMock(ConverterInterface::class),
+            $attributeLocator
+        );
+        $resolver->resolve($request, $argument)->current();
+    }
+
+    /** @test */
+    public function notNullableArgumentOnEmptyBody()
+    {
+        $this->expectException(BadRequestHttpException::class);
+
+        $attributeLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return $this->createAttributeContainer([new Attribute\RequestBody()]);
+            }
+        ));
+
+        $request = new Request([], [], ['_controller' => 'FooController']);
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, false);
+
+        $resolver = RequestBodyValueResolver::onAttribute(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class),
+            $attributeLocator
+        );
+        $resolver->resolve($request, $argument)->current();
+    }
+
+    /** @test */
+    public function defaultArgumentValueIsUsed()
+    {
+        $attributeLocator = new ServiceLocator(array(
+            'FooController$foo' => function() {
+                return $this->createAttributeContainer([new Attribute\RequestBody()]);
+            }
+        ));
+
+        $request = new Request([], [], ['_controller' => 'FooController']);
+        $argument = new ArgumentMetadata('foo', 'int', false, true, 123, false);
+
+        $resolver = RequestBodyValueResolver::onAttribute(
+            $this->createMock(MessageBodyMapperManager::class),
+            $this->createMock(ConverterInterface::class),
+            $attributeLocator
+        );
+
+        $this->assertEquals(123, $resolver->resolve($request, $argument)->current());
     }
 
     /** @test */

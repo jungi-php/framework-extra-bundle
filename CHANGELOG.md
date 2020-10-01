@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added support of nullable `RequestBody` arguments. When a request body is empty, and the content type is unavailable, a default argument value is used, or `null` in case of a nullable argument.
+
+### Changed
+- No error for nullable `RequestBody` arguments.
+
 ## [1.2.0] - 2020-09-27
 
 ### Added

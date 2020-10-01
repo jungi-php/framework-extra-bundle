@@ -74,11 +74,6 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         if (!$argument->getType()) {
             throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request body conversion.', $argument->getName()));
         }
-        if ($argument->isNullable()) {
-            throw new \InvalidArgumentException(sprintf('Argument "%s" cannot be nullable for the request body conversion.', $argument->getName()));
-        }
-
-        $contentType = $request->headers->get('CONTENT_TYPE') ?: $this->defaultContentType;
 
         $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
         /** @var Attribute\RequestBody $attribute */
@@ -88,10 +83,27 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         // when request parameters are available
         if ($parameters = array_replace_recursive($request->request->all(), $request->files->all())) {
             try {
-                yield $this->converter->convert($parameters, $argumentType); return;
+                yield $this->converter->convert($parameters, $argumentType);
+                return;
             } catch (TypeConversionException $e) {
                 throw new BadRequestHttpException('Request body parameters are invalid.', $e);
             }
+        }
+
+        $contentType = $request->headers->get('CONTENT_TYPE');
+        if (null === $contentType && '' !== $request->getContent()) {
+            $contentType = $this->defaultContentType;
+        }
+
+        // empty body && unavailable content type
+        if (null === $contentType) {
+            $value = $argument->hasDefaultValue() ? $argument->getDefaultValue() : null;
+            if ($value === null && !$argument->isNullable()) {
+                throw new BadRequestHttpException('Request body cannot be empty.');
+            }
+
+            yield $value;
+            return;
         }
 
         // file as the request body
