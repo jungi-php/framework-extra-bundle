@@ -1,0 +1,41 @@
+name: "Continuous Integration"
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: "ubuntu-latest"
+    env:
+      SYMFONY_REQUIRE: "${{ matrix.symfony-version }}"
+
+    strategy:
+      matrix:
+        php-version:
+          - 7.2
+          - 7.3
+          - 7.4
+          - 8.0
+        dependencies:
+          - "highest"
+        symfony-version:
+          - 4.4.*
+          - "" # latest
+
+    steps:
+      - uses: "actions/checkout@v2"
+
+      - name: "Setup PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Install Symfony Flex"
+        run: "composer global require --no-progress --no-scripts --no-plugins symfony/flex"
+
+      - name: "Install dependencies using Composer"
+        uses: "ramsey/composer-install@v1"
+        with:
+          dependency-versions: "${{ matrix.dependencies }}"
+
+      - name: "Run PHPUnit"
+        run: "bin/simple-phpunit"
