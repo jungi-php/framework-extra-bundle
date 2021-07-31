@@ -15,7 +15,7 @@
         "doctrine/annotations": "For annotations"
     },
     "require-dev": {
-        "symfony/serializer": "^5.1",
+        "symfony/serializer": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
         "symfony/phpunit-bridge": "^5.1",
         "doctrine/annotations": "^1.6"
