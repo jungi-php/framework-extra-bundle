@@ -1,8 +1,9 @@
 # JungiFrameworkExtraBundle
 
-Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on top of existing in the Symfony `FrameworkBundle`. The main aim of this bundle is to facilitate the request/response operations.
+[![Build Status](https://github.com/piku235/jungi-framework-extra-bundle/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/piku235/jungi-framework-extra-bundle/actions)
+![PHP](https://img.shields.io/packagist/php-v/jungi/framework-extra-bundle)
 
-![Build Status](https://github.com/piku235/jungi-framework-extra-bundle/actions/workflows/continuous-integration.yml/badge.svg)
+Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on top of existing in the Symfony `FrameworkBundle`. The main aim of this bundle is to facilitate the request/response operations.
 
 Attributes (aka annotations):
 
@@ -14,7 +15,72 @@ Attributes (aka annotations):
 * **QueryParams** - Converts the request query parameters to the controller method argument.
 * **ResponseBody** - Maps the controller method result to an appropriate entity response.
 
+## Installation
+
+Before you install, decide which version suits you the most:
+* `^1.4` - for Symfony `^5.3`
+* `1.3` - for Symfony `<5.3`(bugfixes only)
+
+```text
+composer require jungi/framework-extra-bundle
+```
+
+## Documentation
+
+[GitBook](https://piku235.gitbook.io/jungiframeworkextrabundle)
+
 ## Quick insight
+
+### #[Attribute]
+
+```php
+namespace App\Controller;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Attribute\Route;
+use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
+use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
+use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
+use Jungi\FrameworkExtraBundle\Attribute\QueryParam;
+use Jungi\FrameworkExtraBundle\Attribute\RequestParam;
+
+#[Route('/users')]
+class UserController
+{
+    #[Route('/{userId}/residential-address', methods: ['PATCH'])]
+    public function changeResidentialAddress(string $userId, #[RequestBody] UserResidentialAddressData $data)
+    {
+        // ..
+    }
+
+    #[Route('/{userId}/files/{fileName}', methods: ['PUT'])]
+    public function uploadFile(string $userId, string $fileName, #[RequestBody] UploadedFile $file)
+    {
+        // ..
+    }
+
+    #[Route('/{userId}/avatar', methods: ['PATCH'])]
+    public function replaceAvatar(string $userId, #[RequestParam] UploadedFile $file,  #[RequestParam] string $title)
+    {
+        // ..
+    }
+
+    #[Route(methods: ['GET'])]
+    public function getUsers(#[QueryParam] ?int $limit = null, #[QueryParam] ?int $offset = null)
+    {
+        // ..
+    }
+
+    #[Route(methods: ['GET'])]
+    #[ResponseBody]
+    public function filterUsers(#[QueryParams] FilterUsersDto $filterData)
+    {
+        // ..
+        /** @var UserData[] $filteredUsers */
+        return $filteredUsers;
+    }
+}
+```
 
 ### @Annotation
 
@@ -64,7 +130,7 @@ class UserController
     }
 
     /**
-     * @Route("", methods={"GET"})
+     * @Route(methods={"GET"})
      *
      * @QueryParam("limit")
      * @QueryParam("offset")
@@ -75,7 +141,7 @@ class UserController
     }
 
     /**
-     * @Route("", methods={"GET"})
+     * @Route(methods={"GET"})
      *
      * @QueryParams("filterData")
      * @ResponseBody
@@ -88,78 +154,3 @@ class UserController
     }
 }
 ```
-
-### #[Attribute]
-
-```php
-namespace App\Controller;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Routing\Attribute\Route;
-use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
-use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
-use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
-use Jungi\FrameworkExtraBundle\Attribute\QueryParam;
-use Jungi\FrameworkExtraBundle\Attribute\RequestParam;
-
-#[Route('/users')]
-class UserController
-{
-    #[Route('/{userId}/residential-address', methods: ['PATCH'])]
-    public function changeResidentialAddress(string $userId, #[RequestBody] UserResidentialAddressData $data)
-    {
-        // ..
-    }
-
-    #[Route('/{userId}/files/{fileName}', methods: ['PUT'])]
-    public function uploadFile(string $userId, string $fileName, #[RequestBody] UploadedFile $file)
-    {
-        // ..
-    }
-
-    #[Route('/{userId}/avatar', methods: ['PATCH'])]
-    public function replaceAvatar(string $userId, #[RequestParam] UploadedFile $file,  #[RequestParam] string $title)
-    {
-        // ..
-    }
-
-    #[Route('', methods: ['GET'])]
-    public function getUsers(#[QueryParam] ?int $limit = null, #[QueryParam] ?int $offset = null)
-    {
-        // ..
-    }
-
-    #[Route('', methods: ['GET'])]
-    #[ResponseBody]
-    public function filterUsers(#[QueryParams] FilterUsersDto $filterData)
-    {
-        // ..
-        /** @var UserData[] $filteredUsers */
-        return $filteredUsers;
-    }
-}
-```
-
-## Installation
-
-```text
-composer require jungi/framework-extra-bundle
-```
-
-If you're using in your project symfony flex you're already done! Otherwise, you need to enable the bundle manually.
-
-```php
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Jungi\FrameworkExtraBundle\JungiFrameworkExtraBundle(),
-    );
-    // ...
-}
-```
-
-## Documentation
-
-[click me](https://piku235.gitbook.io/jungiframeworkextrabundle)
-
