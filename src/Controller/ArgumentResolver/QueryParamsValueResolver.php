@@ -2,8 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation;
-use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Psr\Container\ContainerInterface;
@@ -16,36 +15,48 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 {
-    private $attributeClass;
     private $converter;
     private $attributeLocator;
 
+    /** @deprecated since v1.4, use constructor instead */
     public static function onAttribute(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        return new self(Attribute\QueryParams::class, $converter, $attributeLocator);
+        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
+
+        return new self($converter, $attributeLocator);
     }
 
+    /** @deprecated since v1.4, use constructor instead */
     public static function onAnnotation(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        return new self(Annotation\QueryParams::class, $converter, $attributeLocator);
+        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
+
+        return new self($converter, $attributeLocator);
     }
 
-    private function __construct(string $attributeClass, ConverterInterface $converter, ContainerInterface $attributeLocator)
+    public function __construct(ConverterInterface $converter, ?ContainerInterface $attributeLocator = null)
     {
-        $this->attributeClass = $attributeClass;
         $this->converter = $converter;
         $this->attributeLocator = $attributeLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
+        if ($argument->getAttributes(QueryParams::class, ArgumentMetadata::IS_INSTANCEOF)) {
+            return true;
+        }
+
+        if (null === $this->attributeLocator) {
+            return false;
+        }
+
         if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
             return false;
         }
 
         $id = $controller.'$'.$argument->getName();
 
-        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has($this->attributeClass);
+        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(QueryParams::class);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)

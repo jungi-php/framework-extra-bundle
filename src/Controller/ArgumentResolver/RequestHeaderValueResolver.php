@@ -2,8 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation;
-use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\RequestHeader;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,14 +12,22 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestHeaderValueResolver extends AbstractNamedValueArgumentValueResolver
 {
+    protected static $attributeClass = RequestHeader::class;
+
+    /** @deprecated since v1.4, use constructor instead */
     public static function onAttribute(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        return new self(Attribute\RequestHeader::class, $converter, $attributeLocator);
+        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
+
+        return new self($converter, $attributeLocator);
     }
 
+    /** @deprecated since v1.4, use constructor instead */
     public static function onAnnotation(ConverterInterface $converter, ContainerInterface $attributeLocator): self
     {
-        return new self(Annotation\RequestHeader::class, $converter, $attributeLocator);
+        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
+
+        return new self($converter, $attributeLocator);
     }
 
     protected function getArgumentValue(NamedValueArgument $argument, Request $request)

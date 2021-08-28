@@ -2,8 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation;
-use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
@@ -26,7 +25,6 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 {
     private const DEFAULT_CONTENT_TYPE = 'application/json';
 
-    private $attributeClass;
     private $messageBodyMapperManager;
     private $converter;
     private $attributeLocator;
@@ -39,19 +37,24 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         \SplFileObject::class,
     ];
 
+    /** @deprecated since v1.4, use constructor instead */
     public static function onAttribute(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType = self::DEFAULT_CONTENT_TYPE): self
     {
-        return new self(Attribute\RequestBody::class, $messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
+        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
+
+        return new self($messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
     }
 
+    /** @deprecated since v1.4, use constructor instead */
     public static function onAnnotation(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType = self::DEFAULT_CONTENT_TYPE): self
     {
-        return new self(Annotation\RequestBody::class, $messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
+        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
+
+        return new self($messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
     }
 
-    private function __construct(string $attributeClass, MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType)
+    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ?ContainerInterface $attributeLocator = null, string $defaultContentType = self::DEFAULT_CONTENT_TYPE)
     {
-        $this->attributeClass = $attributeClass;
         $this->messageBodyMapperManager = $messageBodyMapperManager;
         $this->converter = $converter;
         $this->attributeLocator = $attributeLocator;
@@ -60,13 +63,21 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
+        if ($argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)) {
+            return true;
+        }
+
+        if (null === $this->attributeLocator) {
+            return false;
+        }
+
         if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
             return false;
         }
 
         $id = $controller.'$'.$argument->getName();
 
-        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has($this->attributeClass);
+        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(RequestBody::class);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
@@ -75,9 +86,13 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
             throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request body conversion.', $argument->getName()));
         }
 
-        $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
-        /** @var Attribute\RequestBody $attribute */
-        $attribute = $this->attributeLocator->get($id)->get($this->attributeClass);
+        /** @var RequestBody $attribute */
+        $attribute = $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
+        if (null === $attribute) {
+            $id = RequestUtils::getControllerAsCallableString($request) . '$' . $argument->getName();
+            $attribute = $this->attributeLocator->get($id)->get(RequestBody::class);
+        }
+
         $argumentType = $attribute->type() ?: $argument->getType();
 
         // when request parameters are available

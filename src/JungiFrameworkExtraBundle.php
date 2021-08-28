@@ -2,8 +2,8 @@
 
 namespace Jungi\FrameworkExtraBundle;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterControllerAnnotationLocatorsPass;
-use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterControllerAttributeLocatorsPass;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterConvertersPass;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Compiler\RegisterMessageBodyMappersPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
@@ -21,9 +21,7 @@ class JungiFrameworkExtraBundle extends Bundle
         $container->addCompilerPass(new RegisterMessageBodyMappersPass());
         $container->addCompilerPass(new RegisterConvertersPass());
 
-        if (PHP_VERSION_ID >= 80000) {
-            $container->addCompilerPass(new RegisterControllerAttributeLocatorsPass());
-        } else {
+        if (ContainerBuilder::willBeAvailable('doctrine/annotations', AnnotationReader::class, ['jungi/framework-extra-bundle'])) {
             $container->addCompilerPass(new RegisterControllerAnnotationLocatorsPass());
         }
 

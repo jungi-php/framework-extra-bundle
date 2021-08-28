@@ -6,7 +6,7 @@ use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
 use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-use Jungi\FrameworkExtraBundle\Tests\Fixtures\DummyObject;
+use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
 
 class FooController extends AbstractFooController
 {
@@ -18,7 +18,7 @@ class FooController extends AbstractFooController
     }
 
     /**
-     * @DummyObject
+     * @ForeignAttribute
      * @RequestBody("body")
      * @QueryParam("foo")
      * @QueryParam("bar")

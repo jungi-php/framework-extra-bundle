@@ -2,12 +2,11 @@
 
 namespace Jungi\FrameworkExtraBundle\EventListener;
 
-use Jungi\FrameworkExtraBundle\Annotation;
-use Jungi\FrameworkExtraBundle\Attribute;
-use Jungi\FrameworkExtraBundle\Http\RequestUtils;
+use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -18,43 +17,55 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 final class ResponseBodyConversionListener implements EventSubscriberInterface
 {
-    private $attributeClass;
     private $responseFactory;
     private $attributeLocator;
 
-    public static function onAttribute(ResponseFactory $responseFactory, ContainerInterface $attributeLocator): self
+    public function __construct(ResponseFactory $responseFactory, ?ContainerInterface $attributeLocator = null)
     {
-        return new self(Attribute\ResponseBody::class, $responseFactory, $attributeLocator);
-    }
-
-    public static function onAnnotation(ResponseFactory $responseFactory, ContainerInterface $attributeLocator): self
-    {
-        return new self(Annotation\ResponseBody::class, $responseFactory, $attributeLocator);
-    }
-
-    public function __construct(string $attributeClass, ResponseFactory $responseFactory, ContainerInterface $attributeLocator)
-    {
-        $this->attributeClass = $attributeClass;
         $this->responseFactory = $responseFactory;
         $this->attributeLocator = $attributeLocator;
     }
 
-    public function onKernelView(ViewEvent $event)
+    public function onControllerArguments(ControllerArgumentsEvent $event)
     {
-        $id = RequestUtils::getControllerAsCallableString($event->getRequest());
-        if (null === $id || !$this->attributeLocator->has($id) || !$this->attributeLocator->get($id)->has($this->attributeClass)) {
-            return;
+        $request = $event->getRequest();
+        $controller = $event->getController();
+        $hasResponseBody = false;
+
+        if (\is_array($controller)) {
+            $reflection = new \ReflectionMethod($controller[0], $controller[1]);
+        } elseif (\is_object($controller) && !$controller instanceof \Closure) {
+            $reflection = (new \ReflectionObject($controller))->getMethod('__invoke');
+        } else {
+            $reflection = new \ReflectionFunction($controller);
         }
 
-        $event->setResponse($this->responseFactory->createEntityResponse(
-            $event->getRequest(),
-            $event->getControllerResult()
-        ));
+        if (\PHP_VERSION_ID >= 80000) {
+            $hasResponseBody = (bool) $reflection->getAttributes(ResponseBody::class, \ReflectionAttribute::IS_INSTANCEOF);
+        }
+
+        if (!$hasResponseBody && null !== $this->attributeLocator) {
+            $id = (isset($reflection->class) ? $reflection->class . '::' : '') . $reflection->name;
+            $hasResponseBody = $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(ResponseBody::class);
+        }
+
+        $request->attributes->set(ResponseBody::class, $hasResponseBody);
+    }
+
+    public function onKernelView(ViewEvent $event)
+    {
+        if ($event->getRequest()->attributes->get(ResponseBody::class, false)) {
+            $event->setResponse($this->responseFactory->createEntityResponse(
+                $event->getRequest(),
+                $event->getControllerResult()
+            ));
+        }
     }
 
     public static function getSubscribedEvents()
     {
         return [
+            KernelEvents::CONTROLLER_ARGUMENTS => ['onControllerArguments', -256],
             KernelEvents::VIEW => 'onKernelView',
         ];
     }

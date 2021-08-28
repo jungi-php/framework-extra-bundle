@@ -6,7 +6,7 @@ use Jungi\FrameworkExtraBundle\Attribute\QueryParam;
 use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
 use Jungi\FrameworkExtraBundle\Attribute\RequestParam;
 use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
-use Jungi\FrameworkExtraBundle\Tests\Fixtures\DummyObject;
+use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
 
 class FooController extends AbstractFooController
 {
@@ -14,7 +14,7 @@ class FooController extends AbstractFooController
     {
     }
 
-    #[DummyObject]
+    #[ForeignAttribute]
     #[ResponseBody]
     public function withAttributes(#[RequestBody] string $body, #[QueryParam] string $foo, #[QueryParam] string $bar)
     {

@@ -8,6 +8,8 @@ use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 
@@ -16,19 +18,38 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
  */
 class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
+    use ExpectDeprecationTrait;
+
     public function argumentTypeSameAsParameterType()
     {
         $this->markTestSkipped('always as string value');
     }
 
-    protected function createAttributeArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface
+    /**
+     * @test
+     * @group legacy
+     */
+    public function deprecationOnAnnotation(): void
     {
-        return RequestCookieValueResolver::onAttribute($converter, $attributeLocator);
+        $this->expectDeprecation(sprintf('Since jungi/framework-extra-bundle 1.4: The "%s::%s" method is deprecated, use the constructor instead.', RequestCookieValueResolver::class, 'onAnnotation'));
+
+        RequestCookieValueResolver::onAnnotation($this->createMock(ConverterInterface::class), new ServiceLocator([]));
     }
 
-    protected function createAnnotationArgumentValueResolver(ConverterInterface $converter, ContainerInterface $attributeLocator): ArgumentValueResolverInterface
+    /**
+     * @test
+     * @group legacy
+     */
+    public function deprecationOnAttribute(): void
     {
-        return RequestCookieValueResolver::onAnnotation($converter, $attributeLocator);
+        $this->expectDeprecation(sprintf('Since jungi/framework-extra-bundle 1.4: The "%s::%s" method is deprecated, use the constructor instead.', RequestCookieValueResolver::class, 'onAttribute'));
+
+        RequestCookieValueResolver::onAttribute($this->createMock(ConverterInterface::class), new ServiceLocator([]));
+    }
+
+    protected function createArgumentValueResolver(ConverterInterface $converter, ?ContainerInterface $attributeLocator = null): ArgumentValueResolverInterface
+    {
+        return new RequestCookieValueResolver($converter, $attributeLocator);
     }
 
     protected function createRequestWithParameters(array $parameters): Request

@@ -2,6 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests;
 
+use Jungi\FrameworkExtraBundle\Annotation\Annotation;
 use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use Psr\Container\ContainerInterface;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -11,11 +12,14 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  */
 abstract class TestCase extends BaseTestCase
 {
-    protected function createAttributeContainer(array $attributes): ContainerInterface
+    /**
+     * @param Annotation[] $annotations
+     */
+    protected function createAnnotationContainer(array $annotations): ContainerInterface
     {
         $map = array();
-        foreach ($attributes as $attribute) {
-            $map[get_class($attribute)] = $attribute;
+        foreach ($annotations as $annotation) {
+            $map[get_parent_class($annotation)] = $annotation;
         }
 
         return new SimpleContainer($map);

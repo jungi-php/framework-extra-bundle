@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Attributes are taken either directly from the `ArgumentMetadata` or from the attribute locator.
+- Annotations (not attributes) will be only taken into account when the `doctrine\annotations` package is available (in no-dev mode).
+
+### Deprecated
+- `onAttribute()` and `onAnnotation()` methods on `RequestBodyValueResolver`, use the constructor instead
+- `onAttribute()` and `onAnnotation()` methods on `RequestCookieValueResolver`, use the constructor instead
+- `onAttribute()` and `onAnnotation()` methods on `RequestHeaderValueResolver`, use the constructor instead
+- `onAttribute()` and `onAnnotation()` methods on `RequestParamValueResolver`, use the constructor instead
+- `onAttribute()` and `onAnnotation()` methods on `QueryParamValueResolver`, use the constructor instead
+- `onAttribute()` and `onAnnotation()` methods on `QueryParamsValueResolver`, use the constructor instead
+
+### Removed
+- Support for Symfony lower than v5.3
+
 ## [1.3.0] - 2021-07-31
 
 ### Added

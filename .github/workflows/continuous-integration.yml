@@ -17,6 +17,7 @@ jobs:
           - 8.0
         dependencies:
           - "highest"
+          - "lowest"
         symfony-version:
           - "" # latest
 

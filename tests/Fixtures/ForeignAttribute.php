@@ -4,7 +4,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
 /** @Annotation */
 #[Attribute]
-final class DummyObject
+final class ForeignAttribute
 {
 
 }

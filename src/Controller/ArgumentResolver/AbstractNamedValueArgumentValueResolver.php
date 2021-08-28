@@ -20,30 +20,35 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueResolverInterface
 {
-    private $attributeClass;
+    /** @var string */
+    protected static $attributeClass;
+    
     private $converter;
     private $attributeLocator;
 
-    protected function __construct(string $attributeClass, ConverterInterface $converter, ContainerInterface $attributeLocator)
+    public function __construct(ConverterInterface $converter, ?ContainerInterface $attributeLocator = null)
     {
-        if (!is_subclass_of($attributeClass, NamedValue::class)) {
-            throw new \InvalidArgumentException(sprintf('Expected a subclass of "%s", got: "%s".', NamedValue::class, $attributeClass));
-        }
-
-        $this->attributeClass = $attributeClass;
         $this->converter = $converter;
         $this->attributeLocator = $attributeLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
+        if ($argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)) {
+            return true;
+        }
+
+        if (null === $this->attributeLocator) {
+            return false;
+        }
+
         if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
             return false;
         }
 
         $id = $controller.'$'.$argument->getName();
 
-        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has($this->attributeClass);
+        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(static::$attributeClass);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)
@@ -52,9 +57,12 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
             throw new \InvalidArgumentException('Variadic arguments are not supported.');
         }
 
-        $id = RequestUtils::getControllerAsCallableString($request).'$'.$argument->getName();
         /** @var NamedValue $attribute */
-        $attribute = $this->attributeLocator->get($id)->get($this->attributeClass);
+        $attribute = $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
+        if (null === $attribute) {
+            $id = RequestUtils::getControllerAsCallableString($request) . '$' . $argument->getName();
+            $attribute = $this->attributeLocator->get($id)->get(static::$attributeClass);
+        }
 
         $namedValueArgument = new NamedValueArgument(
             $attribute->name() ?: $argument->getName(),

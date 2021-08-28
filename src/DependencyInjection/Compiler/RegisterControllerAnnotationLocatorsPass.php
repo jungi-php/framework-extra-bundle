@@ -9,12 +9,15 @@ use Jungi\FrameworkExtraBundle\Annotation\Argument;
 use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\DefaultObjectExporter;
 use Jungi\FrameworkExtraBundle\DependencyInjection\Exporter\ObjectExporterInterface;
+use Jungi\FrameworkExtraBundle\DependencyInjection\SimpleContainer;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -23,6 +26,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInterface
 {
+    public const SERVICE_ALIAS = 'jungi.controller_attribute_locator';
+
     private $controllerTag;
     private $annotationReader;
     private $objectExporter;
@@ -116,12 +121,12 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
                 $suffixId = '__invoke' === $methodRefl->name ? '' : '::'.$methodRefl->name;
 
                 if ($methodAnnotations) {
-                    $refMap[$id.$suffixId] = RegisterControllerAttributeLocatorsPass::registerLocator($container, $this->objectExporter, $id.$suffixId, array_values($methodAnnotations));
+                    $refMap[$id.$suffixId] = $this->registerLocator($container, $this->objectExporter, $id.$suffixId, array_values($methodAnnotations));
                 }
 
                 foreach ($argumentAnnotations as $argumentName => $annotations) {
                     $entryId = $id.$suffixId.'$'.$argumentName;
-                    $refMap[$entryId] = RegisterControllerAttributeLocatorsPass::registerLocator($container, $this->objectExporter, $entryId, array_values($annotations));
+                    $refMap[$entryId] = $this->registerLocator($container, $this->objectExporter, $entryId, array_values($annotations));
                 }
 
                 foreach ($aliases[$id] ?? [] as $alias) {
@@ -137,6 +142,26 @@ final class RegisterControllerAnnotationLocatorsPass implements CompilerPassInte
         }
 
         $refId = ServiceLocatorTagPass::register($container, $refMap);
-        $container->setAlias(RegisterControllerAttributeLocatorsPass::SERVICE_ALIAS, (string) $refId);
+        $container->setAlias(self::SERVICE_ALIAS, (string) $refId);
+    }
+
+    /**
+     * @param Annotation[] $annotations
+     */
+    private function registerLocator(ContainerBuilder $container, ObjectExporterInterface $objectExporter, string $id, array $annotations): Reference
+    {
+        $exportedAttributes = [];
+        foreach ($annotations as $annotation) {
+            $exportedAttributes[get_parent_class($annotation)] = $objectExporter->export($annotation);
+        }
+
+        $definition = (new Definition(SimpleContainer::class))
+            ->setPublic(false)
+            ->addArgument($exportedAttributes);
+
+        $definitionId = 'jungi.controller_attributes.'.ContainerBuilder::hash($id);
+        $container->setDefinition($definitionId, $definition);
+
+        return new Reference($definitionId);
     }
 }

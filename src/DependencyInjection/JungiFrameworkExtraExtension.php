@@ -22,12 +22,7 @@ final class JungiFrameworkExtraExtension extends Extension
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.xml');
-
-        if (PHP_VERSION_ID >= 80000) {
-            $loader->load('attributes.xml');
-        } else {
-            $loader->load('annotations.xml');
-        }
+        $loader->load('attributes.xml');
 
         if ($config['serializer'] && interface_exists(SerializerInterface::class)) {
             $loader->load('serializer.xml');
