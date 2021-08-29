@@ -7,13 +7,13 @@ Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on to
 
 Attributes (aka annotations):
 
-* **RequestBody** - Maps/converts the request body content/parameters to the controller method argument.
-* **RequestHeader** - Converts a request header to the controller method argument.
-* **RequestCookie** - Converts a request cookie to the controller method argument.
-* **RequestParam** - Converts a request body parameter to the controller method argument.
-* **QueryParam** - Converts a request query parameter to the controller method argument.
-* **QueryParams** - Converts the request query parameters to the controller method argument.
-* **ResponseBody** - Maps the controller method result to an appropriate entity response.
+* [`RequestBody`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#requestbody)
+* [`RequestHeader`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#requestheader)
+* [`RequestCookie`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#requestcookie)
+* [`RequestParam`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#requestparam)
+* [`QueryParam`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#queryparam)
+* [`QueryParams`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#queryparams)
+* [`ResponseBody`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#responsebody)
 
 ## Installation
 
