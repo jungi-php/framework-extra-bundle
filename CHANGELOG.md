@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2021-08-29
+
 ### Changed
 - Attributes are taken either directly from the `ArgumentMetadata` or from the attribute locator.
 - Annotations (not attributes) will be only taken into account when the `doctrine\annotations` package is available (in no-dev mode).
@@ -71,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 - Config option "default_content_type" at "entity_response". Moved to the root node "jungi_framework_extra".
 
-[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/piku235/JungiFrameworkExtraBundle/compare/v1.0.0...v1.1.0
