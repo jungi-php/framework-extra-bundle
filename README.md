@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/piku235/jungi-framework-extra-bundle/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/piku235/jungi-framework-extra-bundle/actions)
 ![PHP](https://img.shields.io/packagist/php-v/jungi/framework-extra-bundle)
 
-Just like the `SensioFrameworkExtraBundle` this bundle adds extra features on top of existing in the Symfony `FrameworkBundle`. The main aim of this bundle is to facilitate the request/response operations.
+This bundle adds additional features whose main purpose is to facilitate request/response operations.
 
 Attributes (aka annotations):
 
