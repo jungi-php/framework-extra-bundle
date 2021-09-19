@@ -15,12 +15,16 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
-          - 8.1
         dependencies:
           - "highest"
           - "lowest"
+        phpunit-version:
+          - "" # latest
         symfony-version:
           - "" # latest
+        include:
+          - php-version: 8.1
+            phpunit-version: 9.5
 
     steps:
       - uses: "actions/checkout@v2"
@@ -39,4 +43,6 @@ jobs:
           dependency-versions: "${{ matrix.dependencies }}"
 
       - name: "Run PHPUnit"
+        env:
+          SYMFONY_PHPUNIT_VERSION: "${{ matrix.phpunit-version }}"
         run: "bin/simple-phpunit"
