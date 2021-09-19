@@ -56,7 +56,6 @@ class BuiltinTypeSafeConverterTest extends TestCase
         yield [1.23, '1.23', 'float'];
         yield [true, 1, 'bool'];
         yield [false, 0, 'bool'];
-        yield [1, 1.23, 'int'];
     }
 
     public function provideInvalid()
