@@ -46,7 +46,7 @@ final class DefaultObjectExporter implements ObjectExporterInterface
         try {
             $serialized = serialize($object);
         } catch (Exception $e) {
-            throw new InvalidArgumentException(sprintf('Could not serialize object of the type "%s": %s.', $class, $e->getMessage()), null, $e);
+            throw new InvalidArgumentException(sprintf('Could not serialize object of the type "%s": %s.', $class, $e->getMessage()), 0, $e);
         }
 
         return (new Definition($class))
