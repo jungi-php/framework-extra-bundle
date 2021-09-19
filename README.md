@@ -1,6 +1,6 @@
 # JungiFrameworkExtraBundle
 
-[![Build Status](https://github.com/piku235/jungi-framework-extra-bundle/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/piku235/jungi-framework-extra-bundle/actions)
+[![Build Status](https://github.com/jungi-php/framework-extra-bundle/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/jungi-php/framework-extra-bundle/actions)
 ![PHP](https://img.shields.io/packagist/php-v/jungi/framework-extra-bundle)
 
 This bundle adds additional features whose main purpose is to facilitate request/response operations.
