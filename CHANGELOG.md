@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Deprecated PHP 8.1 "null" on the 2nd argument of the `InvalidArgumentException` in `DefaultObjectExporter`.
+
 ## [1.4.0] - 2021-08-29
 
 ### Changed
