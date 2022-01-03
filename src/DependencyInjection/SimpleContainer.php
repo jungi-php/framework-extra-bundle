@@ -19,7 +19,7 @@ final class SimpleContainer implements ContainerInterface
         $this->entries = $entries;
     }
 
-    public function get($id)
+    public function get($id): ?object
     {
         if (!isset($this->entries[$id])) {
             throw $this->createNotFoundException(sprintf('Entry "%s" not found in the container.', $id));
@@ -28,7 +28,7 @@ final class SimpleContainer implements ContainerInterface
         return $this->entries[$id];
     }
 
-    public function has($id)
+    public function has($id): bool
     {
         return isset($this->entries[$id]);
     }

@@ -62,7 +62,7 @@ final class ResponseBodyConversionListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER_ARGUMENTS => ['onControllerArguments', -256],

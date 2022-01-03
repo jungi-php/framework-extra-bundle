@@ -32,7 +32,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         $this->attributeLocator = $attributeLocator;
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if ($argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)) {
             return true;
@@ -51,7 +51,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(static::$attributeClass);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if ($argument->isVariadic()) {
             throw new \InvalidArgumentException('Variadic arguments are not supported.');

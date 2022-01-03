@@ -40,7 +40,7 @@ final class QueryParamsValueResolver implements ArgumentValueResolverInterface
         $this->attributeLocator = $attributeLocator;
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if ($argument->getAttributes(QueryParams::class, ArgumentMetadata::IS_INSTANCEOF)) {
             return true;
@@ -59,7 +59,7 @@ final class QueryParamsValueResolver implements ArgumentValueResolverInterface
         return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(QueryParams::class);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if (!$argument->getType()) {
             throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request query conversion.', $argument->getName()));

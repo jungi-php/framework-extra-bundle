@@ -61,7 +61,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         $this->defaultContentType = $defaultContentType;
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if ($argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)) {
             return true;
@@ -80,7 +80,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(RequestBody::class);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if (!$argument->getType()) {
             throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request body conversion.', $argument->getName()));
