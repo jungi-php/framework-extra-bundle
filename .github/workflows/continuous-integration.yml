@@ -5,8 +5,6 @@ on: [push, pull_request]
 jobs:
   tests:
     runs-on: "ubuntu-latest"
-    env:
-      SYMFONY_REQUIRE: "${{ matrix.symfony-version }}"
 
     strategy:
       matrix:
@@ -15,16 +13,12 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
-        dependencies:
-          - "highest"
-          - "lowest"
-        phpunit-version:
-          - "" # latest
+          - 8.1
         symfony-version:
-          - "" # latest
+          - ""
         include:
-          - php-version: 8.1
-            phpunit-version: 9.5
+          - php-version: 7.4
+            symfony-version: "5.3.*"
 
     steps:
       - uses: "actions/checkout@v2"
@@ -38,11 +32,9 @@ jobs:
         run: "composer global require --no-progress --no-scripts --no-plugins symfony/flex"
 
       - name: "Install dependencies using Composer"
-        uses: "ramsey/composer-install@v1"
-        with:
-          dependency-versions: "${{ matrix.dependencies }}"
+        env:
+          SYMFONY_REQUIRE: "${{ matrix.symfony-version }}"
+        run: "composer install --no-interaction --no-progress"
 
       - name: "Run PHPUnit"
-        env:
-          SYMFONY_PHPUNIT_VERSION: "${{ matrix.phpunit-version }}"
         run: "bin/simple-phpunit"
