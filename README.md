@@ -17,10 +17,6 @@ Attributes (aka annotations):
 
 ## Installation
 
-Before you install, decide which version suits you the most:
-* `^1.4` - for Symfony `^5.3`
-* `1.3` - for Symfony `<5.3`(bugfixes only)
-
 ```text
 composer require jungi/framework-extra-bundle
 ```
