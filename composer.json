@@ -5,19 +5,19 @@
     "type": "symfony-bundle",
     "license": "MIT",
     "require": {
-        "php": ">=7.2.9",
-        "symfony/framework-bundle": "^5.3",
-        "symfony/http-kernel": "^5.3",
-        "symfony/dependency-injection": "^5.3"
+        "php": ">=8.0.2",
+        "symfony/framework-bundle": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "symfony/dependency-injection": "^6.0"
     },
     "suggest": {
         "symfony/serializer": "For serializer adapters",
         "doctrine/annotations": "For annotations"
     },
     "require-dev": {
-        "symfony/serializer": "^5.3",
-        "symfony/property-info": "^5.3",
-        "symfony/phpunit-bridge": "^5.3",
+        "symfony/serializer": "^6.0",
+        "symfony/property-info": "^6.0",
+        "symfony/phpunit-bridge": "^6.0",
         "doctrine/annotations": "^1.6"
     },
     "authors": [
@@ -41,7 +41,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.x-dev"
+            "dev-main": "2.x-dev"
         }
     }
 }

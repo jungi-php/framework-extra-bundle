@@ -5,7 +5,7 @@
 
 This bundle adds additional features whose main purpose is to facilitate request/response operations.
 
-Attributes (aka annotations):
+Attributes:
 
 * [`RequestBody`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#requestbody)
 * [`RequestHeader`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#requestheader)
@@ -17,6 +17,11 @@ Attributes (aka annotations):
 
 ## Installation
 
+Before you install, decide which version suits you the most.
+
+* `^2.0` (upcoming) - for Symfony `^6.0` and PHP `>=8.0.2`
+* `^1.4` (current) - for Symfony `^5.3` and PHP `>=7.2.9`
+
 ```text
 composer require jungi/framework-extra-bundle
 ```
@@ -26,8 +31,6 @@ composer require jungi/framework-extra-bundle
 [GitBook](https://piku235.gitbook.io/jungiframeworkextrabundle)
 
 ## Quick insight
-
-### #[Attribute]
 
 ```php
 namespace App\Controller;
@@ -70,79 +73,6 @@ class UserController
     #[Route(methods: ['GET'])]
     #[ResponseBody]
     public function filterUsers(#[QueryParams] FilterUsersDto $filterData)
-    {
-        // ..
-        /** @var UserData[] $filteredUsers */
-        return $filteredUsers;
-    }
-}
-```
-
-### @Annotation
-
-```php
-namespace App\Controller;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Routing\Annotation\Route;
-use Jungi\FrameworkExtraBundle\Annotation\QueryParams;
-use Jungi\FrameworkExtraBundle\Annotation\RequestBody;
-use Jungi\FrameworkExtraBundle\Annotation\ResponseBody;
-use Jungi\FrameworkExtraBundle\Annotation\QueryParam;
-use Jungi\FrameworkExtraBundle\Annotation\RequestParam;
-
-/**
- * @Route("/users")
- */
-class UserController
-{
-    /**
-     * @Route("/{userId}/residential-address", methods={"PATCH"})
-     * @RequestBody("data")
-     */
-    public function changeResidentialAddress(string $userId, UserResidentialAddressData $data)
-    {
-        // ..
-    }
-
-    /**
-     * @Route("/{userId}/files/{fileName}", methods={"PUT"})
-     * @RequestBody("file")
-     */
-    public function uploadFile(string $userId, string $fileName, UploadedFile $file)
-    {
-        // ..
-    }
-
-    /**
-     * @Route("/{userId}/avatar", methods={"PATCH"})
-     *
-     * @RequestParam("file")
-     * @RequestParam("title")
-     */
-    public function replaceAvatar(string $userId, UploadedFile $file, string $title)
-    {
-        // ..
-    }
-
-    /**
-     * @Route(methods={"GET"})
-     *
-     * @QueryParam("limit")
-     * @QueryParam("offset")
-     */
-    public function getUsers(?int $limit = null, ?int $offset = null)
-    {
-        // ..
-    }
-
-    /**
-     * @Route(methods={"GET"})
-     *
-     * @QueryParams("filterData")
-     * @ResponseBody
-     */
-    public function filterUsers(FilterUsersDto $filterData)
     {
         // ..
         /** @var UserData[] $filteredUsers */

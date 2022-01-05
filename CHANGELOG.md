@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Transition to PHP v8.0
+- Transition to Symfony v6.0
+
 ## [1.4.2] - 2022-01-03
 
 ### Fixed
