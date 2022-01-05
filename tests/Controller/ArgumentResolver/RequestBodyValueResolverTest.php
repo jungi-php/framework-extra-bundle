@@ -2,8 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
-use Jungi\FrameworkExtraBundle\Annotation;
-use Jungi\FrameworkExtraBundle\Attribute;
+use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
@@ -12,7 +11,6 @@ use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
 use Jungi\FrameworkExtraBundle\Tests\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,22 +35,12 @@ class RequestBodyValueResolverTest extends TestCase
 
         $request = new Request([], [], array('_controller' => 'FooController'));
         $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ])));
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new ForeignAttribute()
         ])));
         $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', 'stdClass', false, false, null)));
-
-        // Annotation
-        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter, new ServiceLocator(array(
-            'FooController$foo' => function() {
-                return $this->createAnnotationContainer([new Annotation\RequestBody(['value' => 'foo'])]);
-            }
-        )));
-        $request = new Request([], [], array('_controller' => 'FooController'));
-        $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null)));
-        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', null, false, false, null)));
     }
 
     /**
@@ -67,20 +55,13 @@ class RequestBodyValueResolverTest extends TestCase
         $converter = $this->createMock(ConverterInterface::class);
         $mapperManager = $this->createMock(MessageBodyMapperManager::class);
         $mapperManager
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(1))
             ->method('mapFrom')
             ->with('hello-world', 'application/vnd.jungi.test', $annotatedAsType ?: $argumentType);
 
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter, new ServiceLocator(array(
-            'FooController$foo' => function() use ($annotatedAsType) {
-                return $this->createAnnotationContainer([new Annotation\RequestBody(['type' => $annotatedAsType])]);
-            }
-        )));
-        $resolver->resolve($request, new ArgumentMetadata('foo', $argumentType, false, false, null))->current();
-
         $resolver = new RequestBodyValueResolver($mapperManager, $converter);
         $resolver->resolve($request, new ArgumentMetadata('foo', $argumentType, false, false, null, false, [
-            new Attribute\RequestBody($annotatedAsType)
+            new RequestBody($annotatedAsType)
         ]))->current();
     }
 
@@ -117,7 +98,7 @@ class RequestBodyValueResolverTest extends TestCase
 
         $resolver = new RequestBodyValueResolver($mapperManager, $converter);
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
     }
 
@@ -137,7 +118,7 @@ class RequestBodyValueResolverTest extends TestCase
 
         /** @var \SplFileInfo $file */
         $file = $resolver->resolve($request, new ArgumentMetadata('foo', $type, false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
 
         $this->assertInstanceOf($type, $file);
@@ -152,7 +133,7 @@ class RequestBodyValueResolverTest extends TestCase
         $request->headers->set('Content-Disposition', 'inline; filename = "foo123.csv"');
 
         $argument = new ArgumentMetadata('foo', UploadedFile::class, false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]);
 
         $resolver = new RequestBodyValueResolver(
@@ -191,9 +172,9 @@ class RequestBodyValueResolverTest extends TestCase
             ->method('mapFrom')
             ->with('123', 'application/vnd.jungi.test', 'int');
 
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter, null, 'application/vnd.jungi.test');
+        $resolver = new RequestBodyValueResolver($mapperManager, $converter, 'application/vnd.jungi.test');
         $resolver->resolve($request, new ArgumentMetadata('foo', 'int', false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
     }
 
@@ -208,7 +189,7 @@ class RequestBodyValueResolverTest extends TestCase
         );
 
         $this->assertNull($resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null, true, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current());
     }
 
@@ -229,7 +210,7 @@ class RequestBodyValueResolverTest extends TestCase
             $this->createMock(ConverterInterface::class)
         );
         $resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null, true, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
     }
 
@@ -245,7 +226,7 @@ class RequestBodyValueResolverTest extends TestCase
             $this->createMock(ConverterInterface::class)
         );
         $resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
     }
 
@@ -255,7 +236,7 @@ class RequestBodyValueResolverTest extends TestCase
         $request = new Request([], [], ['_controller' => 'FooController']);
 
         $argument = new ArgumentMetadata('foo', 'int', false, true, 123, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]);
         $resolver = new RequestBodyValueResolver(
             $this->createMock(MessageBodyMapperManager::class),
@@ -276,7 +257,7 @@ class RequestBodyValueResolverTest extends TestCase
             $this->createMock(ConverterInterface::class)
         );
         $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
     }
 
@@ -297,7 +278,7 @@ class RequestBodyValueResolverTest extends TestCase
         
         $resolver = new RequestBodyValueResolver($mapperManager, $converter);
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
     }
 
@@ -318,38 +299,8 @@ class RequestBodyValueResolverTest extends TestCase
 
         $resolver = new RequestBodyValueResolver($mapperManager, $converter);
         $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
-            new Attribute\RequestBody()
+            new RequestBody()
         ]))->current();
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    public function deprecationOnAnnotation(): void
-    {
-        $this->expectDeprecation(sprintf('Since jungi/framework-extra-bundle 1.4: The "%s::%s" method is deprecated, use the constructor instead.', RequestBodyValueResolver::class, 'onAnnotation'));
-
-        RequestBodyValueResolver::onAnnotation(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class),
-            new ServiceLocator([])
-        );
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    public function deprecationOnAttribute(): void
-    {
-        $this->expectDeprecation(sprintf('Since jungi/framework-extra-bundle 1.4: The "%s::%s" method is deprecated, use the constructor instead.', RequestBodyValueResolver::class, 'onAttribute'));
-
-        RequestBodyValueResolver::onAttribute(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class),
-            new ServiceLocator([])
-        );
     }
 
     public function provideRegularFileClassTypes()

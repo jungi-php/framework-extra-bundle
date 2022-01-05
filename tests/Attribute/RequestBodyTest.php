@@ -18,11 +18,5 @@ class RequestBodyTest extends TestCase
 
         $annotation = new RequestBody('int[]');
         $this->assertEquals('int[]', $annotation->type());
-
-        $annotation = RequestBody::__set_state([]);
-        $this->assertNull($annotation->type());
-
-        $annotation = RequestBody::__set_state(['type' => 'int[]']);
-        $this->assertEquals('int[]', $annotation->type());
     }
 }

@@ -18,11 +18,5 @@ class RequestCookieTest extends TestCase
 
         $annotation = new RequestCookie('foo');
         $this->assertEquals('foo', $annotation->name());
-
-        $annotation = RequestCookie::__set_state([]);
-        $this->assertNull($annotation->name());
-
-        $annotation = RequestCookie::__set_state(['name' => 'foo']);
-        $this->assertEquals('foo', $annotation->name());
     }
 }

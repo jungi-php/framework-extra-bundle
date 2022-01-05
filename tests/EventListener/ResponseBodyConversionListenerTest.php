@@ -2,13 +2,10 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\EventListener;
 
-use Jungi\FrameworkExtraBundle\Attribute;
-use Jungi\FrameworkExtraBundle\Annotation;
 use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
 use Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
 use Jungi\FrameworkExtraBundle\Tests\TestCase;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -38,15 +35,11 @@ class ResponseBodyConversionListenerTest extends TestCase
             ->with($request, 'foo')
             ->willReturn($response);
 
-        $listener = new ResponseBodyConversionListener($responseFactory, new ServiceLocator(array(
-            self::class.'::controller1' => function() {
-                return $this->createAnnotationContainer([new Annotation\ResponseBody()]);
-            },
-        )));
+        $listener = new ResponseBodyConversionListener($responseFactory);
 
         $event = new ControllerArgumentsEvent($httpKernel, $callable, [], $request, HttpKernelInterface::MAIN_REQUEST);
         $listener->onControllerArguments($event);
-        $this->assertTrue($request->attributes->get(Attribute\ResponseBody::class, false));
+        $this->assertTrue($request->attributes->get(ResponseBody::class, false));
 
         $event = new ViewEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, 'foo');
         $listener->onKernelView($event);
@@ -58,15 +51,11 @@ class ResponseBodyConversionListenerTest extends TestCase
     /** @test */
     public function unavailableResponseBody()
     {
-        $callable = [self::class, 'controller1'];
+        $callable = [$this, 'controller1'];
         $request = new Request([], [], ['_controller' => $callable]);
 
         $httpKernel = $this->createMock(HttpKernelInterface::class);
-        $listener = new ResponseBodyConversionListener($this->createMock(ResponseFactory::class), new ServiceLocator(array(
-            self::class.'::differentController' => function() {
-                return $this->createAnnotationContainer([new Annotation\ResponseBody()]);
-            },
-        )));
+        $listener = new ResponseBodyConversionListener($this->createMock(ResponseFactory::class));
 
         $event = new ControllerArgumentsEvent($httpKernel, $callable, [], $request, HttpKernelInterface::MAIN_REQUEST);
         $listener->onControllerArguments($event);
@@ -80,39 +69,42 @@ class ResponseBodyConversionListenerTest extends TestCase
 
     public function provideCallables(): iterable
     {
-        yield [[self::class, 'controller1']];
-
-        if (PHP_VERSION_ID >= 80000) {
-            yield [[$this, 'controller2']];
-            yield [$this];
-            yield [__NAMESPACE__ . '\controller3'];
-        }
+        yield [[$this, 'controller2']];
+        yield [$this];
+        yield [[__CLASS__, 'controller3']];
+        yield [__NAMESPACE__ . '\controller4'];
     }
 
     public function provideCallablesWithoutAttribute(): iterable
     {
-        yield [[self::class, 'controller1']];
+        yield [[$this, 'controller1']];
     }
 
-    public static function controller1()
+    public function controller1()
     {
         return 'foo';
     }
 
-    #[Attribute\ResponseBody]
+    #[ResponseBody]
     public function controller2()
     {
         return 'foo';
     }
 
-    #[Attribute\ResponseBody]
+    #[ResponseBody]
+    public static function controller3()
+    {
+        return 'foo';
+    }
+
+    #[ResponseBody]
     public function __invoke()
     {
         return 'foo';
     }
 }
 
-#[Attribute\ResponseBody]
-function controller3() {
+#[ResponseBody]
+function controller4() {
     return 'foo';
 }

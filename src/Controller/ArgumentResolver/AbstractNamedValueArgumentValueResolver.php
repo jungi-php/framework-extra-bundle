@@ -5,9 +5,7 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
-use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -24,31 +22,15 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
     protected static $attributeClass;
     
     private $converter;
-    private $attributeLocator;
 
-    public function __construct(ConverterInterface $converter, ?ContainerInterface $attributeLocator = null)
+    public function __construct(ConverterInterface $converter)
     {
         $this->converter = $converter;
-        $this->attributeLocator = $attributeLocator;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        if ($argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)) {
-            return true;
-        }
-
-        if (null === $this->attributeLocator) {
-            return false;
-        }
-
-        if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
-            return false;
-        }
-
-        $id = $controller.'$'.$argument->getName();
-
-        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(static::$attributeClass);
+        return (bool) $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
@@ -58,12 +40,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         }
 
         /** @var NamedValue $attribute */
-        $attribute = $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
-        if (null === $attribute) {
-            $id = RequestUtils::getControllerAsCallableString($request) . '$' . $argument->getName();
-            $attribute = $this->attributeLocator->get($id)->get(static::$attributeClass);
-        }
-
+        $attribute = $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)[0];
         $namedValueArgument = new NamedValueArgument(
             $attribute->name() ?: $argument->getName(),
             $argument->getType(),

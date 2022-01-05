@@ -2,8 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Fixtures;
 
-/** @Annotation */
-#[Attribute]
+#[\Attribute]
 final class ForeignAttribute
 {
 

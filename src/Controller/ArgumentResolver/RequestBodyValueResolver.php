@@ -7,10 +7,8 @@ use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
-use Jungi\FrameworkExtraBundle\Http\RequestUtils;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Utils\TmpFileUtils;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +25,6 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 
     private $messageBodyMapperManager;
     private $converter;
-    private $attributeLocator;
     private $defaultContentType;
 
     private static $fileClassTypes = [
@@ -37,47 +34,16 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         \SplFileObject::class,
     ];
 
-    /** @deprecated since v1.4, use constructor instead */
-    public static function onAttribute(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType = self::DEFAULT_CONTENT_TYPE): self
-    {
-        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
-
-        return new self($messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
-    }
-
-    /** @deprecated since v1.4, use constructor instead */
-    public static function onAnnotation(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ContainerInterface $attributeLocator, string $defaultContentType = self::DEFAULT_CONTENT_TYPE): self
-    {
-        trigger_deprecation('jungi/framework-extra-bundle', '1.4', 'The "%s" method is deprecated, use the constructor instead.', __METHOD__);
-
-        return new self($messageBodyMapperManager, $converter, $attributeLocator, $defaultContentType);
-    }
-
-    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, ?ContainerInterface $attributeLocator = null, string $defaultContentType = self::DEFAULT_CONTENT_TYPE)
+    public function __construct(MessageBodyMapperManager $messageBodyMapperManager, ConverterInterface $converter, string $defaultContentType = self::DEFAULT_CONTENT_TYPE)
     {
         $this->messageBodyMapperManager = $messageBodyMapperManager;
         $this->converter = $converter;
-        $this->attributeLocator = $attributeLocator;
         $this->defaultContentType = $defaultContentType;
     }
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        if ($argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)) {
-            return true;
-        }
-
-        if (null === $this->attributeLocator) {
-            return false;
-        }
-
-        if (null === $controller = RequestUtils::getControllerAsCallableString($request)) {
-            return false;
-        }
-
-        $id = $controller.'$'.$argument->getName();
-
-        return $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(RequestBody::class);
+        return (bool) $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
@@ -87,12 +53,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         }
 
         /** @var RequestBody $attribute */
-        $attribute = $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
-        if (null === $attribute) {
-            $id = RequestUtils::getControllerAsCallableString($request) . '$' . $argument->getName();
-            $attribute = $this->attributeLocator->get($id)->get(RequestBody::class);
-        }
-
+        $attribute = $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)[0];
         $argumentType = $attribute->type() ?: $argument->getType();
 
         // when request parameters are available

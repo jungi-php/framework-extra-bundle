@@ -4,7 +4,6 @@ namespace Jungi\FrameworkExtraBundle\EventListener;
 
 use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -18,19 +17,16 @@ use Symfony\Component\HttpKernel\KernelEvents;
 final class ResponseBodyConversionListener implements EventSubscriberInterface
 {
     private $responseFactory;
-    private $attributeLocator;
 
-    public function __construct(ResponseFactory $responseFactory, ?ContainerInterface $attributeLocator = null)
+    public function __construct(ResponseFactory $responseFactory)
     {
         $this->responseFactory = $responseFactory;
-        $this->attributeLocator = $attributeLocator;
     }
 
     public function onControllerArguments(ControllerArgumentsEvent $event)
     {
         $request = $event->getRequest();
         $controller = $event->getController();
-        $hasResponseBody = false;
 
         if (\is_array($controller)) {
             $reflection = new \ReflectionMethod($controller[0], $controller[1]);
@@ -40,15 +36,7 @@ final class ResponseBodyConversionListener implements EventSubscriberInterface
             $reflection = new \ReflectionFunction($controller);
         }
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $hasResponseBody = (bool) $reflection->getAttributes(ResponseBody::class, \ReflectionAttribute::IS_INSTANCEOF);
-        }
-
-        if (!$hasResponseBody && null !== $this->attributeLocator) {
-            $id = (isset($reflection->class) ? $reflection->class . '::' : '') . $reflection->name;
-            $hasResponseBody = $this->attributeLocator->has($id) && $this->attributeLocator->get($id)->has(ResponseBody::class);
-        }
-
+        $hasResponseBody = (bool) $reflection->getAttributes(ResponseBody::class, \ReflectionAttribute::IS_INSTANCEOF);
         $request->attributes->set(ResponseBody::class, $hasResponseBody);
     }
 

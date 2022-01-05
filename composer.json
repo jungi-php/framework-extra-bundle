@@ -1,6 +1,6 @@
 {
     "name": "jungi/framework-extra-bundle",
-    "description": "attributes and annotations for request and response operations, content negotiation, and more for symfony projects",
+    "description": "attributes for request and response operations, content negotiation, and more for symfony projects",
     "keywords": ["body", "param", "conversion", "mapper"],
     "type": "symfony-bundle",
     "license": "MIT",
@@ -11,14 +11,12 @@
         "symfony/dependency-injection": "^6.0"
     },
     "suggest": {
-        "symfony/serializer": "For serializer adapters",
-        "doctrine/annotations": "For annotations"
+        "symfony/serializer": "For serializer adapters"
     },
     "require-dev": {
         "symfony/serializer": "^6.0",
         "symfony/property-info": "^6.0",
-        "symfony/phpunit-bridge": "^6.0",
-        "doctrine/annotations": "^1.6"
+        "symfony/phpunit-bridge": "^6.0"
     },
     "authors": [
         {
