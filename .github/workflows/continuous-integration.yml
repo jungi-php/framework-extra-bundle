@@ -37,4 +37,4 @@ jobs:
         run: "composer install --no-interaction --no-progress"
 
       - name: "Run PHPUnit"
-        run: "bin/simple-phpunit"
+        run: "bin/phpunit"

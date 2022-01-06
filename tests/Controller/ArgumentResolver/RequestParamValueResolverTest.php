@@ -6,7 +6,6 @@ use Jungi\FrameworkExtraBundle\Attribute\RequestParam;
 use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -17,8 +16,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 class RequestParamValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
-    use ExpectDeprecationTrait;
-
     /** @test */
     public function uploadedFileArgument()
     {

@@ -6,7 +6,6 @@ use Jungi\FrameworkExtraBundle\Attribute\RequestCookie;
 use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 
@@ -15,8 +14,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
  */
 class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
-    use ExpectDeprecationTrait;
-
     public function argumentTypeSameAsParameterType()
     {
         $this->markTestSkipped('always as string value');

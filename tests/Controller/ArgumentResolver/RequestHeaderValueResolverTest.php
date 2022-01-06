@@ -6,7 +6,6 @@ use Jungi\FrameworkExtraBundle\Attribute\RequestHeader;
 use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -16,8 +15,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 class RequestHeaderValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
-    use ExpectDeprecationTrait;
-
     public function argumentTypeSameAsParameterType()
     {
         $this->markTestSkipped('always as string value');

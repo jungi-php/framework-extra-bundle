@@ -6,7 +6,6 @@ use Jungi\FrameworkExtraBundle\Attribute\QueryParam;
 use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 
@@ -15,8 +14,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
  */
 class QueryParamValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
-    use ExpectDeprecationTrait;
-
     protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
     {
         return new QueryParamValueResolver($converter);

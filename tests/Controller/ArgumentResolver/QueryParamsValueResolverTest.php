@@ -7,7 +7,6 @@ use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResol
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
 use Jungi\FrameworkExtraBundle\Tests\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
@@ -16,8 +15,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 class QueryParamsValueResolverTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /** @test */
     public function supports()
     {

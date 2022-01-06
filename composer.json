@@ -16,7 +16,7 @@
     "require-dev": {
         "symfony/serializer": "^6.0",
         "symfony/property-info": "^6.0",
-        "symfony/phpunit-bridge": "^6.0"
+        "phpunit/phpunit": "^9.5"
     },
     "authors": [
         {

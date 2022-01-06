@@ -10,7 +10,6 @@ use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
 use Jungi\FrameworkExtraBundle\Tests\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +21,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class RequestBodyValueResolverTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /** @test */
     public function supports()
     {
