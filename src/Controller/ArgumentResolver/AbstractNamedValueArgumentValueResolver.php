@@ -18,10 +18,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueResolverInterface
 {
-    /** @var string */
-    protected static $attributeClass;
+    protected static string $attributeClass;
     
-    private $converter;
+    private ConverterInterface $converter;
 
     public function __construct(ConverterInterface $converter)
     {
@@ -71,5 +70,5 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         }
     }
 
-    abstract protected function getArgumentValue(NamedValueArgument $argument, Request $request);
+    abstract protected function getArgumentValue(NamedValueArgument $argument, Request $request): mixed;
 }

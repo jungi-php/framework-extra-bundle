@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class QueryParamValueResolver extends AbstractNamedValueArgumentValueResolver
 {
-    protected static $attributeClass = QueryParam::class;
+    protected static string $attributeClass = QueryParam::class;
 
-    protected function getArgumentValue(NamedValueArgument $argument, Request $request)
+    protected function getArgumentValue(NamedValueArgument $argument, Request $request): string|int|float|bool|null
     {
         return $request->query->get($argument->getName());
     }

@@ -16,14 +16,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 final class ResponseBodyConversionListener implements EventSubscriberInterface
 {
-    private $responseFactory;
+    private ResponseFactory $responseFactory;
 
     public function __construct(ResponseFactory $responseFactory)
     {
         $this->responseFactory = $responseFactory;
     }
 
-    public function onControllerArguments(ControllerArgumentsEvent $event)
+    public function onControllerArguments(ControllerArgumentsEvent $event): void
     {
         $request = $event->getRequest();
         $controller = $event->getController();
@@ -40,7 +40,7 @@ final class ResponseBodyConversionListener implements EventSubscriberInterface
         $request->attributes->set(ResponseBody::class, $hasResponseBody);
     }
 
-    public function onKernelView(ViewEvent $event)
+    public function onKernelView(ViewEvent $event): void
     {
         if ($event->getRequest()->attributes->get(ResponseBody::class, false)) {
             $event->setResponse($this->responseFactory->createEntityResponse(

@@ -23,11 +23,11 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
 {
     private const DEFAULT_CONTENT_TYPE = 'application/json';
 
-    private $messageBodyMapperManager;
-    private $converter;
-    private $defaultContentType;
+    private MessageBodyMapperManager $messageBodyMapperManager;
+    private ConverterInterface $converter;
+    private string $defaultContentType;
 
-    private static $fileClassTypes = [
+    private static array $fileClassTypes = [
         UploadedFile::class,
         File::class,
         \SplFileInfo::class,
@@ -106,17 +106,12 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
     {
         $tmpFile = TmpFileUtils::fromResource($resource);
 
-        switch ($type) {
-            case UploadedFile::class:
-                return new UploadedFile($tmpFile, $filename ?: '', $mediaType, UPLOAD_ERR_OK, true);
-            case File::class:
-                return new File($tmpFile, false);
-            case 'SplFileObject':
-                return new \SplFileObject($tmpFile);
-            case 'SplFileInfo':
-                return new \SplFileInfo($tmpFile);
-            default:
-                throw new \InvalidArgumentException(sprintf('Unknown type "%s".', $type));
-        }
+        return match ($type) {
+            UploadedFile::class => new UploadedFile($tmpFile, $filename ?: '', $mediaType, UPLOAD_ERR_OK, true),
+            File::class => new File($tmpFile, false),
+            'SplFileObject' => new \SplFileObject($tmpFile),
+            'SplFileInfo' => new \SplFileInfo($tmpFile),
+            default => throw new \InvalidArgumentException(sprintf('Unknown type "%s".', $type)),
+        };
     }
 }

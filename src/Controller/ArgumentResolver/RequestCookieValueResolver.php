@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestCookieValueResolver extends AbstractNamedValueArgumentValueResolver
 {
-    protected static $attributeClass = RequestCookie::class;
+    protected static string $attributeClass = RequestCookie::class;
 
-    protected function getArgumentValue(NamedValueArgument $argument, Request $request)
+    protected function getArgumentValue(NamedValueArgument $argument, Request $request): string|int|float|bool|null
     {
         return $request->cookies->get($argument->getName());
     }

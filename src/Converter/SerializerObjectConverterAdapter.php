@@ -10,8 +10,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class SerializerObjectConverterAdapter implements ConverterInterface
 {
-    private $denormalizer;
-    private $context;
+    private DenormalizerInterface $denormalizer;
+    private array $context;
 
     public function __construct(DenormalizerInterface $denormalizer, array $context = [])
     {
@@ -19,7 +19,7 @@ final class SerializerObjectConverterAdapter implements ConverterInterface
         $this->context = $context;
     }
 
-    public function convert($data, string $type)
+    public function convert(mixed $data, string $type): mixed
     {
         if (!class_exists($type)) {
             throw new \InvalidArgumentException('Conversion to class types is only supported.');

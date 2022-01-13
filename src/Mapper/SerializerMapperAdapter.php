@@ -17,13 +17,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class SerializerMapperAdapter implements MapperInterface
 {
-    private $format;
-    private $context;
+    private string $format;
+    private array $context;
 
-    /**
-     * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
-     */
-    private $serializer;
+    private SerializerInterface|DenormalizerInterface|NormalizerInterface $serializer;
 
     public function __construct(string $format, SerializerInterface $serializer, array $context = [])
     {
@@ -32,7 +29,7 @@ final class SerializerMapperAdapter implements MapperInterface
         $this->setSerializer($serializer);
     }
 
-    public function mapFrom(string $data, string $type)
+    public function mapFrom(string $data, string $type): mixed
     {
         try {
             return $this->serializer->deserialize($data, $type, $this->format, $this->context);
@@ -47,7 +44,7 @@ final class SerializerMapperAdapter implements MapperInterface
         }
     }
 
-    public function mapTo($data): string
+    public function mapTo(mixed $data): string
     {
         try {
             return $this->serializer->serialize($data, $this->format, $this->context);

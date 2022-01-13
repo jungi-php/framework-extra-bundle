@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  */
 class JungiFrameworkExtraBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new RegisterMessageBodyMappersPass());
         $container->addCompilerPass(new RegisterConvertersPass());

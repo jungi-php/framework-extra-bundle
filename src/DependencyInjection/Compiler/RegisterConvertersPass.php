@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class RegisterConvertersPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $map = [];
         foreach ($container->findTaggedServiceIds('jungi.converter') as $id => $attributes) {

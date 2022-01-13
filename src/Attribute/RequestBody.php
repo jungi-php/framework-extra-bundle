@@ -8,7 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Attribute;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class RequestBody implements Attribute
 {
-    private $type;
+    private ?string $type;
 
     public function __construct(?string $type = null)
     {

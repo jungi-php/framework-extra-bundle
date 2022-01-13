@@ -13,10 +13,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class MessageBodyMapperManager
 {
-    /**
-     * @var ServiceProviderInterface
-     */
-    private $mappers;
+    private ServiceProviderInterface $mappers;
 
     public function __construct(ServiceProviderInterface $mappers)
     {
@@ -35,7 +32,7 @@ class MessageBodyMapperManager
      * @throws UnsupportedMediaTypeException
      * @throws MalformedDataException
      */
-    public function mapFrom(string $messageBody, string $mediaType, string $type)
+    public function mapFrom(string $messageBody, string $mediaType, string $type): mixed
     {
         if (!$this->mappers->has($mediaType)) {
             throw UnsupportedMediaTypeException::mapperNotRegistered($mediaType);
@@ -48,11 +45,9 @@ class MessageBodyMapperManager
     }
 
     /**
-     * @param mixed $data
-     *
      * @throws UnsupportedMediaTypeException
      */
-    public function mapTo($data, string $mediaType): string
+    public function mapTo(mixed $data, string $mediaType): string
     {
         if (!$this->mappers->has($mediaType)) {
             throw UnsupportedMediaTypeException::mapperNotRegistered($mediaType);

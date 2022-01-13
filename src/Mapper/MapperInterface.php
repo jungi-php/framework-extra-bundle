@@ -15,14 +15,12 @@ interface MapperInterface
      * @throws \InvalidArgumentException On non supported data
      * @throws MalformedDataException
      */
-    public function mapFrom(string $data, string $type);
+    public function mapFrom(string $data, string $type): mixed;
 
     /**
      * Maps PHP data to text.
      *
-     * @param mixed $data
-     *
      * @throws \InvalidArgumentException On non supported data
      */
-    public function mapTo($data): string;
+    public function mapTo(mixed $data): string;
 }

@@ -10,14 +10,14 @@ use Psr\Container\ContainerInterface;
  */
 final class ConverterManager implements ConverterInterface
 {
-    private $converters;
+    private ContainerInterface $converters;
 
     public function __construct(ContainerInterface $converters)
     {
         $this->converters = $converters;
     }
 
-    public function convert($data, string $type)
+    public function convert(mixed $data, string $type): mixed
     {
         if ('object' === $type) {
             throw new \InvalidArgumentException('Type "object" is too ambiguous, provide a concrete class type.');

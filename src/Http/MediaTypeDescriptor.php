@@ -12,8 +12,8 @@ final class MediaTypeDescriptor
     private const WILDCARD = '*';
     private const SEPARATOR = '/';
 
-    private $type;
-    private $subType;
+    private string $type;
+    private string $subType;
 
     /**
      * @param string[] $mediaTypes
@@ -22,7 +22,7 @@ final class MediaTypeDescriptor
      */
     public static function parseList(array $mediaTypes): array
     {
-        return array_map(function (string $mediaType) { return self::parse($mediaType); }, $mediaTypes);
+        return array_map(fn (string $mediaType) => self::parse($mediaType), $mediaTypes);
     }
 
     public static function parse(string $mediaType): self
@@ -47,9 +47,7 @@ final class MediaTypeDescriptor
 
     public static function listToString(array $mediaTypes): array
     {
-        return array_map(function (self $descriptor) {
-            return $descriptor->toString();
-        }, $mediaTypes);
+        return array_map(fn (self $descriptor) => $descriptor->toString(), $mediaTypes);
     }
 
     public function __construct(string $type, string $subType)
@@ -96,7 +94,7 @@ final class MediaTypeDescriptor
         return $this->subType;
     }
 
-    public function toString()
+    public function toString(): string
     {
         return $this->type.self::SEPARATOR.$this->subType;
     }

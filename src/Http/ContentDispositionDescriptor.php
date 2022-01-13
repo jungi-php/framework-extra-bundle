@@ -13,8 +13,8 @@ final class ContentDispositionDescriptor
 {
     private const TYPE_INLINE = 'inline';
 
-    private $type;
-    private $params;
+    private string $type;
+    private array $params;
 
     public static function parse(string $contentDisposition): self
     {

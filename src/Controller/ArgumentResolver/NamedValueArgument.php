@@ -11,9 +11,9 @@ use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
  */
 final class NamedValueArgument
 {
-    private $name;
-    private $type;
-    private $attribute;
+    private string $name;
+    private ?string $type;
+    private NamedValue $attribute;
 
     public function __construct(string $name, ?string $type, NamedValue $attribute)
     {

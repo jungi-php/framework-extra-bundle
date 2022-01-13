@@ -10,11 +10,9 @@ namespace Jungi\FrameworkExtraBundle\Utils;
 final class TypeUtils
 {
     /**
-     * @param mixed $value
-     *
      * @throws \InvalidArgumentException
      */
-    public static function isValueOfType($value, string $type): bool
+    public static function isValueOfType(mixed $value, string $type): bool
     {
         if (class_exists($type) || interface_exists($type)) {
             return $value instanceof $type;
@@ -31,7 +29,7 @@ final class TypeUtils
 
     public static function isCollection(string $type): bool
     {
-        return '[]' === substr($type, -2);
+        return str_ends_with($type, '[]');
     }
 
     public static function getCollectionBaseElementType(string $type): string

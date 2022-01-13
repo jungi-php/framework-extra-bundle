@@ -7,22 +7,17 @@ namespace Jungi\FrameworkExtraBundle\Http;
  */
 class NotAcceptableMediaTypeException extends \RuntimeException
 {
-    /**
-     * @var string[]
-     */
-    protected $notAcceptableMediaTypes;
+    /** @var string[] */
+    protected array $notAcceptableMediaTypes;
 
-    /**
-     * @var string[]
-     */
-    protected $supportedMediaTypes;
+    /** @var string[] */
+    protected array $supportedMediaTypes;
 
     /**
      * @param string[] $notAcceptableMediaTypes
      * @param string[] $supportedMediaTypes
-     * @param int      $code
      */
-    public function __construct(array $notAcceptableMediaTypes, array $supportedMediaTypes, string $message, $code = 0, \Throwable $previous = null)
+    public function __construct(array $notAcceptableMediaTypes, array $supportedMediaTypes, string $message, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

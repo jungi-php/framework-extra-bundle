@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class RegisterMessageBodyMappersPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $map = [];
         foreach ($container->findTaggedServiceIds('jungi.message_body_mapper') as $id => $attributes) {

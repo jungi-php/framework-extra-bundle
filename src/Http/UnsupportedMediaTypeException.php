@@ -7,15 +7,9 @@ namespace Jungi\FrameworkExtraBundle\Http;
  */
 class UnsupportedMediaTypeException extends \RuntimeException
 {
-    /**
-     * @var string
-     */
-    protected $mediaType;
+    protected string $mediaType;
 
-    /**
-     * @return static
-     */
-    public static function mapperNotRegistered(string $mediaType): self
+    public static function mapperNotRegistered(string $mediaType): static
     {
         return new static($mediaType, sprintf('No mapper is registered for media type "%s".', $mediaType));
     }

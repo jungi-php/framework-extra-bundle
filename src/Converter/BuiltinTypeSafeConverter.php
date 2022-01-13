@@ -9,28 +9,28 @@ namespace Jungi\FrameworkExtraBundle\Converter;
  */
 final class BuiltinTypeSafeConverter implements ConverterInterface
 {
-    public function convert($value, $type)
+    public function convert(mixed $data, string $type): string|int|bool|array|object|float
     {
         try {
             switch ($type) {
                 case 'array':
-                    return $this->convertToArray($value);
+                    return $this->convertToArray($data);
                 case 'object':
-                    return $this->convertToObject($value);
+                    return $this->convertToObject($data);
                 case 'int':
-                    $result = @$this->convertToInt($value);
+                    $result = @$this->convertToInt($data);
                     $this->handleNonNumericValueNotice();
 
                     return $result;
                 case 'float':
-                    $result = @$this->convertToFloat($value);
+                    $result = @$this->convertToFloat($data);
                     $this->handleNonNumericValueNotice();
 
                     return $result;
                 case 'bool':
-                    return $this->convertToBool($value);
+                    return $this->convertToBool($data);
                 case 'string':
-                    return $this->convertToString($value);
+                    return $this->convertToString($data);
                 default:
                     throw new \InvalidArgumentException(sprintf('Unknown type "%s".', $type));
             }
@@ -69,7 +69,7 @@ final class BuiltinTypeSafeConverter implements ConverterInterface
         return $value;
     }
 
-    private function handleNonNumericValueNotice()
+    private function handleNonNumericValueNotice(): void
     {
         $error = error_get_last();
         if ($error && 'A non well formed numeric value encountered' === $error['message']) {

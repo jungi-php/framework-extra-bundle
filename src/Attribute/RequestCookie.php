@@ -8,7 +8,7 @@ namespace Jungi\FrameworkExtraBundle\Attribute;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class RequestCookie implements NamedValue
 {
-    private $name;
+    private ?string $name;
 
     public function __construct(?string $name = null)
     {

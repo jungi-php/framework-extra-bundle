@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class QueryParamsValueResolver implements ArgumentValueResolverInterface
 {
-    private $converter;
+    private ConverterInterface $converter;
 
     public function __construct(ConverterInterface $converter)
     {

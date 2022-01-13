@@ -15,8 +15,8 @@ class ResponseFactory
 {
     private const MEDIA_TYPE_ALL = '*/*';
 
-    private $defaultContentType;
-    private $messageBodyMapperManager;
+    private MediaTypeDescriptor $defaultContentType;
+    private MessageBodyMapperManager $messageBodyMapperManager;
 
     public function __construct(string $defaultContentType, MessageBodyMapperManager $messageBodyMapperManager)
     {
@@ -30,12 +30,10 @@ class ResponseFactory
     }
 
     /**
-     * @param mixed $entity
-     *
      * @throws NotAcceptableMediaTypeException
      * @throws \LogicException
      */
-    public function createEntityResponse(Request $request, $entity, int $status = 200, array $headers = []): Response
+    public function createEntityResponse(Request $request, mixed $entity, int $status = 200, array $headers = []): Response
     {
         $acceptableMediaTypes = $this->resolveAcceptableMediaTypes($request);
         $supportedMediaTypes = MediaTypeDescriptor::parseList($this->messageBodyMapperManager->getSupportedMediaTypes());

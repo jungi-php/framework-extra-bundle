@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestHeaderValueResolver extends AbstractNamedValueArgumentValueResolver
 {
-    protected static $attributeClass = RequestHeader::class;
+    protected static string $attributeClass = RequestHeader::class;
 
-    protected function getArgumentValue(NamedValueArgument $argument, Request $request)
+    protected function getArgumentValue(NamedValueArgument $argument, Request $request): string|array|null
     {
         if ('array' === $argument->getType()) {
             return $request->headers->all($argument->getName());

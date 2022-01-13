@@ -9,7 +9,7 @@ namespace Jungi\FrameworkExtraBundle\Utils;
  */
 final class TmpFileUtils
 {
-    private static $resources = [];
+    private static array $resources = [];
 
     public static function fromData(string $data, string $mimeType = 'application/octet-stream'): string
     {
