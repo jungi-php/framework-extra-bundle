@@ -9,28 +9,28 @@ namespace Jungi\FrameworkExtraBundle\Converter;
  */
 final class BuiltinTypeSafeConverter implements ConverterInterface
 {
-    public function convert(mixed $data, string $type): string|int|bool|array|object|float
+    public function convert(mixed $value, string $type): string|int|bool|array|object|float
     {
         try {
             switch ($type) {
                 case 'array':
-                    return $this->convertToArray($data);
+                    return $this->convertToArray($value);
                 case 'object':
-                    return $this->convertToObject($data);
+                    return $this->convertToObject($value);
                 case 'int':
-                    $result = @$this->convertToInt($data);
+                    $result = @$this->convertToInt($value);
                     $this->handleNonNumericValueNotice();
 
                     return $result;
                 case 'float':
-                    $result = @$this->convertToFloat($data);
+                    $result = @$this->convertToFloat($value);
                     $this->handleNonNumericValueNotice();
 
                     return $result;
                 case 'bool':
-                    return $this->convertToBool($data);
+                    return $this->convertToBool($value);
                 case 'string':
-                    return $this->convertToString($data);
+                    return $this->convertToString($value);
                 default:
                     throw new \InvalidArgumentException(sprintf('Unknown type "%s".', $type));
             }

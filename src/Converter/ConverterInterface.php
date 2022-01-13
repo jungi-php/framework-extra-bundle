@@ -10,10 +10,10 @@ namespace Jungi\FrameworkExtraBundle\Converter;
 interface ConverterInterface
 {
     /**
-     * Converts data to type.
+     * Converts a value to the given type.
      *
      * @throws \InvalidArgumentException On non supported type
      * @throws TypeConversionException
      */
-    public function convert(mixed $data, string $type): mixed;
+    public function convert(mixed $value, string $type): mixed;
 }

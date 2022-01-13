@@ -19,14 +19,14 @@ final class SerializerObjectConverterAdapter implements ConverterInterface
         $this->context = $context;
     }
 
-    public function convert(mixed $data, string $type): mixed
+    public function convert(mixed $value, string $type): mixed
     {
         if (!class_exists($type)) {
             throw new \InvalidArgumentException('Conversion to class types is only supported.');
         }
 
         try {
-            return $this->denormalizer->denormalize($data, $type, null, $this->context);
+            return $this->denormalizer->denormalize($value, $type, null, $this->context);
         } catch (NotNormalizableValueException | \TypeError $e) {
             throw new TypeConversionException($e->getMessage(), 0, $e);
         }

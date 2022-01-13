@@ -17,21 +17,21 @@ final class ConverterManager implements ConverterInterface
         $this->converters = $converters;
     }
 
-    public function convert(mixed $data, string $type): mixed
+    public function convert(mixed $value, string $type): mixed
     {
         if ('object' === $type) {
             throw new \InvalidArgumentException('Type "object" is too ambiguous, provide a concrete class type.');
         }
 
-        if (TypeUtils::isValueOfType($data, $type)) {
-            return $data;
+        if (TypeUtils::isValueOfType($value, $type)) {
+            return $value;
         }
 
         if ($this->converters->has($type)) {
             /** @var ConverterInterface $converter */
             $converter = $this->converters->get($type);
 
-            return $converter->convert($data, $type);
+            return $converter->convert($value, $type);
         }
 
         // fallback to object converter if available
@@ -39,7 +39,7 @@ final class ConverterManager implements ConverterInterface
             /** @var ConverterInterface $converter */
             $converter = $this->converters->get('object');
 
-            return $converter->convert($data, $type);
+            return $converter->convert($value, $type);
         }
 
         throw new \InvalidArgumentException(sprintf('Unsupported type "%s".', $type));
