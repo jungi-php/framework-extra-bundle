@@ -19,14 +19,6 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('serializer')->defaultTrue()->end()
                 ->scalarNode('default_content_type')->defaultValue('application/json')->end()
-                ->arrayNode('entity_response')
-                    ->setDeprecated('jungi/framework-extra-bundle', '1.1')
-                    ->children()
-                        ->scalarNode('default_content_type')
-                            ->setDeprecated('jungi/framework-extra-bundle', '1.1', 'moved to the root node "jungi_framework_extra".')
-                        ->end()
-                    ->end()
-                ->end()
             ->end();
 
         return $builder;
