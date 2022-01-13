@@ -35,6 +35,19 @@ class BuiltinTypeSafeConverterTest extends TestCase
         $converter->convert($value, $type);
     }
 
+    /**
+     * @test
+     * @dataProvider provideUnsupported
+     */
+    public function unsupported($type)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Unsupported type "%s"', $type));
+
+        $converter = new BuiltinTypeSafeConverter();
+        $converter->convert(123, $type);
+    }
+
     /** @test */
     public function nonNumericValuePhpNotice()
     {
@@ -52,7 +65,7 @@ class BuiltinTypeSafeConverterTest extends TestCase
     public function provideValid()
     {
         yield [123, '123', 'int'];
-        yield [123, '123', 'int'];
+        yield ['1.23', 1.23, 'string'];
         yield [1.23, '1.23', 'float'];
         yield [true, 1, 'bool'];
         yield [false, 0, 'bool'];
@@ -66,7 +79,11 @@ class BuiltinTypeSafeConverterTest extends TestCase
         yield ['foo123', 'int'];
         yield ['foo1.23', 'float'];
         yield ['1.23foo', 'float'];
-        yield [[], 'object'];
-        yield [new \stdClass(), 'array'];
+    }
+
+    public function provideUnsupported()
+    {
+        yield ['object'];
+        yield ['array'];
     }
 }

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Annotations
+- Conversion of `array|object` types by `BuiltinTypeSafeConverter`.
 
 ## [1.4.2] - 2022-01-03
 

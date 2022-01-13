@@ -9,14 +9,10 @@ namespace Jungi\FrameworkExtraBundle\Converter;
  */
 final class BuiltinTypeSafeConverter implements ConverterInterface
 {
-    public function convert(mixed $value, string $type): string|int|bool|array|object|float
+    public function convert(mixed $value, string $type): string|int|bool|float
     {
         try {
             switch ($type) {
-                case 'array':
-                    return $this->convertToArray($value);
-                case 'object':
-                    return $this->convertToObject($value);
                 case 'int':
                     $result = @$this->convertToInt($value);
                     $this->handleNonNumericValueNotice();
@@ -32,7 +28,7 @@ final class BuiltinTypeSafeConverter implements ConverterInterface
                 case 'string':
                     return $this->convertToString($value);
                 default:
-                    throw new \InvalidArgumentException(sprintf('Unknown type "%s".', $type));
+                    throw new \InvalidArgumentException(sprintf('Unsupported type "%s".', $type));
             }
         } catch (\TypeError $e) {
             throw new TypeConversionException($e->getMessage(), 0, $e);
@@ -55,16 +51,6 @@ final class BuiltinTypeSafeConverter implements ConverterInterface
     }
 
     private function convertToString(string $value): string
-    {
-        return $value;
-    }
-
-    private function convertToObject(object $value): object
-    {
-        return $value;
-    }
-
-    private function convertToArray(array $value): array
     {
         return $value;
     }
