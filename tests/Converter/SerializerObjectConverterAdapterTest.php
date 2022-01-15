@@ -17,6 +17,17 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 class SerializerObjectConverterAdapterTest extends TestCase
 {
     /** @test */
+    public function convertToSameType()
+    {
+        $converter = new SerializerObjectConverterAdapter(new DateTimeNormalizer());
+
+        $expected = new \DateTimeImmutable('1992-12-10 23:22:21');
+        $actual = $converter->convert(new \DateTimeImmutable('1992-12-10 23:22:21'), \DateTimeImmutable::class);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /** @test */
     public function convertStringToDate()
     {
         $converter = new SerializerObjectConverterAdapter(new DateTimeNormalizer());

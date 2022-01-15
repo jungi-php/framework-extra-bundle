@@ -25,6 +25,10 @@ final class SerializerObjectConverterAdapter implements ConverterInterface
             throw new \InvalidArgumentException('Conversion to class types is only supported.');
         }
 
+        if ($value instanceof $type) {
+            return $value;
+        }
+
         try {
             return $this->denormalizer->denormalize($value, $type, null, $this->context);
         } catch (NotNormalizableValueException | \TypeError $e) {

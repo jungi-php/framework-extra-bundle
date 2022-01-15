@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Transition to Symfony v6.0
 - `ConverterManager` no longer checks whether the passed value is already of the given type. Now, each converter should
 take care of this itself.
+- `SerializerObjectConverterAdapter` won't convert a value if it's already of a given type.
 
 ### Removed
 - Annotations
