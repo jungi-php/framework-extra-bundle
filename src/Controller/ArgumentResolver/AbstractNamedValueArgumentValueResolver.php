@@ -5,7 +5,6 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
-use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -59,7 +58,7 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
             throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $namedValueArgument->getName()));
         }
 
-        if (null === $argument->getType() || TypeUtils::isValueOfType($value, $argument->getType())) {
+        if (null === $argument->getType()) {
             yield $value; return;
         }
 

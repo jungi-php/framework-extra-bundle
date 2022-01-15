@@ -13,15 +13,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 class ConverterManagerTest extends TestCase
 {
     /** @test */
-    public function dataIsAlreadyOfType()
-    {
-        $manager = new ConverterManager(new ServiceLocator([]));
-        $data = 123;
-
-        $this->assertSame($data, $manager->convert($data, 'int'));
-    }
-
-    /** @test */
     public function converterForRegisteredType()
     {
         $manager = new ConverterManager(new ServiceLocator(array(

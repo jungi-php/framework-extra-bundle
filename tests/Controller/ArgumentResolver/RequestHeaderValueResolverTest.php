@@ -15,11 +15,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 class RequestHeaderValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
-    public function argumentTypeSameAsParameterType()
-    {
-        $this->markTestSkipped('always as string value');
-    }
-
     /** @test */
     public function argumentOfArrayType()
     {

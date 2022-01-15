@@ -2,7 +2,6 @@
 
 namespace Jungi\FrameworkExtraBundle\Converter;
 
-use Jungi\FrameworkExtraBundle\Utils\TypeUtils;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -21,10 +20,6 @@ final class ConverterManager implements ConverterInterface
     {
         if ('object' === $type) {
             throw new \InvalidArgumentException('Type "object" is too ambiguous, provide a concrete class type.');
-        }
-
-        if (TypeUtils::isValueOfType($value, $type)) {
-            return $value;
         }
 
         if ($this->converters->has($type)) {

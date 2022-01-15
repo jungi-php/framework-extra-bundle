@@ -70,25 +70,6 @@ abstract class AbstractNamedValueArgumentValueResolverTest extends TestCase
     }
 
     /** @test */
-    public function argumentTypeSameAsParameterType()
-    {
-        $converter = $this->createMock(ConverterInterface::class);
-        $converter
-            ->expects($this->never())
-            ->method('convert');
-
-        $request = $this->createRequestWithParameters(array(
-            'foo' => 123
-        ));
-        $request->attributes->set('_controller', 'FooController');
-
-        $resolver = $this->createArgumentValueResolver($converter);
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'int', false, false, null, false, [
-            $this->createAttribute('foo')
-        ]))->current();
-    }
-
-    /** @test */
     public function invalidParameter()
     {
         $this->expectException(BadRequestHttpException::class);

@@ -14,11 +14,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
  */
 class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
 {
-    public function argumentTypeSameAsParameterType()
-    {
-        $this->markTestSkipped('always as string value');
-    }
-
     protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
     {
         return new RequestCookieValueResolver($converter);

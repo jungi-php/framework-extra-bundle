@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Transition to PHP v8.0
 - Transition to Symfony v6.0
+- `ConverterManager` no longer checks whether the passed value is already of the given type. Now, each converter should
+take care of this itself.
 
 ### Removed
 - Annotations
