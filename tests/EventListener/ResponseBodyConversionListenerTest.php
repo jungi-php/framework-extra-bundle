@@ -5,7 +5,7 @@ namespace Jungi\FrameworkExtraBundle\Tests\EventListener;
 use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
 use Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener;
 use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
-use Jungi\FrameworkExtraBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;

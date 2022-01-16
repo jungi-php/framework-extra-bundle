@@ -9,7 +9,7 @@ use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
-use Jungi\FrameworkExtraBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;

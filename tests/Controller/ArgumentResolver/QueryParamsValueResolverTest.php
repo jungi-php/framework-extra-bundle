@@ -6,7 +6,7 @@ use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\QueryParamsValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Jungi\FrameworkExtraBundle\Tests\Fixtures\ForeignAttribute;
-use Jungi\FrameworkExtraBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
