@@ -18,70 +18,87 @@ class QueryParamsValueResolverTest extends TestCase
     /** @test */
     public function supports()
     {
-        // Attribute
         $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
+        $request = new Request();
 
-        $request = new Request([], [], ['_controller' => 'FooController']);
-        $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null, false, [
+        $argument = new ArgumentMetadata('foo', null, false, false, null, false, [
             new QueryParams()
-        ])));
-        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', null, false, false, null, false, [
+        ]);
+        $this->assertTrue($resolver->supports($request, $argument));
+
+        $argument = new ArgumentMetadata('foo', null, false, false, null, false, [
             new ForeignAttribute()
-        ])));
-        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', null, false, false, null)));
+        ]);
+        $this->assertFalse($resolver->supports($request, $argument));
+
+        $argument = new ArgumentMetadata('bar', null, false, false, null);
+        $this->assertFalse($resolver->supports($request, $argument));
     }
 
     /** @test */
-    public function requestWithQueryParameters()
+    public function parameterIsConverted()
     {
-        $type = 'stdClass';
-        $request = new Request(['foo' => 'bar'], [], ['_controller' => 'FooController']);
+        $request = new Request(['foo' => 'bar']);
 
         $converter = $this->createMock(ConverterInterface::class);
         $converter
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('convert')
-            ->with($request->query->all(), $type);
+            ->with($request->query->all(), 'stdClass');
 
         $resolver = new QueryParamsValueResolver($converter);
-        $resolver->resolve($request, new ArgumentMetadata('foo', $type, false, false, null, false, [
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new QueryParams()
-        ]))->current();
+        ]);
+
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function nullableArgument()
+    public function resolveForNullableArgumentFails()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" cannot be nullable');
 
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'stdClass', false, false, null, true, [
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new QueryParamsValueResolver($converter);
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, true, [
             new QueryParams()
-        ]))->current();
+        ]);
+
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function argumentWithoutType()
+    public function resolveForArgumentWithoutTypeFails()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must have the type specified');
 
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null, false, [
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new QueryParamsValueResolver($converter);
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', null, false, false, null, false, [
             new QueryParams()
-        ]))->current();
+        ]);
+
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function nonObjectArgument()
+    public function resolveForArgumentWithNoConcreteClassTypeFails()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must be of concrete class type');
 
-        $resolver = new QueryParamsValueResolver($this->createMock(ConverterInterface::class));
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', 'string', false, false, null, false, [
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new QueryParamsValueResolver($converter);
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, false, [
             new QueryParams()
-        ]))->current();
+        ]);
+
+        $resolver->resolve($request, $argument)->current();
     }
 }

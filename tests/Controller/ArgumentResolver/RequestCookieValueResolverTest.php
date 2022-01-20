@@ -3,29 +3,30 @@
 namespace Jungi\FrameworkExtraBundle\Tests\Controller\ArgumentResolver;
 
 use Jungi\FrameworkExtraBundle\Attribute\RequestCookie;
-use Jungi\FrameworkExtraBundle\Attribute\NamedValue;
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestCookieValueResolver;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
  */
-class RequestCookieValueResolverTest extends AbstractNamedValueArgumentValueResolverTest
+class RequestCookieValueResolverTest extends TestCase
 {
-    protected function createArgumentValueResolver(ConverterInterface $converter): ArgumentValueResolverInterface
+    /** @test */
+    public function argumentValueIsResolved()
     {
-        return new RequestCookieValueResolver($converter);
-    }
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestCookieValueResolver($converter);
 
-    protected function createRequestWithParameters(array $parameters): Request
-    {
-        return new Request([], [], [], $parameters);
-    }
+        $request = new Request([], [], [], [
+            'foo' => 'bar'
+        ]);
+        $argument = new ArgumentMetadata('foo', null, false, false, null, false, [
+            new RequestCookie()
+        ]);
 
-    protected function createAttribute(string $name): NamedValue
-    {
-        return new RequestCookie($name);
+        $this->assertEquals('bar', $resolver->resolve($request, $argument)->current());
     }
 }

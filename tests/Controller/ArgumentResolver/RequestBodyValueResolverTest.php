@@ -26,18 +26,21 @@ class RequestBodyValueResolverTest extends TestCase
     {
         $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
         $converter = $this->createMock(ConverterInterface::class);
-
-        // Attribute
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
-
-        $request = new Request([], [], array('_controller' => 'FooController'));
-        $this->assertTrue($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
+        $request = new Request();
+        
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new RequestBody()
-        ])));
-        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
+        ]);
+        $this->assertTrue($resolver->supports($request, $argument));
+
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new ForeignAttribute()
-        ])));
-        $this->assertFalse($resolver->supports($request, new ArgumentMetadata('bar', 'stdClass', false, false, null)));
+        ]);
+        $this->assertFalse($resolver->supports($request, $argument));
+
+        $argument = new ArgumentMetadata('bar', 'stdClass', false, false, null);
+        $this->assertFalse($resolver->supports($request, $argument));
     }
 
     /**
@@ -46,26 +49,46 @@ class RequestBodyValueResolverTest extends TestCase
      */
     public function mapRequestBody(string $argumentType, ?string $annotatedAsType)
     {
-        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello-world');
-        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
-
         $converter = $this->createMock(ConverterInterface::class);
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $mapperManager
-            ->expects($this->exactly(1))
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $messageBodyMapperManager
+            ->expects($this->once())
             ->method('mapFrom')
             ->with('hello-world', 'application/vnd.jungi.test', $annotatedAsType ?: $argumentType);
 
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter);
-        $resolver->resolve($request, new ArgumentMetadata('foo', $argumentType, false, false, null, false, [
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+
+        $request = new Request([], [], [], [], [], [], 'hello-world');
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
+
+        $argument = new ArgumentMetadata('foo', $argumentType, false, false, null, false, [
             new RequestBody($annotatedAsType)
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
     public function multipartFormDataRequest()
     {
         $file = new UploadedFile(__DIR__.'/../../Fixtures/uploaded_file', 'uploaded_file', 'text/plain');
+        $expectedData = array(
+            'hello' => 'world',
+            'attachments' => [array(
+                'name' => 'foo',
+                'file' => $file,
+            )],
+        );
+
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $converter
+            ->expects($this->once())
+            ->method('convert')
+            ->with($expectedData, 'stdClass');
+
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+
         $request = new Request([], array(
             'hello' => 'world',
             'attachments' => [array('name' => 'foo')],
@@ -78,25 +101,11 @@ class RequestBodyValueResolverTest extends TestCase
         ));
         $request->headers->set('Content-Type', 'multipart/form-data');
 
-        $expectedData = array(
-            'hello' => 'world',
-            'attachments' => [array(
-                'name' => 'foo',
-                'file' => $file,
-            )],
-        );
-
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $converter = $this->createMock(ConverterInterface::class);
-        $converter
-            ->expects($this->once())
-            ->method('convert')
-            ->with($expectedData, 'stdClass');
-
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter);
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /**
@@ -105,18 +114,19 @@ class RequestBodyValueResolverTest extends TestCase
      */
     public function regularFileRequest($type)
     {
-        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello,world');
-        $request->headers->set('Content-Type', 'text/csv');
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
 
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
-        );
+        $request = new Request([], [], [], [], [], [], 'hello,world');
+        $request->headers->set('Content-Type', 'text/csv');
+        
+        $argument = new ArgumentMetadata('foo', $type, false, false, null, false, [
+            new RequestBody()
+        ]);
 
         /** @var \SplFileInfo $file */
-        $file = $resolver->resolve($request, new ArgumentMetadata('foo', $type, false, false, null, false, [
-            new RequestBody()
-        ]))->current();
+        $file = $resolver->resolve($request, $argument)->current();
 
         $this->assertInstanceOf($type, $file);
         $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
@@ -125,18 +135,17 @@ class RequestBodyValueResolverTest extends TestCase
     /** @test */
     public function uploadedFileRequest()
     {
-        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], 'hello,world');
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+
+        $request = new Request([], [], [], [], [], [], 'hello,world');
         $request->headers->set('Content-Type', 'text/csv');
         $request->headers->set('Content-Disposition', 'inline; filename = "foo123.csv"');
 
         $argument = new ArgumentMetadata('foo', UploadedFile::class, false, false, null, false, [
             new RequestBody()
         ]);
-
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
-        );
 
         /** @var UploadedFile $file */
         $file = $resolver->resolve($request, $argument)->current();
@@ -158,162 +167,174 @@ class RequestBodyValueResolverTest extends TestCase
     }
 
     /** @test */
-    public function defaultContentTypeIsUsed()
+    public function mapFromDefaultContentTypeOnUnavailableContentType()
     {
-        $request = new Request([], [], ['_controller' => 'FooController'], [], [], [], '123');
-
         $converter = $this->createMock(ConverterInterface::class);
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $mapperManager
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
             ->with('123', 'application/vnd.jungi.test', 'int');
 
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter, 'application/vnd.jungi.test');
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'int', false, false, null, false, [
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter, 'application/vnd.jungi.test');
+        $request = new Request([], [], [], [], [], [], '123');
+        $argument = new ArgumentMetadata('foo', 'int', false, false, null, false, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function argumentIsSetToNullOnEmptyBodyAndUnavailableContentType()
+    public function argumentOnEmptyRequestBodyAndUnavailableContentTypeIsResolvedToNullValue()
     {
-        $request = new Request([], [], ['_controller' => 'FooController']);
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
 
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
-        );
-
-        $this->assertNull($resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null, true, [
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, true, [
             new RequestBody()
-        ]))->current());
+        ]);
+
+        $this->assertNull($resolver->resolve($request, $argument)->current());
     }
 
     /** @test */
-    public function mapperIsUsedOnEmptyBodyAndAvailableContentType()
+    public function mapOnEmptyRequestBodyAndAvailableContentType()
     {
-        $request = new Request([], [], ['_controller' => 'FooController']);
-        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
-
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $mapperManager
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
             ->with('', 'application/vnd.jungi.test', 'string');
 
-        $resolver = new RequestBodyValueResolver(
-            $mapperManager,
-            $this->createMock(ConverterInterface::class)
-        );
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null, true, [
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+
+        $request = new Request();
+        $request->headers->set('Content-Type', 'application/vnd.jungi.test');
+        
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, true, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function notNullableArgumentOnEmptyBody()
+    public function resolveForNotNullableArgumentOnEmptyRequestBodyFails()
     {
         $this->expectException(BadRequestHttpException::class);
-
-        $request = new Request([], [], ['_controller' => 'FooController']);
-
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
-        );
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'string', false, false, null, false, [
+        $this->expectExceptionMessage('Request body cannot be empty');
+        
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+        
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, false, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function defaultArgumentValueIsUsed()
+    public function argumentOnEmptyRequestBodyIsResolvedToDefaultValue()
     {
-        $request = new Request([], [], ['_controller' => 'FooController']);
-
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+        
+        $request = new Request();
         $argument = new ArgumentMetadata('foo', 'int', false, true, 123, false, [
             new RequestBody()
         ]);
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
-        );
 
         $this->assertEquals(123, $resolver->resolve($request, $argument)->current());
     }
 
     /** @test */
-    public function argumentWithoutType()
+    public function resolveForArgumentWithoutTypeFails()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument "foo" must have the type specified');
 
-        $resolver = new RequestBodyValueResolver(
-            $this->createMock(MessageBodyMapperManager::class),
-            $this->createMock(ConverterInterface::class)
-        );
-        $resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null, false, [
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $converter = $this->createMock(ConverterInterface::class);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', null, false, false, null, false, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
-    public function malformedRequestData()
+    public function malformedRequestBody()
     {
         $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Request body is malformed');
 
         $converter = $this->createMock(ConverterInterface::class);
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
-        $mapperManager
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
             ->willThrowException(new MalformedDataException('Malformed data'));
+        
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
 
-        $request = new Request([], [], array('_controller' => 'FooController'));
+        $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
         
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter);
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
     /** @test */
     public function invalidRequestBodyParameters()
     {
         $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Request body parameters are invalid');
 
-        $mapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
         $converter = $this->createMock(ConverterInterface::class);
         $converter
             ->expects($this->once())
             ->method('convert')
             ->willThrowException(new TypeConversionException('Cannot convert data'));
 
-        $request = new Request([], ['foo' => 'bar'], ['_controller' => 'FooController']);
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+        
+        $request = new Request([], ['foo' => 'bar']);
         $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
 
-        $resolver = new RequestBodyValueResolver($mapperManager, $converter);
-        $resolver->resolve($request, new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new RequestBody()
-        ]))->current();
+        ]);
+        
+        $resolver->resolve($request, $argument)->current();
     }
 
-    public function provideRegularFileClassTypes()
+    public function provideRegularFileClassTypes(): iterable
     {
         yield [File::class];
         yield ['SplFileInfo'];
         yield ['SplFileObject'];
     }
 
-    public function provideMappableTypes()
+    public function provideMappableTypes(): iterable
     {
         yield ['string', null];
         yield ['stdClass', null];
         yield ['array', 'stdClass[]'];
-        yield ['array', 'stdClass[][]'];
         yield ['array', 'string[]'];
-        yield ['array', 'string[][]'];
     }
 }
