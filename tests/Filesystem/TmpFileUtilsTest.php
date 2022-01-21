@@ -1,8 +1,8 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\Tests\Utils;
+namespace Jungi\FrameworkExtraBundle\Tests\Filesystem;
 
-use Jungi\FrameworkExtraBundle\Utils\TmpFileUtils;
+use Jungi\FrameworkExtraBundle\Filesystem\TmpFileUtils;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jungi\FrameworkExtraBundle\Utils;
+namespace Jungi\FrameworkExtraBundle\Filesystem;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>

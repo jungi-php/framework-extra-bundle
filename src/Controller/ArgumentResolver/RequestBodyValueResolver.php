@@ -8,7 +8,7 @@ use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Http\ContentDispositionDescriptor;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Jungi\FrameworkExtraBundle\Mapper\MalformedDataException;
-use Jungi\FrameworkExtraBundle\Utils\TmpFileUtils;
+use Jungi\FrameworkExtraBundle\Filesystem\TmpFileUtils;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
