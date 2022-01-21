@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\DependencyInjection\Compiler;
 
-use Jungi\FrameworkExtraBundle\Http\MediaTypeUtils;
+use Jungi\FrameworkExtraBundle\Http\MediaTypeDescriptor;
 use Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -25,7 +25,7 @@ final class RegisterMessageBodyMappersPass implements CompilerPassInterface
                 if (!isset($attribute['media_type'])) {
                     throw new InvalidArgumentException(sprintf('Service "%s" must define the "media_type" attribute on "jungi.message_conversion_mapper" tag.', $id));
                 }
-                if (!MediaTypeUtils::isSpecific($attribute['media_type'])) {
+                if (true !== MediaTypeDescriptor::parseOrNull($attribute['media_type'])?->isSpecific()) {
                     throw new InvalidArgumentException(sprintf('Service "%s" has the invalid media type "%s", it should be specific eg. "application/json".', $id, $attribute['media_type']));
                 }
 
