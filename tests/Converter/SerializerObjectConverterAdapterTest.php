@@ -4,12 +4,13 @@ namespace Jungi\FrameworkExtraBundle\Tests\Converter;
 
 use Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
-use Jungi\FrameworkExtraBundle\Serializer\Serializer;
+use Jungi\FrameworkExtraBundle\Serializer\ObjectAlreadyOfTypeDenormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Piotr Kugla <piku235@gmail.com>
@@ -88,7 +89,10 @@ class SerializerObjectConverterAdapterTest extends TestCase
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
         $converter = new SerializerObjectConverterAdapter(
-            new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]),
+            new Serializer([
+                new ObjectAlreadyOfTypeDenormalizer(),
+                new PropertyNormalizer(null, null, $propertyInfo)
+            ]),
             ['disable_type_enforcement' => true]
         );
 

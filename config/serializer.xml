@@ -15,14 +15,14 @@
             <argument type="service" id="Symfony\Component\Serializer\SerializerInterface" />
         </service>
 
-        <service id="jungi.serializer" class="Jungi\FrameworkExtraBundle\Serializer\Serializer">
-            <argument type="collection" />
-            <argument type="collection" />
+        <service id="Jungi\FrameworkExtraBundle\Serializer\ObjectAlreadyOfTypeDenormalizer" class="Jungi\FrameworkExtraBundle\Serializer\ObjectAlreadyOfTypeDenormalizer">
+            <tag name="serializer.normalizer" priority="-915" />
+            <!-- run before the serializer.normalizer.object -->
         </service>
         <service id="Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter" class="Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter">
             <tag name="jungi.converter" type="object" />
 
-            <argument type="service" id="jungi.serializer" />
+            <argument type="service" id="Symfony\Component\Serializer\Normalizer\DenormalizerInterface" />
             <argument type="collection">
                 <argument key="disable_type_enforcement">true</argument>
             </argument>
