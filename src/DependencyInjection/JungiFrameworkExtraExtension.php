@@ -32,6 +32,6 @@ final class JungiFrameworkExtraExtension extends Extension
         $entityResponseListener->replaceArgument(1, $config['default_content_type']);
 
         $requestBodyValueResolver = $container->getDefinition(RequestBodyValueResolver::class);
-        $requestBodyValueResolver->replaceArgument(3, $config['default_content_type']);
+        $requestBodyValueResolver->replaceArgument(2, $config['default_content_type']);
     }
 }
