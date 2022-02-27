@@ -7,11 +7,6 @@
     <services>
         <defaults public="false" />
 
-        <service id="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener" class="Jungi\FrameworkExtraBundle\EventListener\ResponseBodyConversionListener">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" />
-        </service>
-
         <service id="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver" class="Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver">
             <tag name="controller.argument_value_resolver" />
             <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />

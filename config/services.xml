@@ -30,11 +30,6 @@
         <service id="jungi.converter.request_header" alias="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
         <service id="jungi.converter.request_cookie" alias="Jungi\FrameworkExtraBundle\Converter\ConverterInterface" />
 
-        <service id="Jungi\FrameworkExtraBundle\Http\ResponseFactory" class="Jungi\FrameworkExtraBundle\Http\ResponseFactory" public="true">
-            <argument />
-            <argument type="service" id="Jungi\FrameworkExtraBundle\Http\MessageBodyMapperManager" />
-        </service>
-
         <service id="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener" class="Jungi\FrameworkExtraBundle\EventListener\ExceptionListener">
             <tag name="kernel.event_subscriber" />
         </service>

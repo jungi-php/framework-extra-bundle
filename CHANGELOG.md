@@ -18,6 +18,7 @@ take care of this itself.
 - Annotations
 - Conversion of `array|object` types by `BuiltinTypeSafeConverter`.
 - Deprecated configuration option `entity_response.default_content_type`.
+- Attribute `ResponseBody`
 
 ## [1.4.2] - 2022-01-03
 

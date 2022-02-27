@@ -3,7 +3,6 @@
 namespace Jungi\FrameworkExtraBundle\DependencyInjection;
 
 use Jungi\FrameworkExtraBundle\Controller\ArgumentResolver\RequestBodyValueResolver;
-use Jungi\FrameworkExtraBundle\Http\ResponseFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -27,9 +26,6 @@ final class JungiFrameworkExtraExtension extends Extension
         if ($config['serializer'] && interface_exists(SerializerInterface::class)) {
             $loader->load('serializer.xml');
         }
-
-        $responseFactory = $container->getDefinition(ResponseFactory::class);
-        $responseFactory->replaceArgument(0, $config['default_content_type']);
 
         $requestBodyValueResolver = $container->getDefinition(RequestBodyValueResolver::class);
         $requestBodyValueResolver->replaceArgument(3, $config['default_content_type']);
