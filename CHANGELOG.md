@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `EntityResponse` - an HTTP response with an entity that is mapped to the selected content type using the content negotiation.
+
 ### Changed
 - Transition to PHP v8.0
 - Transition to Symfony v6.0

@@ -39,13 +39,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
 use Jungi\FrameworkExtraBundle\Attribute\RequestBody;
-use Jungi\FrameworkExtraBundle\Attribute\ResponseBody;
 use Jungi\FrameworkExtraBundle\Attribute\QueryParam;
 use Jungi\FrameworkExtraBundle\Attribute\RequestParam;
+use Jungi\FrameworkExtraBundle\Controller\ControllerTrait;
 
 #[Route('/users')]
 class UserController
 {
+    use ControllerTrait;
+
     #[Route('/{userId}/residential-address', methods: ['PATCH'])]
     public function changeResidentialAddress(string $userId, #[RequestBody] UserResidentialAddressData $data)
     {
@@ -71,12 +73,11 @@ class UserController
     }
 
     #[Route(methods: ['GET'])]
-    #[ResponseBody]
     public function filterUsers(#[QueryParams] FilterUsersDto $filterData)
     {
         // ..
         /** @var UserData[] $filteredUsers */
-        return $filteredUsers;
+        return $this->entity($filteredUsers);
     }
 }
 ```
