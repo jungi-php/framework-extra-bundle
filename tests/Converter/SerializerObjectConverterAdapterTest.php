@@ -2,7 +2,7 @@
 
 namespace Jungi\FrameworkExtraBundle\Tests\Converter;
 
-use Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter;
+use Jungi\FrameworkExtraBundle\Converter\SerializerConverterAdapter;
 use Jungi\FrameworkExtraBundle\Converter\TypeConversionException;
 use Jungi\FrameworkExtraBundle\Serializer\ObjectAlreadyOfTypeDenormalizer;
 use PHPUnit\Framework\TestCase;
@@ -18,20 +18,9 @@ use Symfony\Component\Serializer\Serializer;
 class SerializerObjectConverterAdapterTest extends TestCase
 {
     /** @test */
-    public function convertToSameType()
-    {
-        $converter = new SerializerObjectConverterAdapter(new DateTimeNormalizer());
-
-        $expected = new \DateTimeImmutable('1992-12-10 23:22:21');
-        $actual = $converter->convert(new \DateTimeImmutable('1992-12-10 23:22:21'), \DateTimeImmutable::class);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /** @test */
     public function convertStringToDate()
     {
-        $converter = new SerializerObjectConverterAdapter(new DateTimeNormalizer());
+        $converter = new SerializerConverterAdapter(new DateTimeNormalizer());
 
         $expected = new \DateTimeImmutable('1992-12-10 23:22:21');
         $actual = $converter->convert('1992-12-10 23:22:21', \DateTimeImmutable::class);
@@ -49,7 +38,7 @@ class SerializerObjectConverterAdapterTest extends TestCase
     {
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]));
+        $converter = new SerializerConverterAdapter(new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]));
 
         $expected = new FooDto('hello-world', true, new Number(123), array('foo' => 'bar'));
         $actual = $converter->convert(array(
@@ -67,7 +56,7 @@ class SerializerObjectConverterAdapterTest extends TestCase
     {
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(
+        $converter = new SerializerConverterAdapter(
             new Serializer([new PropertyNormalizer(null, null, $propertyInfo)]),
             ['disable_type_enforcement' => true]
         );
@@ -88,7 +77,7 @@ class SerializerObjectConverterAdapterTest extends TestCase
     {
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(
+        $converter = new SerializerConverterAdapter(
             new Serializer([
                 new ObjectAlreadyOfTypeDenormalizer(),
                 new PropertyNormalizer(null, null, $propertyInfo)
@@ -120,7 +109,7 @@ class SerializerObjectConverterAdapterTest extends TestCase
 
         $extractors = [new ReflectionExtractor()];
         $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
-        $converter = new SerializerObjectConverterAdapter(new Serializer(
+        $converter = new SerializerConverterAdapter(new Serializer(
             [new PropertyNormalizer(null, null, $propertyInfo)]),
             ['disable_type_enforcement' => true]
         );
@@ -138,7 +127,7 @@ class SerializerObjectConverterAdapterTest extends TestCase
     {
         $this->expectException(TypeConversionException::class);
 
-        $converter = new SerializerObjectConverterAdapter(new DateTimeNormalizer(), ['datetime_format' => '!Y-m-d']);
+        $converter = new SerializerConverterAdapter(new DateTimeNormalizer(), ['datetime_format' => '!Y-m-d']);
 
         $converter->convert('10-12-1992', \DateTimeImmutable::class);
     }

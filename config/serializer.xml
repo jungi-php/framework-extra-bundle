@@ -19,7 +19,7 @@
             <tag name="serializer.normalizer" priority="-915" />
             <!-- run before the serializer.normalizer.object -->
         </service>
-        <service id="Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter" class="Jungi\FrameworkExtraBundle\Converter\SerializerObjectConverterAdapter">
+        <service id="Jungi\FrameworkExtraBundle\Converter\SerializerConverterAdapter" class="Jungi\FrameworkExtraBundle\Converter\SerializerConverterAdapter">
             <tag name="jungi.converter" type="object" />
 
             <argument type="service" id="Symfony\Component\Serializer\Normalizer\DenormalizerInterface" />
