@@ -25,7 +25,7 @@ final class EntityResponseListenerTest extends TestCase
     }
 
     /** @test */
-    public function testContentIsNegotiated()
+    public function contentIsNegotiated()
     {
         $response = $this->createMock(EntityResponse::class);
         $response
@@ -43,7 +43,8 @@ final class EntityResponseListenerTest extends TestCase
         $listener->onKernelResponse($event);
     }
 
-    public function testContentIsNotNegotiatedForSubRequests()
+    /** @test */
+    public function contentIsNotNegotiatedForSubRequests()
     {
         $response = $this->createMock(EntityResponse::class);
         $response
