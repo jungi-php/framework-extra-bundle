@@ -60,7 +60,7 @@ class MediaTypeDescriptorTest extends TestCase
 
         $this->assertEquals('application', $descriptor->getType());
         $this->assertEquals('xml', $descriptor->getSubType());
-        $this->assertEquals('application/xml', $descriptor->toString());
+        $this->assertEquals('application/xml', (string) $descriptor);
         $this->assertTrue($descriptor->isSpecific());
         $this->assertFalse($descriptor->isRange());
 
@@ -68,7 +68,7 @@ class MediaTypeDescriptorTest extends TestCase
 
         $this->assertEquals('application', $descriptor->getType());
         $this->assertEquals('*', $descriptor->getSubType());
-        $this->assertEquals('application/*', $descriptor->toString());
+        $this->assertEquals('application/*', (string) $descriptor);
         $this->assertFalse($descriptor->isSpecific());
         $this->assertTrue($descriptor->isRange());
 
@@ -76,7 +76,7 @@ class MediaTypeDescriptorTest extends TestCase
 
         $this->assertEquals('*', $descriptor->getType());
         $this->assertEquals('*', $descriptor->getSubType());
-        $this->assertEquals('*/*', $descriptor->toString());
+        $this->assertEquals('*/*', (string) $descriptor);
         $this->assertFalse($descriptor->isSpecific());
         $this->assertTrue($descriptor->isRange());
     }

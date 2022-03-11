@@ -76,8 +76,8 @@ class EntityResponse extends Response
             throw new NotAcceptableMediaTypeException(MediaTypeDescriptor::listToString($acceptableMediaTypes), MediaTypeDescriptor::listToString($supportedMediaTypes), 'Could not select any content type for response.');
         }
 
-        $this->headers->set('Content-Type', $contentType->toString());
-        $this->setContent($messageBodyMapperManager->mapTo($this->entity, $contentType->toString()));
+        $this->headers->set('Content-Type', (string) $contentType);
+        $this->setContent($messageBodyMapperManager->mapTo($this->entity, (string) $contentType));
 
         parent::prepare($request);
 

@@ -47,7 +47,7 @@ final class MediaTypeDescriptor
 
     public static function listToString(array $mediaTypes): array
     {
-        return array_map(fn (self $descriptor) => $descriptor->toString(), $mediaTypes);
+        return array_map(fn (self $descriptor) => (string) $descriptor, $mediaTypes);
     }
 
     public function __construct(string $type, string $subType)
@@ -94,7 +94,7 @@ final class MediaTypeDescriptor
         return $this->subType;
     }
 
-    public function toString(): string
+    public function __toString(): string
     {
         return $this->type.self::SEPARATOR.$this->subType;
     }
