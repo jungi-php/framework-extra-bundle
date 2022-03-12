@@ -22,7 +22,7 @@ it fully delegates to the adapted denormalizer.
 - Annotations
 - Conversion of `array|object` types by `BuiltinTypeSafeConverter`.
 - Deprecated configuration option `entity_response.default_content_type`.
-- Attribute `ResponseBody`
+- Attribute `ResponseBody`, use `EntityResponse` instead.
 
 ## [1.4.2] - 2022-01-03
 
