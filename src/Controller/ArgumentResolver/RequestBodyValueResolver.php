@@ -102,7 +102,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         }
     }
 
-    private function convertToFile($resource, string $mediaType, string $type, ?string $filename): \SplFileInfo
+    private function convertToFile($resource, string $mediaType, string $type, ?string $filename): UploadedFile|File|\SplFileObject|\SplFileInfo
     {
         $tmpFile = TmpFileUtils::fromResource($resource);
 
