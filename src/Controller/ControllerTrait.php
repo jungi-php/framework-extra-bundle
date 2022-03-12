@@ -13,7 +13,7 @@ trait ControllerTrait
      * Returns an EntityResponse with the given entity that is mapped
      * to the selected content type using the content negotiation.
      */
-    public function entity(mixed $entity, int $status = 200, array $headers = []): EntityResponse
+    protected function entity(mixed $entity, int $status = 200, array $headers = []): EntityResponse
     {
         return new EntityResponse($entity, $status, $headers);
     }
