@@ -5,7 +5,6 @@ namespace Jungi\FrameworkExtraBundle\Controller\ArgumentResolver;
 use Jungi\FrameworkExtraBundle\Attribute\QueryParams;
 use Jungi\FrameworkExtraBundle\Converter\ConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
