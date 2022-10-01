@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueResolverInterface
 {
     protected static string $attributeClass;
-    
+
     private ConverterInterface $converter;
 
     public function __construct(ConverterInterface $converter)
