@@ -4,6 +4,7 @@
     "keywords": ["body", "param", "conversion", "mapper"],
     "type": "symfony-bundle",
     "license": "MIT",
+    "minimum-stability": "dev",
     "require": {
         "php": ">=8.0.2",
         "symfony/framework-bundle": "^6.0",
