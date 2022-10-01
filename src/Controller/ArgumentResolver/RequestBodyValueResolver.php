@@ -45,21 +45,25 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
         return (bool) $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
+        /** @var RequestBody|null $attribute */
+        $attribute = $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
+
+        if (null === $attribute) {
+            return [];
+        }
+
         if (!$argument->getType()) {
             throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request body conversion.', $argument->getName()));
         }
 
-        /** @var RequestBody $attribute */
-        $attribute = $argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)[0];
         $argumentType = $attribute->type() ?: $argument->getType();
 
         // when request parameters are available
         if ($parameters = array_replace_recursive($request->request->all(), $request->files->all())) {
             try {
-                yield $this->converter->convert($parameters, $argumentType);
-                return;
+                return [$this->converter->convert($parameters, $argumentType)];
             } catch (TypeConversionException $e) {
                 throw new BadRequestHttpException('Request body parameters are invalid.', $e);
             }
@@ -77,8 +81,7 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
                 throw new BadRequestHttpException('Request body cannot be empty.');
             }
 
-            yield $value;
-            return;
+            return [$value];
         }
 
         // file as the request body
@@ -90,12 +93,11 @@ final class RequestBodyValueResolver implements ArgumentValueResolverInterface
                 $filename = $contentDisposition->isInline() ? $contentDisposition->getFilename() : null;
             }
 
-            yield $this->convertToFile($request->getContent(true), $contentType, $argumentType, $filename);
-            return;
+            return [$this->convertToFile($request->getContent(true), $contentType, $argumentType, $filename)];
         }
 
         try {
-            yield $this->messageBodyMapperManager->mapFrom($request->getContent(), $contentType, $argumentType);
+            return [$this->messageBodyMapperManager->mapFrom($request->getContent(), $contentType, $argumentType)];
         } catch (MalformedDataException $e) {
             throw new BadRequestHttpException('Request body is malformed.', $e);
         }

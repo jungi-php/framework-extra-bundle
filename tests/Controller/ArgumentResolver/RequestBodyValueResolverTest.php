@@ -47,14 +47,15 @@ class RequestBodyValueResolverTest extends TestCase
      * @test
      * @dataProvider provideMappableTypes
      */
-    public function mapRequestBody(string $argumentType, ?string $annotatedAsType)
+    public function mapRequestBody(string $argumentType, ?string $annotatedAsType, mixed $value)
     {
         $converter = $this->createMock(ConverterInterface::class);
         $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
         $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
-            ->with('hello-world', 'application/vnd.jungi.test', $annotatedAsType ?: $argumentType);
+            ->with('hello-world', 'application/vnd.jungi.test', $annotatedAsType ?: $argumentType)
+            ->willReturn($value);
 
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
 
@@ -65,7 +66,10 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody($annotatedAsType)
         ]);
         
-        $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertSame($value, $values[0]);
     }
 
     /** @test */
@@ -85,7 +89,8 @@ class RequestBodyValueResolverTest extends TestCase
         $converter
             ->expects($this->once())
             ->method('convert')
-            ->with($expectedData, 'stdClass');
+            ->with($expectedData, 'stdClass')
+            ->willReturn(new \stdClass());
 
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
 
@@ -104,8 +109,11 @@ class RequestBodyValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new RequestBody()
         ]);
-        
-        $resolver->resolve($request, $argument)->current();
+
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertInstanceOf('stdClass', $values[0]);
     }
 
     /**
@@ -125,11 +133,11 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
 
-        /** @var \SplFileInfo $file */
-        $file = $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
 
-        $this->assertInstanceOf($type, $file);
-        $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
+        $this->assertCount(1, $values);
+        $this->assertInstanceOf($type, $values[0]);
+        $this->assertEquals('hello,world', $values[0]->openFile('r')->fread(32));
     }
 
     /** @test */
@@ -147,23 +155,22 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
 
-        /** @var UploadedFile $file */
-        $file = $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
 
-        $this->assertEquals('hello,world', $file->openFile('r')->fread(32));
-        $this->assertEquals('text/csv', $file->getClientMimeType());
-        $this->assertEquals('foo123.csv', $file->getClientOriginalName());
-        $this->assertEquals('csv', $file->getClientOriginalExtension());
-        $this->assertTrue($file->isValid());
-        $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
+        $this->assertCount(1, $values);
+        $this->assertEquals('hello,world', $values[0]->openFile('r')->fread(32));
+        $this->assertEquals('text/csv', $values[0]->getClientMimeType());
+        $this->assertEquals('foo123.csv', $values[0]->getClientOriginalName());
+        $this->assertEquals('csv', $values[0]->getClientOriginalExtension());
+        $this->assertTrue($values[0]->isValid());
+        $this->assertEquals(UPLOAD_ERR_OK, $values[0]->getError());
 
         $request->headers->set('Content-Disposition', 'attachment; filename = "foo123.csv"');
+        $values = $resolver->resolve($request, $argument);
 
-        /** @var UploadedFile $file */
-        $file = $resolver->resolve($request, $argument)->current();
-
-        $this->assertEmpty($file->getClientOriginalName());
-        $this->assertEmpty($file->getClientOriginalExtension());
+        $this->assertCount(1, $values);
+        $this->assertEmpty($values[0]->getClientOriginalName());
+        $this->assertEmpty($values[0]->getClientOriginalExtension());
     }
 
     /** @test */
@@ -174,7 +181,8 @@ class RequestBodyValueResolverTest extends TestCase
         $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
-            ->with('123', 'application/vnd.jungi.test', 'int');
+            ->with('123', 'application/vnd.jungi.test', 'int')
+            ->willReturn(123);
 
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter, 'application/vnd.jungi.test');
         $request = new Request([], [], [], [], [], [], '123');
@@ -182,7 +190,10 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
         
-        $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertEquals(123, $values[0]);
     }
 
     /** @test */
@@ -197,7 +208,10 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
 
-        $this->assertNull($resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertNull($values[0]);
     }
 
     /** @test */
@@ -207,7 +221,8 @@ class RequestBodyValueResolverTest extends TestCase
         $messageBodyMapperManager
             ->expects($this->once())
             ->method('mapFrom')
-            ->with('', 'application/vnd.jungi.test', 'string');
+            ->with('', 'application/vnd.jungi.test', 'string')
+            ->willReturnArgument(0);
 
         $converter = $this->createMock(ConverterInterface::class);
         $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
@@ -218,8 +233,32 @@ class RequestBodyValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('foo', 'string', false, false, null, true, [
             new RequestBody()
         ]);
-        
-        $resolver->resolve($request, $argument)->current();
+
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertSame('', $values[0]);
+    }
+
+    /** @test */
+    public function resolveForArgumentWithoutAttributeIsIgnored()
+    {
+        $messageBodyMapperManager = $this->createMock(MessageBodyMapperManager::class);
+        $messageBodyMapperManager
+            ->expects($this->never())
+            ->method('mapFrom');
+
+        $converter = $this->createMock(ConverterInterface::class);
+        $converter
+            ->expects($this->never())
+            ->method('convert');
+
+        $resolver = new RequestBodyValueResolver($messageBodyMapperManager, $converter);
+
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', 'string', false, false, null, false);
+
+        $this->assertEmpty($resolver->resolve($request, $argument));
     }
 
     /** @test */
@@ -237,7 +276,7 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
         
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -252,7 +291,10 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
 
-        $this->assertEquals(123, $resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertEquals(123, $values[0]);
     }
 
     /** @test */
@@ -270,7 +312,7 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
         
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -295,7 +337,7 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
         
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -320,7 +362,7 @@ class RequestBodyValueResolverTest extends TestCase
             new RequestBody()
         ]);
         
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     public function provideRegularFileClassTypes(): iterable
@@ -332,9 +374,9 @@ class RequestBodyValueResolverTest extends TestCase
 
     public function provideMappableTypes(): iterable
     {
-        yield ['string', null];
-        yield ['stdClass', null];
-        yield ['array', 'stdClass[]'];
-        yield ['array', 'string[]'];
+        yield ['string', null, 'hello-world'];
+        yield ['stdClass', null, new \stdClass()];
+        yield ['array', 'stdClass[]', []];
+        yield ['array', 'string[]', []];
     }
 }
