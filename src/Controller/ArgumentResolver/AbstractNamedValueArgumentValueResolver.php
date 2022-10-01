@@ -30,14 +30,19 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
         return (bool) $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
+        /** @var NamedValue|null $attribute */
+        $attribute = $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
+
+        if (null === $attribute) {
+            return [];
+        }
+
         if ($argument->isVariadic()) {
             throw new \InvalidArgumentException('Variadic arguments are not supported.');
         }
 
-        /** @var NamedValue $attribute */
-        $attribute = $argument->getAttributes(static::$attributeClass, ArgumentMetadata::IS_INSTANCEOF)[0];
         $namedValueArgument = new NamedValueArgument(
             $attribute->name() ?: $argument->getName(),
             $argument->getType(),
@@ -51,18 +56,18 @@ abstract class AbstractNamedValueArgumentValueResolver implements ArgumentValueR
 
         if (null === $value) {
             if ($argument->isNullable()) {
-                yield null; return;
+                return [null];
             }
 
             throw new BadRequestHttpException(sprintf('Argument "%s" cannot be found in the request.', $namedValueArgument->getName()));
         }
 
         if (null === $argument->getType()) {
-            yield $value; return;
+            return [$value];
         }
 
         try {
-            yield $this->converter->convert($value, $argument->getType());
+            return [$this->converter->convert($value, $argument->getType())];
         } catch (TypeConversionException $e) {
             throw new BadRequestHttpException(sprintf('Cannot convert named argument "%s".', $namedValueArgument->getName()), $e);
         }

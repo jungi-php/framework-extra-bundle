@@ -49,7 +49,8 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
         $converter
             ->expects($this->once())
             ->method('convert')
-            ->with('1992-12-10 23:23:23', \DateTimeImmutable::class);
+            ->with('1992-12-10 23:23:23', \DateTimeImmutable::class)
+            ->willReturn(new \DateTimeImmutable('1992-12-10 23:23:23'));
 
         $resolver = new DummyRequestAttributeValueResolver($converter);
 
@@ -60,7 +61,10 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute($parameterName)
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $values[0]);
     }
 
     /** @test */
@@ -79,7 +83,10 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute('foo')
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertEquals('bar', $values[0]);
     }
 
     /** @test */
@@ -101,7 +108,22 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute('foo')
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
+    }
+
+    /** @test */
+    public function resolveForArgumentWithoutAttributeIsIgnored()
+    {
+        $converter = $this->createMock(ConverterInterface::class);
+        $converter
+            ->expects($this->never())
+            ->method('convert');
+
+        $resolver = new DummyRequestAttributeValueResolver($converter);
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', null, false, false, null, false);
+
+        $this->assertEmpty($resolver->resolve($request, $argument));
     }
 
     /** @test */
@@ -117,7 +139,7 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute('foo')
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -133,7 +155,7 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute('foo')
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -146,7 +168,10 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute('foo')
         ]);
 
-        $this->assertNull($resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertNull($values[0]);
     }
 
     /** @test */
@@ -159,7 +184,10 @@ class AbstractNamedValueArgumentValueResolverTest extends TestCase
             new DummyRequestAttribute('foo')
         ]);
 
-        $this->assertEquals('bar', $resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertEquals('bar', $values[0]);
     }
 
     public function provideArgumentParameterNames(): iterable

@@ -35,7 +35,10 @@ class RequestHeaderValueResolverTest extends TestCase
             new RequestHeader('foo')
         ]);
 
-        $this->assertSame($value, $resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertSame($value, $values[0]);
     }
 
     public function provideArgumentValues(): iterable

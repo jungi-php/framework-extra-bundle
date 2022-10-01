@@ -28,7 +28,10 @@ class RequestParamValueResolverTest extends TestCase
             'foo' => 'bar'
         ]);
 
-        $this->assertEquals('bar', $resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertEquals('bar', $values[0]);
     }
 
     /** @test */
@@ -45,6 +48,9 @@ class RequestParamValueResolverTest extends TestCase
             'foo' => $expected
         ]);
 
-        $this->assertSame($expected, $resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+        
+        $this->assertCount(1, $values);
+        $this->assertSame($expected, $values[0]);
     }
 }

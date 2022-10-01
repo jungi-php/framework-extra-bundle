@@ -27,6 +27,9 @@ class QueryParamValueResolverTest extends TestCase
             new QueryParam()
         ]);
 
-        $this->assertEquals('bar', $resolver->resolve($request, $argument)->current());
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertEquals('bar', $values[0]);
     }
 }
