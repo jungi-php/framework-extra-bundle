@@ -44,14 +44,33 @@ class QueryParamsValueResolverTest extends TestCase
         $converter
             ->expects($this->once())
             ->method('convert')
-            ->with($request->query->all(), 'stdClass');
+            ->with($request->query->all(), 'stdClass')
+            ->willReturn(new \stdClass());
 
         $resolver = new QueryParamsValueResolver($converter);
         $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false, [
             new QueryParams()
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $values = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $values);
+        $this->assertInstanceOf('stdClass', $values[0]);
+    }
+
+    /** @test */
+    public function resolveForArgumentWithoutAttributeIsIgnored()
+    {
+        $converter = $this->createMock(ConverterInterface::class);
+        $converter
+            ->expects($this->never())
+            ->method('convert');
+
+        $resolver = new QueryParamsValueResolver($converter);
+        $request = new Request();
+        $argument = new ArgumentMetadata('foo', 'stdClass', false, false, null, false);
+
+        $this->assertEmpty($resolver->resolve($request, $argument));
     }
 
     /** @test */
@@ -67,7 +86,7 @@ class QueryParamsValueResolverTest extends TestCase
             new QueryParams()
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -83,7 +102,7 @@ class QueryParamsValueResolverTest extends TestCase
             new QueryParams()
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 
     /** @test */
@@ -99,6 +118,6 @@ class QueryParamsValueResolverTest extends TestCase
             new QueryParams()
         ]);
 
-        $resolver->resolve($request, $argument)->current();
+        $resolver->resolve($request, $argument);
     }
 }

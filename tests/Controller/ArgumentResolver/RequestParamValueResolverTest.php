@@ -49,7 +49,7 @@ class RequestParamValueResolverTest extends TestCase
         ]);
 
         $values = $resolver->resolve($request, $argument);
-        
+
         $this->assertCount(1, $values);
         $this->assertSame($expected, $values[0]);
     }

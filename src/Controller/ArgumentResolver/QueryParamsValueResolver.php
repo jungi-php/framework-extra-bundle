@@ -24,8 +24,12 @@ final class QueryParamsValueResolver implements ArgumentValueResolverInterface
         return (bool) $argument->getAttributes(QueryParams::class, ArgumentMetadata::IS_INSTANCEOF);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
+        if (!$argument->getAttributes(QueryParams::class, ArgumentMetadata::IS_INSTANCEOF)) {
+            return [];
+        }
+
         if (!$argument->getType()) {
             throw new \InvalidArgumentException(sprintf('Argument "%s" must have the type specified for the request query conversion.', $argument->getName()));
         }
@@ -36,6 +40,6 @@ final class QueryParamsValueResolver implements ArgumentValueResolverInterface
             throw new \InvalidArgumentException(sprintf('Argument "%s" must be of concrete class type for the request query conversion.', $argument->getName()));
         }
 
-        yield $this->converter->convert($request->query->all(), $argument->getType());
+        return [$this->converter->convert($request->query->all(), $argument->getType())];
     }
 }
