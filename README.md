@@ -16,11 +16,6 @@ Attributes:
 
 ## Installation
 
-Before you install, decide which version suits you the most.
-
-* `^2.0` (current) - for Symfony `^6.0` and PHP `>=8.0.2`
-* `^1.4` (maintained) - for Symfony `^5.3` and PHP `>=7.2.9`
-
 ```text
 composer require jungi/framework-extra-bundle
 ```
