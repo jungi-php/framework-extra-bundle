@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2022-12-07
+
 ### Changed
 - Adapted new `ValueResolverInterface` (6.2) in all value argument resolvers
 
@@ -105,7 +107,8 @@ it fully delegates to the adapted denormalizer.
 ### Deprecated
 - Config option "default_content_type" at "entity_response". Moved to the root node "jungi_framework_extra".
 
-[unreleased]: https://github.com/jungi-php/framework-extra-bundle/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/jungi-php/framework-extra-bundle/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/jungi-php/framework-extra-bundle/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/jungi-php/framework-extra-bundle/compare/v1.4.2...v2.0.0
 [1.4.2]: https://github.com/jungi-php/framework-extra-bundle/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/jungi-php/framework-extra-bundle/compare/v1.4.0...v1.4.1
