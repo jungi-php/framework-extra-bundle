@@ -17,6 +17,7 @@
     "require-dev": {
         "symfony/serializer": "^6.0",
         "symfony/property-info": "^6.0",
+        "symfony/property-access": "^6.0",
         "phpunit/phpunit": "^9.5",
         "friendsofphp/php-cs-fixer": "^3.11"
     },
