@@ -14,11 +14,9 @@ Attributes:
 * [`QueryParam`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#queryparam)
 * [`QueryParams`](https://piku235.gitbook.io/jungiframeworkextrabundle/attributes#queryparams)
 
-## Installation
+## Development
 
-```text
-composer require jungi/framework-extra-bundle
-```
+With the new release of Symfony v6.3 [mapping request data to typed objects](https://symfony.com/blog/new-in-symfony-6-3-mapping-request-data-to-typed-objects), the development and further need for this bundle has come to an end.
 
 ## Documentation
 
